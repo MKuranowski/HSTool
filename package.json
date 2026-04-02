@@ -1,0 +1,45 @@
+{
+    "name": "hstool-ui",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc -b && vite build",
+        "lint": "tsc --noEmit && eslint . --max-warnings 0 && prettier . --check",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@nanostores/persistent": "^1.3.3",
+        "@nanostores/react": "^1.1.0",
+        "@turf/turf": "^7.3.4",
+        "bootstrap": "^5.3.8",
+        "leaflet": "^1.9.4",
+        "nanostores": "^1.2.0",
+        "react": "^19.2.4",
+        "react-bootstrap": "^2.10.10",
+        "react-dom": "^19.2.4",
+        "react-leaflet": "^5.0.0",
+        "zod": "^4.3.6"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.39.4",
+        "@types/geojson": "^7946.0.16",
+        "@types/leaflet": "^1.9.21",
+        "@types/node": "^24.12.0",
+        "@types/react": "^19.2.14",
+        "@types/react-dom": "^19.2.3",
+        "@vitejs/plugin-react": "^6.0.1",
+        "eslint": "^9.39.4",
+        "eslint-plugin-react-dom": "^3.0.0",
+        "eslint-plugin-react-hooks": "^7.0.1",
+        "eslint-plugin-react-refresh": "^0.5.2",
+        "eslint-plugin-react-x": "^3.0.0",
+        "globals": "^17.4.0",
+        "prettier": "^3.8.1",
+        "sass": "^1.98.0",
+        "typescript": "~5.9.3",
+        "typescript-eslint": "^8.57.0",
+        "vite": "^8.0.1"
+    }
+}

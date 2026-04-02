@@ -1,0 +1,45 @@
+// SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+import { MapContainer, TileLayer } from "react-leaflet";
+import * as L from "leaflet";
+import { useEffect, useMemo, useState } from "react";
+import { useStore } from "@nanostores/react";
+import { $preset } from "../model/state";
+import type { PropertiesWithName } from "../model/schema";
+
+let stationsLayer: L.Layer | null = null;
+
+export default function Map() {
+    const [map, setMap] = useState<L.Map | null>(null);
+    const preset = useStore($preset);
+
+    const displayMap = useMemo(
+        () => (
+            <MapContainer center={[52.2, 21.0]} zoom={13} className="map" ref={setMap}>
+                <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+            </MapContainer>
+        ),
+        [],
+    );
+
+    useEffect(() => {
+        if (!map) return;
+
+        const newLayer = L.geoJSON(preset.stations, {
+            pointToLayer(f, latlng) {
+                const m = L.circleMarker(latlng, { radius: 5 });
+                m.bindPopup((f.properties as PropertiesWithName).name);
+                return m;
+            },
+        });
+
+        if (stationsLayer) stationsLayer.removeFrom(map);
+        stationsLayer = newLayer.addTo(map);
+    }, [map, preset]);
+
+    return displayMap;
+}

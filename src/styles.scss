@@ -1,0 +1,20 @@
+@import "bootstrap/scss/bootstrap";
+@import "leaflet/dist/leaflet.css";
+
+.map {
+    height: 90svh;
+}
+
+.tab-content {
+    margin-top: $spacer;
+}
+
+.toast-header > .btn-close {
+    margin-left: auto;
+}
+
+@include media-breakpoint-up(md) {
+    .map {
+        height: 98svh;
+    }
+}
