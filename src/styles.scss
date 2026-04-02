@@ -2,7 +2,7 @@
 @import "leaflet/dist/leaflet.css";
 
 .map {
-    height: 90svh;
+    height: 85vh;
 }
 
 .tab-content {
@@ -13,8 +13,23 @@
     margin-left: auto;
 }
 
-@include media-breakpoint-up(md) {
+@include media-breakpoint-up(lg) {
     .map {
-        height: 98svh;
+        height: 98vh;
+    }
+
+    .tabs {
+        display: flex;
+        flex-direction: column;
+        height: 98vh;
+    }
+
+    .nav-tabs {
+        flex: 0 1 auto;
+    }
+
+    .tab-content {
+        flex: 1 1 auto;
+        overflow: auto;
     }
 }

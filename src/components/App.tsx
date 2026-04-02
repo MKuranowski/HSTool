@@ -13,10 +13,10 @@ function App() {
             <ToastManager />
             <Container fluid>
                 <Row className="my-1 gy-1">
-                    <Col md={8}>
+                    <Col lg={8}>
                         <Map />
                     </Col>
-                    <Col md={4}>
+                    <Col lg={4} className="tabs">
                         <Tabs defaultActiveKey="questions">
                             <Tab eventKey="questions" title="Questions">
                                 Lorem ipsum dolor sit amet.
