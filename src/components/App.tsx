@@ -5,6 +5,7 @@ import { Col, Container, Row, Tab, Tabs } from "react-bootstrap";
 import Map from "./Map";
 import Settings from "./Settings";
 import ToastManager from "./ToastManager";
+import Stations from "./Stations";
 
 function App() {
     return (
@@ -21,7 +22,7 @@ function App() {
                                 Lorem ipsum dolor sit amet.
                             </Tab>
                             <Tab eventKey="stations" title="Stations">
-                                Lorem ipsum dolor sit amet.
+                                <Stations />
                             </Tab>
                             <Tab eventKey="settings" title="Settings">
                                 <Settings />
