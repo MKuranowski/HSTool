@@ -5,14 +5,16 @@ import { MapContainer, TileLayer } from "react-leaflet";
 import * as L from "leaflet";
 import { useEffect, useMemo, useState } from "react";
 import { useStore } from "@nanostores/react";
-import { $preset } from "../model/state";
+import { $eliminatedQuestions, $preset } from "../model/state";
 import type { PropertiesWithName } from "../model/schema";
+import * as record from "../helper/record";
 
 let stationsLayer: L.Layer | null = null;
 
 export default function Map() {
     const [map, setMap] = useState<L.Map | null>(null);
     const preset = useStore($preset);
+    const eliminatedStations = useStore($eliminatedQuestions);
 
     const displayMap = useMemo(
         () => (
@@ -30,6 +32,13 @@ export default function Map() {
         if (!map) return;
 
         const newLayer = L.geoJSON(preset.stations, {
+            filter(f) {
+                return !record.contains(
+                    eliminatedStations,
+                    (f.properties as PropertiesWithName).id,
+                );
+            },
+
             pointToLayer(f, latlng) {
                 const m = L.circleMarker(latlng, { radius: 5 });
                 m.bindPopup((f.properties as PropertiesWithName).name);
@@ -39,7 +48,7 @@ export default function Map() {
 
         if (stationsLayer) stationsLayer.removeFrom(map);
         stationsLayer = newLayer.addTo(map);
-    }, [map, preset]);
+    }, [eliminatedStations, map, preset]);
 
     return displayMap;
 }
