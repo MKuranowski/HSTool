@@ -9,6 +9,7 @@ HSTool is a single-page application written using React, Bootstrap, Leaflet and 
 [pnpm](https://pnpm.io/) is required to build and develop the application.
 
 * `pnpm dev` starts the application in development mode with hot reload,
+* `pnpm test` runs unit tests,
 * `pnpm lint` checks the code,
 * `pnpm build` builds the application in release mode for distribution under the `dist` folder.
 
