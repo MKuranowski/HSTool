@@ -244,7 +244,7 @@ export class TentaclesQuestion extends Question<string> {
     candidates: FeatureCollection<Point, Properties>;
     #radius: number;
     #seeker: Position;
-    #voronoi: FeatureCollection<Polygon | MultiPolygon, Properties>;
+    #viableCandidates: FeatureCollection<Point, Properties>;
 
     constructor(
         presetName: string,
@@ -257,45 +257,12 @@ export class TentaclesQuestion extends Question<string> {
         this.candidates = candidates;
         this.#radius = radius;
         this.#seeker = seeker;
-        this.#voronoi = this.calculateVoronoi();
+        this.#viableCandidates = this.calculateViableCandidates();
     }
 
-    private calculateVoronoi(): FeatureCollection<Polygon | MultiPolygon, Properties> {
-        const circle = turf.buffer(turf.point(this.#seeker), this.#radius);
-        if (circle === undefined) throw new Error("turf.buffer: undefined around seeker location");
-
-        const viableCandidates = turf.featureCollection(
-            this.candidates.features.filter((f) => turf.distance(f, this.#seeker) < this.#radius),
-        );
-
-        const voronoi = turf.toWgs84(
-            turf.voronoi(turf.toMercator(viableCandidates), {
-                bbox: turf.bbox(turf.toMercator(circle)),
-            }),
-        );
-
-        if (voronoi.features.length !== viableCandidates.features.length)
-            throw new Error(
-                `turf.voronoi: from ${viableCandidates.features.length.toFixed()} features ` +
-                    `gave only ${voronoi.features.length.toFixed()} areas`,
-            );
-
+    private calculateViableCandidates(): FeatureCollection<Point, Properties> {
         return turf.featureCollection(
-            voronoi.features
-                .map((voronoiArea, i) => {
-                    const point = viableCandidates.features[i];
-
-                    if (!turf.booleanContains(voronoiArea, point))
-                        throw new Error(
-                            `turf.voronoi: area at index ${i.toFixed(0)} ` +
-                                "does not contain feature from the same index",
-                        );
-
-                    return turf.intersect(turf.featureCollection([voronoiArea, circle]), {
-                        properties: point.properties,
-                    });
-                })
-                .filter((f) => f !== null),
+            this.candidates.features.filter((f) => turf.distance(f, this.#seeker) < this.#radius),
         );
     }
 
@@ -313,7 +280,7 @@ export class TentaclesQuestion extends Question<string> {
 
     set seeker(pos: Position) {
         this.#seeker = pos;
-        this.#voronoi = this.calculateVoronoi();
+        this.#viableCandidates = this.calculateViableCandidates();
     }
 
     get radius(): number {
@@ -322,29 +289,33 @@ export class TentaclesQuestion extends Question<string> {
 
     set radius(r: number) {
         this.#radius = r;
-        this.#voronoi = this.calculateVoronoi();
+        this.#viableCandidates = this.calculateViableCandidates();
     }
 
-    get voronoi(): FeatureCollection<Polygon | MultiPolygon, Properties> {
-        return this.#voronoi;
+    get viableCandidates(): FeatureCollection<Point, Properties> {
+        return this.#viableCandidates;
     }
 
     categorizePoint(pos: Position, tolerance: number): string {
-        const matches: string[] = [];
+        // Shortcut - without any viable candidates, no non-nil answer is possible
+        if (this.#viableCandidates.features.length === 0) return "(nil)";
+
+        // Check if miss is the only possible outcome
+        const distanceToRoot = turf.distance(pos, this.#seeker);
+        if (distanceToRoot > this.#radius + tolerance) return "(nil)";
 
         // Check if miss is possible
-        if (turf.distance(pos, this.#seeker) + tolerance > this.#radius) {
-            matches.push("(nil)");
-        }
+        const matches: string[] = [];
+        if (distanceToRoot >= this.#radius - tolerance) matches.push("(nil)");
 
-        // Add matches if the circle around provided position intersects the area determined
-        // by the voronoi diagram
-        const posBuffer = tolerance > 0 ? turf.circle(turf.point(pos), tolerance) : turf.point(pos);
-        for (const area of this.#voronoi.features) {
-            if (turf.booleanIntersects(area, posBuffer)) {
-                matches.push(area.properties.id);
-            }
-        }
+        // Check which candidates could be returned
+        const distances = this.#viableCandidates.features.map((c) => turf.distance(pos, c));
+        const closest = Math.min(...distances);
+        matches.push(
+            ...this.#viableCandidates.features
+                .map((c) => c.properties.id)
+                .filter((_, i) => distances[i] <= closest + tolerance),
+        );
 
         return matches.join(";");
     }
