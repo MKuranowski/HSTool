@@ -1,6 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+/**
+ * Converts anything to its string representation, by calling its `toString` method.
+ * Also handle the sole 2 primitive values (null, undefined) that don't have toString.
+ */
 export function toString(obj: unknown): string {
     if (obj === null) {
         return "null";
