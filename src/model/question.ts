@@ -18,6 +18,11 @@ export interface Properties {
     [name: string]: unknown;
 }
 
+export interface NearestPointProperties extends Properties {
+    featureIndex: number;
+    distanceToPoint: number;
+}
+
 export type QuestionKind = "match" | "measure" | "radar" | "thermometer" | "tentacles" | "custom";
 
 export abstract class Question<Answer extends string | null = string | null> {
@@ -95,7 +100,7 @@ export class MatchPointQuestion extends BinaryDistanceQuestion<"hit", "miss"> {
     candidates: FeatureCollection<Point, Properties>;
 
     #seeker: Position;
-    #closest: Feature<Point, Properties & { distanceToPoint: number }>;
+    #closest: Feature<Point, NearestPointProperties>;
 
     constructor(
         presetName: string,
@@ -126,12 +131,15 @@ export class MatchPointQuestion extends BinaryDistanceQuestion<"hit", "miss"> {
         this.#closest = turf.nearestPoint(pos, this.candidates);
     }
 
-    get closest(): Feature<Point, Properties & { distanceToPoint: number }> {
+    get closest(): Feature<Point, NearestPointProperties> {
         return this.#closest;
     }
 
     calculateDistanceDelta(pos: Position): number {
-        return turf.distance(this.#closest, pos) - this.#closest.properties.distanceToPoint;
+        const distances = this.candidates.features.map((c) => turf.distance(pos, c));
+        const [distanceToMatched] = distances.splice(this.#closest.properties.featureIndex, 1);
+        const distanceToOther = Math.min(...distances);
+        return distanceToMatched - distanceToOther;
     }
 }
 
@@ -227,7 +235,7 @@ export class ThermometerQuestion extends BinaryDistanceQuestion<"colder", "hotte
     }
 
     calculateDistanceDelta(pos: Position): number {
-        return turf.distance(pos, this.end) - turf.distance(pos, this.start);
+        return turf.distance(pos, this.start) - turf.distance(pos, this.end);
     }
 }
 
