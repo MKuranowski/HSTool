@@ -10,7 +10,7 @@ import {
     RadarQuestion,
     TentaclesQuestion,
     ThermometerQuestion,
-} from "./question";
+} from "./index";
 import type { Position } from "geojson";
 
 /** Mock question root A, 12.076 km from root B, EPWA airport */
@@ -131,8 +131,8 @@ test(TentaclesQuestion, () => {
             turf.point(candidateB, { id: "B" }),
             turf.point(candidateC, { id: "C" }),
         ]),
-        2.0,
         root,
+        2.0,
     );
 
     const miss = translate(root, 3, 0);
