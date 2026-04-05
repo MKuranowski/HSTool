@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import type { FeatureCollection, LineString, Point, Position } from "geojson";
-import { BinaryDistanceQuestion } from "./binary";
-import type { PropertiesWithID } from "../schema";
 import { distanceToFeature } from "../../helper/geo";
+import type { PropertiesWithID } from "../schema";
+import { BinaryDistanceQuestion } from "./binary";
 
 export class MeasureQuestion extends BinaryDistanceQuestion<"closer", "further"> {
     presetName: string;

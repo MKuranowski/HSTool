@@ -6,6 +6,7 @@ import tseslint from "typescript-eslint";
 import { defineConfig, globalIgnores } from "eslint/config";
 import reactX from "eslint-plugin-react-x";
 import reactDom from "eslint-plugin-react-dom";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
 
 export default defineConfig([
     globalIgnores(["dist"]),
@@ -26,6 +27,13 @@ export default defineConfig([
                 project: ["./tsconfig.node.json", "./tsconfig.app.json"],
                 tsconfigRootDir: import.meta.dirname,
             },
+        },
+        plugins: {
+            "simple-import-sort": simpleImportSort,
+        },
+        rules: {
+            "simple-import-sort/imports": ["error", { groups: [["^\\u0000", "^node:", "^@?\\w", "^", "^\\."]] }],
+            "simple-import-sort/exports": "error",
         },
     },
 ]);

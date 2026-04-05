@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { expect, test } from "vitest";
 import * as turf from "@turf/turf";
+import type { Position } from "geojson";
+import { expect, test } from "vitest";
 import {
     MatchAreaQuestion,
     MatchPointQuestion,
@@ -11,7 +12,6 @@ import {
     TentaclesQuestion,
     ThermometerQuestion,
 } from "./index";
-import type { Position } from "geojson";
 
 /** Mock question root A, 12.076 km from root B, EPWA airport */
 const rootA = [20.974356, 52.168667];

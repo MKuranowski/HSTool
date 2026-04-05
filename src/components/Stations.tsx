@@ -2,15 +2,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { useStore } from "@nanostores/react";
+import type { Feature, Point } from "geojson";
+import { Button, ButtonGroup, ListGroup } from "react-bootstrap";
+import * as record from "../helper/record";
+import type { PropertiesWithName } from "../model/schema";
 import {
     $automaticallyEliminatedQuestions,
     $manuallyEliminatedQuestions,
     $preset,
 } from "../model/state";
-import { Button, ButtonGroup, ListGroup } from "react-bootstrap";
-import type { Feature, Point } from "geojson";
-import type { PropertiesWithName } from "../model/schema";
-import * as record from "../helper/record";
 
 function Station({
     station,

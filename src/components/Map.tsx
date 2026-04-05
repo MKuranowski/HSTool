@@ -1,13 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { MapContainer, TileLayer } from "react-leaflet";
+import { useStore } from "@nanostores/react";
 import * as L from "leaflet";
 import { useEffect, useMemo, useState } from "react";
-import { useStore } from "@nanostores/react";
-import { $eliminatedQuestions, $preset } from "../model/state";
-import type { PropertiesWithName } from "../model/schema";
+import { MapContainer, TileLayer } from "react-leaflet";
 import * as record from "../helper/record";
+import type { PropertiesWithName } from "../model/schema";
+import { $eliminatedQuestions, $preset } from "../model/state";
 
 let stationsLayer: L.Layer | null = null;
 

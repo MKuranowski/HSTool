@@ -4,8 +4,8 @@
 import { Col, Container, Row, Tab, Tabs } from "react-bootstrap";
 import Map from "./Map";
 import Settings from "./Settings";
-import ToastManager from "./ToastManager";
 import Stations from "./Stations";
+import ToastManager from "./ToastManager";
 
 function App() {
     return (

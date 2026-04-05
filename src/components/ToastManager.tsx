@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { useStore } from "@nanostores/react";
-import { $toast } from "../model/state";
 import { Toast, ToastContainer } from "react-bootstrap";
+import { $toast } from "../model/state";
 
 export default function ToastManager() {
     const content = useStore($toast);

@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import "./styles.scss";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./styles.scss";
 import App from "./components/App.tsx";
 
 const root = document.getElementById("root");

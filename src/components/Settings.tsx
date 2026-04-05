@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { useStore } from "@nanostores/react";
-import { $preset, $toast } from "../model/state";
 import { Button, ListGroup } from "react-bootstrap";
-import * as schema from "../model/schema";
 import { toString } from "../helper/strings";
+import * as schema from "../model/schema";
+import { $preset, $toast } from "../model/state";
 
 function onPresetPaste(): void {
     navigator.clipboard

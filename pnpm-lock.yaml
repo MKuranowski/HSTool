@@ -78,6 +78,9 @@ importers:
       eslint-plugin-react-x:
         specifier: ^3.0.0
         version: 3.0.0(eslint@9.39.4)(typescript@5.9.3)
+      eslint-plugin-simple-import-sort:
+        specifier: ^12.1.1
+        version: 12.1.1(eslint@9.39.4)
       globals:
         specifier: ^17.4.0
         version: 17.4.0
@@ -1211,6 +1214,11 @@ packages:
     peerDependencies:
       eslint: ^10.0.0
       typescript: '*'
+
+  eslint-plugin-simple-import-sort@12.1.1:
+    resolution: {integrity: sha512-6nuzu4xwQtE3332Uz0to+TxDQYRLTKRESSc2hefVT48Zc8JthmN23Gx9lnYhu0FtkRSL1oxny3kJ2aveVhmOVA==}
+    peerDependencies:
+      eslint: '>=5.0.0'
 
   eslint-scope@8.4.0:
     resolution: {integrity: sha512-sNXOfKCn74rt8RICKMvJS7XKV/Xk9kA7DyJr8mJik3S7Cwgy3qlkkmyS2uQB3jiJg6VNdZd/pDBJu0nvG2NlTg==}
@@ -3832,6 +3840,10 @@ snapshots:
       typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
+
+  eslint-plugin-simple-import-sort@12.1.1(eslint@9.39.4):
+    dependencies:
+      eslint: 9.39.4
 
   eslint-scope@8.4.0:
     dependencies:

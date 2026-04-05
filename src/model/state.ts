@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { atom, onSet, batched } from "nanostores";
 import { persistentJSON } from "@nanostores/persistent";
-import { type Preset } from "./schema";
-import { Question } from "./question";
+import { atom, batched, onSet } from "nanostores";
 import * as record from "../helper/record";
+import { Question } from "./question";
+import { type Preset } from "./schema";
 
 export const $preset = persistentJSON<Preset>("preset", {
     name: "Empty",

@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import type { Feature, LineString, MultiPolygon, Point, Polygon, Position } from "geojson";
 import * as turf from "@turf/turf";
+import type { Feature, LineString, MultiPolygon, Point, Polygon, Position } from "geojson";
 
 /**
  * Calculates the distance from a Position to any other Feature.

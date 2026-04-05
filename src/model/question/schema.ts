@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import * as z from "zod";
 import {
     anyPolygon,
     feature,
@@ -11,7 +12,6 @@ import {
     withID,
 } from "../schema";
 import { CustomQuestion } from "./custom";
-import * as z from "zod";
 import { MatchAreaQuestion } from "./matchArea";
 import { MatchPointQuestion } from "./matchPoint";
 import { MeasureQuestion } from "./measure";

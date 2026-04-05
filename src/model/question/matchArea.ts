@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import type { Feature, MultiPolygon, Polygon, Position } from "geojson";
-import { BinaryDistanceQuestion } from "./binary";
-import type { PropertiesWithID } from "../schema";
 import * as turf from "@turf/turf";
+import type { Feature, MultiPolygon, Polygon, Position } from "geojson";
+import type { PropertiesWithID } from "../schema";
+import { BinaryDistanceQuestion } from "./binary";
 
 export class MatchAreaQuestion extends BinaryDistanceQuestion<"hit", "miss"> {
     area: Feature<Polygon | MultiPolygon, PropertiesWithID>;

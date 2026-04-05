@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { question as schema } from "./schema";
 import { expect, test } from "vitest";
 import zodJson from "../../helper/zodJson";
 import { RadarQuestion } from "./radar";
+import { question as schema } from "./schema";
 import { ThermometerQuestion } from "./thermometer";
 
 const jsonSchema = zodJson(schema);

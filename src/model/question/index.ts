@@ -7,6 +7,6 @@ export { MatchAreaQuestion } from "./matchArea";
 export { MatchPointQuestion } from "./matchPoint";
 export { MeasureQuestion } from "./measure";
 export { RadarQuestion } from "./radar";
+export { question as schema, type SerializableQuestion } from "./schema";
 export { TentaclesQuestion } from "./tentacles";
 export { ThermometerQuestion } from "./thermometer";
-export { question as schema, type SerializableQuestion } from "./schema";

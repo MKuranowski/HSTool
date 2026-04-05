@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import type { FeatureCollection, Point, Position } from "geojson";
-import { Question } from "./base";
 import * as turf from "@turf/turf";
+import type { FeatureCollection, Point, Position } from "geojson";
 import type { PropertiesWithID } from "../schema";
+import { Question } from "./base";
 
 export class TentaclesQuestion extends Question<string> {
     presetName: string;

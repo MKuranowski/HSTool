@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import * as turf from "@turf/turf";
 import type { Position } from "geojson";
 import { BinaryDistanceQuestion } from "./binary";
-import * as turf from "@turf/turf";
 
 export class ThermometerQuestion extends BinaryDistanceQuestion<"colder", "hotter"> {
     start: Position;
