@@ -9,3 +9,4 @@ export { MeasureQuestion } from "./measure";
 export { RadarQuestion } from "./radar";
 export { TentaclesQuestion } from "./tentacles";
 export { ThermometerQuestion } from "./thermometer";
+export { question as schema } from "./schema";
