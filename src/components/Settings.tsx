@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { useStore } from "@nanostores/react";
+import { useValue } from "@legendapp/state/react";
 import { Button, ListGroup } from "react-bootstrap";
 import { toString } from "../helper/strings";
 import * as schema from "../model/schema";
@@ -24,12 +24,12 @@ function onPresetPaste(): void {
 }
 
 export default function Settings() {
-    const preset = useStore($preset);
+    const presetName = useValue($preset.name);
 
     return (
         <ListGroup>
             <ListGroup.Item className="d-flex align-items-center">
-                <span className="flex-fill">Current preset: {preset.name}</span>
+                <span className="flex-fill">Current preset: {presetName}</span>
                 <Button variant="primary" onClick={onPresetPaste}>
                     Paste
                 </Button>

@@ -1,12 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { useStore } from "@nanostores/react";
+import { useValue } from "@legendapp/state/react";
 import { Toast, ToastContainer } from "react-bootstrap";
 import { $toast } from "../model/state";
 
 export default function ToastManager() {
-    const content = useStore($toast);
+    const content = useValue($toast);
     const element =
         content !== null ? (
             <Toast

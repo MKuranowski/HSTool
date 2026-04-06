@@ -1,20 +1,19 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { useStore } from "@nanostores/react";
+import { useValue } from "@legendapp/state/react";
 import * as L from "leaflet";
 import { useEffect, useMemo, useState } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
-import * as record from "../helper/record";
 import type { PropertiesWithName } from "../model/schema";
-import { $eliminatedQuestions, $preset } from "../model/state";
+import { $disabledStations, $preset } from "../model/state";
 
 let stationsLayer: L.Layer | null = null;
 
 export default function Map() {
     const [map, setMap] = useState<L.Map | null>(null);
-    const preset = useStore($preset);
-    const eliminatedStations = useStore($eliminatedQuestions);
+    const stations = useValue($preset.stations);
+    const disabledStations = useValue($disabledStations);
 
     const displayMap = useMemo(
         () => (
@@ -31,24 +30,23 @@ export default function Map() {
     useEffect(() => {
         if (!map) return;
 
-        const newLayer = L.geoJSON(preset.stations, {
+        const newLayer = L.geoJSON(stations, {
             filter(f) {
-                return !record.contains(
-                    eliminatedStations,
-                    (f.properties as PropertiesWithName).id,
-                );
+                const id = (f.properties as PropertiesWithName).id;
+                return !Object.hasOwn(disabledStations, id);
             },
 
             pointToLayer(f, latlng) {
                 const m = L.circleMarker(latlng, { radius: 5 });
-                m.bindPopup((f.properties as PropertiesWithName).name);
+                const name = (f.properties as PropertiesWithName).name;
+                m.bindPopup(name);
                 return m;
             },
         });
 
         if (stationsLayer) stationsLayer.removeFrom(map);
         stationsLayer = newLayer.addTo(map);
-    }, [eliminatedStations, map, preset]);
+    }, [map, stations, disabledStations]);
 
     return displayMap;
 }
