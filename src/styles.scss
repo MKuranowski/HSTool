@@ -17,6 +17,10 @@
     margin-left: auto;
 }
 
+.toast-body {
+    white-space: pre-line;
+}
+
 @include media-breakpoint-up(lg) {
     .map {
         height: 98vh;

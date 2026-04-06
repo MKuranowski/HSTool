@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import * as z from "zod";
+
 /**
  * Converts anything to its string representation, by calling its `toString` method.
  * Also handle the sole 2 primitive values (null, undefined) that don't have toString.
@@ -10,6 +12,8 @@ export function toString(obj: unknown): string {
         return "null";
     } else if (obj === undefined) {
         return "undefined";
+    } else if (obj instanceof z.ZodError) {
+        return `ZodError:\n${z.prettifyError(obj)}`;
     } else {
         // eslint-disable-next-line @typescript-eslint/no-base-to-string
         return obj.toString();
