@@ -3,6 +3,7 @@
 
 import { Col, Container, Row, Tab, Tabs } from "react-bootstrap";
 import Map from "./Map";
+import Questions from "./Questions";
 import Settings from "./Settings";
 import Stations from "./Stations";
 import ToastManager from "./ToastManager";
@@ -19,7 +20,7 @@ function App() {
                     <Col lg={4} className="tabs">
                         <Tabs defaultActiveKey="questions">
                             <Tab eventKey="questions" title="Questions">
-                                Lorem ipsum dolor sit amet.
+                                <Questions />
                             </Tab>
                             <Tab eventKey="stations" title="Stations">
                                 <Stations />

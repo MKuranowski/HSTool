@@ -167,4 +167,4 @@ export const question = z.discriminatedUnion("kind", [
     thermometerQuestion,
 ]);
 
-export type SerializableQuestion = ReturnType<typeof question.parse>;
+export type SerializableQuestion = z.output<typeof question>;

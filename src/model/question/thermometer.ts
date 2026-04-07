@@ -27,4 +27,9 @@ export class ThermometerQuestion extends BinaryDistanceQuestion<"colder", "hotte
     calculateDistanceDelta(pos: Position): number {
         return turf.distance(pos, this.start) - turf.distance(pos, this.end);
     }
+
+    static empty(seeker: Position): ThermometerQuestion {
+        const end = turf.transformTranslate(turf.point(seeker), 1, 90).geometry.coordinates;
+        return new ThermometerQuestion(seeker, end);
+    }
 }

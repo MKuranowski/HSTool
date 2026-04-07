@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import * as turf from "@turf/turf";
 import type { FeatureCollection, LineString, Point, Position } from "geojson";
 import { distanceToFeature } from "../../helper/geo";
 import type { PropertiesWithID } from "../schema";
@@ -52,5 +53,9 @@ export class MeasureQuestion extends BinaryDistanceQuestion<"closer", "further">
             ...this.candidates.features.map((f) => distanceToFeature(pos, f)),
         );
         return distance - this.#distance;
+    }
+
+    static empty(seeker: Position): MeasureQuestion {
+        return new MeasureQuestion("Empty", turf.featureCollection([]), seeker);
     }
 }

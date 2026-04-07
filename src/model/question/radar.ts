@@ -26,4 +26,8 @@ export class RadarQuestion extends BinaryDistanceQuestion<"hit", "miss"> {
     calculateDistanceDelta(pos: Position): number {
         return turf.distance(pos, this.seeker) - this.radius;
     }
+
+    static empty(seeker: Position): RadarQuestion {
+        return new RadarQuestion(seeker, 5);
+    }
 }

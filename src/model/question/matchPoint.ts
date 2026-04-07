@@ -16,7 +16,7 @@ export class MatchPointQuestion extends BinaryDistanceQuestion<"hit", "miss"> {
     candidates: FeatureCollection<Point, PropertiesWithID>;
 
     #seeker: Position;
-    #closest: Feature<Point, NearestPointProperties>;
+    #closest: Feature<Point, NearestPointProperties> | null;
 
     constructor(
         presetName: string,
@@ -27,7 +27,10 @@ export class MatchPointQuestion extends BinaryDistanceQuestion<"hit", "miss"> {
         this.presetName = presetName;
         this.candidates = candidates;
         this.#seeker = seeker;
-        this.#closest = turf.nearestPoint(seeker, this.candidates);
+        this.#closest =
+            this.candidates.features.length === 0
+                ? null
+                : turf.nearestPoint(seeker, this.candidates);
     }
 
     get kind(): "match-point" {
@@ -44,17 +47,23 @@ export class MatchPointQuestion extends BinaryDistanceQuestion<"hit", "miss"> {
 
     set seeker(pos: Position) {
         this.#seeker = pos;
-        this.#closest = turf.nearestPoint(pos, this.candidates);
+        this.#closest =
+            this.candidates.features.length === 0 ? null : turf.nearestPoint(pos, this.candidates);
     }
 
-    get closest(): Feature<Point, NearestPointProperties> {
+    get closest(): Feature<Point, NearestPointProperties> | null {
         return this.#closest;
     }
 
     calculateDistanceDelta(pos: Position): number {
+        if (this.#closest === null) return Number.POSITIVE_INFINITY;
         const distances = this.candidates.features.map((c) => turf.distance(pos, c));
         const [distanceToMatched] = distances.splice(this.#closest.properties.featureIndex, 1);
         const distanceToOther = Math.min(...distances);
         return distanceToMatched - distanceToOther;
+    }
+
+    static empty(seeker: Position): MatchPointQuestion {
+        return new MatchPointQuestion("Empty", turf.featureCollection([]), seeker);
     }
 }

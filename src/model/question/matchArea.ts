@@ -25,4 +25,26 @@ export class MatchAreaQuestion extends BinaryDistanceQuestion<"hit", "miss"> {
     calculateDistanceDelta(pos: Position): number {
         return turf.pointToPolygonDistance(pos, this.area);
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    static empty(_pos: Position): MatchAreaQuestion {
+        return new MatchAreaQuestion({
+            type: "Feature",
+            geometry: {
+                type: "Polygon",
+                coordinates: [
+                    [
+                        [0, 0],
+                        [0, 0],
+                        [0, 0],
+                        [0, 0],
+                    ],
+                ],
+            },
+            properties: {
+                id: "empty",
+                name: "Empty",
+            },
+        });
+    }
 }

@@ -20,4 +20,9 @@ export class CustomQuestion extends Question<null> {
     categorizePoint(_pos: Position, _tolerance: number): null {
         return null;
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    static empty(_seeker: Position): CustomQuestion {
+        return new CustomQuestion("Custom: empty");
+    }
 }

@@ -24,18 +24,33 @@ export const $preset = observable(
     }),
 );
 
-type SerializedQuestion = z.input<typeof questionSchema>;
 const questionArraySchema = z.array(questionSchema);
-export const $questions = observable(
-    synced<SerializedQuestion[], SerializableQuestion[]>({
+
+export const $stagingQuestion = observable<SerializableQuestion | null>(
+    synced({
+        initial: null,
+        persist: {
+            name: "stagingQuestion",
+            plugin: ObservablePersistLocalStorage,
+            transform: {
+                load: (value) => questionSchema.nullable().parse(value),
+                save: (value) =>
+                    questionSchema.nullable().encode(value as SerializableQuestion | null),
+            },
+        },
+    }),
+);
+
+export const $questions = observable<SerializableQuestion[]>(
+    synced({
         initial: [],
         persist: {
             name: "questions",
             plugin: ObservablePersistLocalStorage,
-        },
-        transform: {
-            load: (value) => questionArraySchema.decode(value),
-            save: (value) => questionArraySchema.encode(value),
+            transform: {
+                load: (value) => questionArraySchema.parse(value),
+                save: (value) => questionArraySchema.encode(value as SerializableQuestion[]),
+            },
         },
     }),
 );

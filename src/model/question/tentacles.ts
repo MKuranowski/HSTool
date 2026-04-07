@@ -86,4 +86,8 @@ export class TentaclesQuestion extends Question<string> {
 
         return matches.join(";");
     }
+
+    static empty(seeker: Position): TentaclesQuestion {
+        return new TentaclesQuestion("Empty", turf.featureCollection([]), seeker, 2);
+    }
 }
