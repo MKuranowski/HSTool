@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { useValue } from "@legendapp/state/react";
+import { useStore } from "@nanostores/react";
 import type { Feature, Point } from "geojson";
 import { Button, ButtonGroup, ListGroup } from "react-bootstrap";
-import type { PropertiesWithName } from "../model/schema";
-import { $discardedStations, $eliminatedQuestions, $preset } from "../model/state";
+import type { PropertiesWithName } from "../model/Geo";
+import { $discardedStations, $eliminatedStations, $preset } from "../state";
 
 function Station({
     station,
@@ -18,10 +18,9 @@ function Station({
         <ListGroup.Item
             onClick={() => {
                 if (isDiscarded) {
-                    $discardedStations[station.properties.id].delete();
+                    $discardedStations.remove(station.properties.id);
                 } else {
-                    $discardedStations[station.properties.id].set(1);
-                    console.log("deleted ", station.properties.id, "now", $discardedStations.get());
+                    $discardedStations.add(station.properties.id);
                 }
             }}
             key={station.properties.id}
@@ -33,11 +32,13 @@ function Station({
 }
 
 export default function Stations() {
-    const allStations = useValue($preset.stations.features);
-    const discardedStations = useValue($discardedStations);
-    const eliminatedStations = useValue($eliminatedQuestions);
+    const preset = useStore($preset);
+    const discardedStations = useStore($discardedStations);
+    const eliminatedStations = useStore($eliminatedStations);
 
-    const stations = allStations.filter((s) => !Object.hasOwn(eliminatedStations, s.properties.id));
+    const stations = preset.stations.features.filter(
+        (s) => !Object.hasOwn(eliminatedStations, s.properties.id),
+    );
     const collator = new Intl.Collator();
     stations.sort((a, b) => collator.compare(a.properties.name, b.properties.name));
 
@@ -58,7 +59,7 @@ export default function Stations() {
                     variant="danger"
                     onClick={() => {
                         const set: Record<string, 1> = {};
-                        allStations.forEach((s) => (set[s.properties.id] = 1));
+                        $preset.get().stations.features.forEach((s) => (set[s.properties.id] = 1));
                         $discardedStations.set(set);
                     }}
                 >

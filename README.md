@@ -13,6 +13,22 @@ HSTool is a single-page application written using React, Bootstrap, Leaflet and 
 * `pnpm lint` checks the code,
 * `pnpm build` builds the application in release mode for distribution under the `dist` folder.
 
+Note that because of React and nanostores immutability constraints, the app is not built with
+standard object-oriented paradigms; even though this problem could benefit from those.
+
+Rather, this app relies heavily on immutable POJO objects, and helper modules to operate on those.
+Instead of a `Question` class with a `categorize` method, the app has a `Question` module/namespace,
+with a `T` interface for the POJO description and a `categorize` function. This is a bit similar
+to working with numbers in JS, as one would do `Math.sin(0.5)`, not `(0.5).sin()`.
+
+Immutability is not strictly enforced, as it's still useful in a lot of places, however
+programmers need to keep in mind that *stored* objects are immutable. `$object.get().position = ...`
+won't work, one must do `$object.set({ ...$object.get(), position: ... })`. Similar constraints
+apply to variables from `useStore`, on which mutations will not be propagated.
+
+To help with stored objects which might be only partially mutated, use [nanostore's map](https://github.com/nanostores/nanostores?tab=readme-ov-file#maps),
+or helper mixins `arrayAtom` or `setAtom` from <src/helper/store.ts>.
+
 ## License
 
 HSTool is distributed under GNU GPL v3 (or any later version).

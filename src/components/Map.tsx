@@ -1,19 +1,19 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { useValue } from "@legendapp/state/react";
+import { useStore } from "@nanostores/react";
 import * as L from "leaflet";
 import { useEffect, useMemo, useState } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
-import type { PropertiesWithName } from "../model/schema";
-import { $disabledStations, $preset } from "../model/state";
+import type { PropertiesWithName } from "../model/Geo";
+import { $disabledStations, $preset } from "../state";
 
 let stationsLayer: L.Layer | null = null;
 
 export default function Map() {
     const [map, setMap] = useState<L.Map | null>(null);
-    const stations = useValue($preset.stations);
-    const disabledStations = useValue($disabledStations);
+    const preset = useStore($preset);
+    const disabledStations = useStore($disabledStations);
 
     const displayMap = useMemo(
         () => (
@@ -30,7 +30,7 @@ export default function Map() {
     useEffect(() => {
         if (!map) return;
 
-        const newLayer = L.geoJSON(stations, {
+        const newLayer = L.geoJSON(preset.stations, {
             filter(f) {
                 const id = (f.properties as PropertiesWithName).id;
                 return !Object.hasOwn(disabledStations, id);
@@ -46,7 +46,7 @@ export default function Map() {
 
         if (stationsLayer) stationsLayer.removeFrom(map);
         stationsLayer = newLayer.addTo(map);
-    }, [map, stations, disabledStations]);
+    }, [map, preset, disabledStations]);
 
     return displayMap;
 }

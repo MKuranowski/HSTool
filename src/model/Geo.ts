@@ -73,15 +73,5 @@ export function featureCollection<G extends z.ZodType, P extends z.ZodType>(
     });
 }
 
-export const preset = z.object({
-    name: z.string(),
-    stations: featureCollection(point, withName),
-    points: z.record(z.string(), featureCollection(point, withID)).optional(),
-    lines: z.record(z.string(), featureCollection(lineString, withID)).optional(),
-    areas: z.record(z.string(), feature(anyPolygon, withID)).optional(),
-    overlay: anyFeatureCollection.optional(),
-});
-
 export type PropertiesWithID = z.infer<typeof withID>;
 export type PropertiesWithName = z.infer<typeof withName>;
-export type Preset = z.infer<typeof preset>;

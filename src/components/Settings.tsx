@@ -1,17 +1,20 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { useValue } from "@legendapp/state/react";
+import { useStore } from "@nanostores/react";
 import { Button, ListGroup } from "react-bootstrap";
+import { zodJson } from "../helper/store";
 import { toString } from "../helper/strings";
-import * as schema from "../model/schema";
-import { $preset, $toast } from "../model/state";
+import * as Preset from "../model/Preset";
+import { $preset, $toast } from "../state";
+
+const presetSchemaJson = zodJson(Preset.schema);
 
 function onPresetPaste(): void {
     navigator.clipboard
         .readText()
         .then((content) => {
-            $preset.set(schema.preset.parse(JSON.parse(content)));
+            $preset.set(presetSchemaJson.decode(content));
         })
         .catch((error: unknown) => {
             console.log("Failed to read preset from clipboard:", error);
@@ -24,12 +27,12 @@ function onPresetPaste(): void {
 }
 
 export default function Settings() {
-    const presetName = useValue($preset.name);
+    const preset = useStore($preset);
 
     return (
         <ListGroup>
             <ListGroup.Item className="d-flex align-items-center">
-                <span className="flex-fill">Current preset: {presetName}</span>
+                <span className="flex-fill">Current preset: {preset.name}</span>
                 <Button variant="primary" onClick={onPresetPaste}>
                     Paste
                 </Button>
