@@ -14,7 +14,7 @@ export const schema = z.object({
     kind: z.literal("thermometer"),
     start: Geo.position,
     end: Geo.position,
-    answer: z.literal(["hotter", "colder"]).optional(),
+    answer: z.literal(["colder", "hotter"]).optional(),
 });
 
 export function name(q: T): string {
@@ -33,7 +33,7 @@ export function empty(seeker: Position): T {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function answers(_q: T): A[] {
-    return ["hotter", "colder"];
+    return ["colder", "hotter"];
 }
 
 export function categorize<P extends { [name: string]: unknown }>(
@@ -44,10 +44,10 @@ export function categorize<P extends { [name: string]: unknown }>(
     return withPossibleAnswers(
         stations,
         binaryCategorizer(
-            (s) => turf.distance(s, q.end) - turf.distance(s, q.start),
+            (s) => turf.distance(s, q.start) - turf.distance(s, q.end),
             tolerance,
-            "hotter",
             "colder",
+            "hotter",
         ),
     );
 }

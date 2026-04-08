@@ -136,7 +136,7 @@ test(ThermometerQuestion.categorize, () => {
         ThermometerQuestion.categorize(q, stations, 0.4).features.map(
             (f) => f.properties.possibleAnswers,
         ),
-    ).toEqual([["colder"], ["hotter"], ["hotter", "colder"]]);
+    ).toEqual([["colder"], ["hotter"], ["colder", "hotter"]]);
 });
 
 test(TentaclesQuestion.categorize, () => {
