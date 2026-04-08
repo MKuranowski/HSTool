@@ -13,6 +13,7 @@ export interface ArrayAtom<T> extends WritableAtom<T[]> {
 
     splice(start: number, deleteCount: number, ...replacements: T[]): void;
     replace(at: number, replacement: T): void;
+    remove(index: number): T | undefined;
 }
 
 export function arrayAtom<T>(atom: WritableAtom<T[]>): ArrayAtom<T> {
@@ -38,6 +39,12 @@ export function arrayAtom<T>(atom: WritableAtom<T[]>): ArrayAtom<T> {
 
         unshift(...elements) {
             atom.set(atom.get().toSpliced(0, 0, ...elements));
+        },
+
+        remove(index) {
+            const arr = atom.get();
+            atom.set(arr.toSpliced(index, 1));
+            return arr.at(index);
         },
 
         splice(start, deleteCount, ...replacements) {
