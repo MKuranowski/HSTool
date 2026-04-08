@@ -12,7 +12,7 @@ import {
 } from "react-bootstrap";
 import * as Question from "../model/Question";
 import { $questions, $stagingQuestion } from "../state";
-import { QuestionColor, QuestionIcon, QuestionKindName } from "./Question/common";
+import { QuestionColor, QuestionForm, QuestionIcon, QuestionKindName } from "./QuestionForm";
 
 const ROOT = [21, 52.2];
 
@@ -31,23 +31,12 @@ function NewQuestionButton({ kind }: { kind: Question.Kind }) {
     );
 }
 
-function QuestionEditor({ q }: { q: Question.T }) {
+function QuestionStagingArea({ q }: { q: Question.T }) {
     return (
         <ListGroup>
-            <ListGroup.Item variant={QuestionColor(q.kind)} active>
-                {Question.name(q)}
-            </ListGroup.Item>
+            <ListGroup.Item variant={QuestionColor(q.kind)}>{Question.name(q)}</ListGroup.Item>
             <ListGroup.Item>
-                <p>Lorem ipsum dolor sit amet consectetur.</p>
-                <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => {
-                        $stagingQuestion.set(null);
-                    }}
-                >
-                    Delete
-                </Button>
+                <QuestionForm q={q} index={null} />
             </ListGroup.Item>
         </ListGroup>
     );
@@ -79,15 +68,23 @@ export default function Questions() {
 
     return (
         <>
-            {stagingQuestion === null ? <QuestionPicker /> : <QuestionEditor q={stagingQuestion} />}
+            {stagingQuestion === null ? (
+                <QuestionPicker />
+            ) : (
+                <QuestionStagingArea q={stagingQuestion} />
+            )}
             <hr />
             <Accordion>
                 {questions.map((q, idx) => {
                     const key = `question-${idx.toFixed(0)}`;
                     return (
                         <Accordion.Item key={key} eventKey={key}>
-                            <Accordion.Header>{Question.name(q)}</Accordion.Header>
-                            <Accordion.Body>Lorem ipsum dolor sit amet consectetur</Accordion.Body>
+                            <Accordion.Header className="overflow-x-scroll">
+                                {Question.name(q)}
+                            </Accordion.Header>
+                            <Accordion.Body>
+                                <QuestionForm q={q} index={idx} />
+                            </Accordion.Body>
                         </Accordion.Item>
                     );
                 })}

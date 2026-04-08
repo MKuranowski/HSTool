@@ -3,6 +3,40 @@
 
 import type { Variant } from "react-bootstrap/esm/types";
 import * as Question from "../../model/Question";
+import CommonButtons from "./common/CommonButtons";
+import MatchAreaQuestionForm from "./MatchAreaQuestionForm";
+import MatchPointQuestionForm from "./MatchPointQuestionForm";
+import MeasureQuestionForm from "./MeasureQuestionForm";
+import RadarQuestionForm from "./RadarQuestionForm";
+import ThermometerQuestionForm from "./ThermometerQuestionForm";
+
+export function QuestionForm({ q, index }: { q: Question.T; index: number | null }) {
+    switch (q.kind) {
+        case "match-area":
+            return <MatchAreaQuestionForm q={q} index={index} />;
+
+        case "match-point":
+            return <MatchPointQuestionForm q={q} index={index} />;
+
+        case "measure":
+            return <MeasureQuestionForm q={q} index={index} />;
+
+        case "radar":
+            return <RadarQuestionForm q={q} index={index} />;
+
+        case "thermometer":
+            return <ThermometerQuestionForm q={q} index={index} />;
+
+        case "custom":
+        case "tentacles":
+            return (
+                <>
+                    <p>Todo - form for {q.kind}</p>
+                    <CommonButtons index={index} />
+                </>
+            );
+    }
+}
 
 export function QuestionColor(kind: Question.Kind): Variant {
     switch (kind) {
