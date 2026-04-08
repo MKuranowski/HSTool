@@ -2,42 +2,41 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { useStore } from "@nanostores/react";
-import type { ReactNode } from "react";
-import { Accordion, Button, ListGroup } from "react-bootstrap";
-import type { ButtonVariant } from "react-bootstrap/esm/types";
+import {
+    Accordion,
+    Button,
+    ButtonGroup,
+    ListGroup,
+    OverlayTrigger,
+    Tooltip,
+} from "react-bootstrap";
 import * as Question from "../model/Question";
 import { $questions, $stagingQuestion } from "../state";
+import { QuestionColor, QuestionIcon, QuestionKindName } from "./Question/common";
 
 const ROOT = [21, 52.2];
 
-function NewQuestionButton({
-    kind,
-    children,
-    variant,
-    size = "sm",
-}: {
-    kind: Question.Kind;
-    children?: ReactNode | undefined;
-    variant: ButtonVariant;
-    size?: "sm" | "lg";
-}) {
+function NewQuestionButton({ kind }: { kind: Question.Kind }) {
     return (
-        <Button
-            variant={variant}
-            size={size}
-            onClick={() => {
-                $stagingQuestion.set(Question.empty(kind, ROOT));
-            }}
-        >
-            {children}
-        </Button>
+        <OverlayTrigger overlay={<Tooltip id={`new-q-${kind}`}>{QuestionKindName(kind)}</Tooltip>}>
+            <Button
+                variant={QuestionColor(kind)}
+                onClick={() => {
+                    $stagingQuestion.set(Question.empty(kind, ROOT));
+                }}
+            >
+                <QuestionIcon kind={kind} hidden />
+            </Button>
+        </OverlayTrigger>
     );
 }
 
 function QuestionEditor({ q }: { q: Question.T }) {
     return (
         <ListGroup>
-            <ListGroup.Item active>{Question.name(q)}</ListGroup.Item>
+            <ListGroup.Item variant={QuestionColor(q.kind)} active>
+                {Question.name(q)}
+            </ListGroup.Item>
             <ListGroup.Item>
                 <p>Lorem ipsum dolor sit amet consectetur.</p>
                 <Button
@@ -56,37 +55,21 @@ function QuestionEditor({ q }: { q: Question.T }) {
 
 function QuestionPicker() {
     return (
-        <>
-            <div className="d-flex justify-content-center">
-                <h5>Create new question:</h5>
-            </div>
-            <div
-                aria-label="Add question"
-                className="d-flex flex-wrap justify-content-center gap-1"
-            >
-                <NewQuestionButton kind="match-area" variant="primary">
-                    Match Area
-                </NewQuestionButton>
-                <NewQuestionButton kind="match-point" variant="info">
-                    Match Point
-                </NewQuestionButton>
-                <NewQuestionButton kind="measure" variant="success">
-                    Measure
-                </NewQuestionButton>
-                <NewQuestionButton kind="radar" variant="warning">
-                    Radar
-                </NewQuestionButton>
-                <NewQuestionButton kind="thermometer" variant="danger">
-                    Thermometer
-                </NewQuestionButton>
-                <NewQuestionButton kind="tentacles" variant="dark">
-                    Tentacles
-                </NewQuestionButton>
-                <NewQuestionButton kind="custom" variant="secondary">
-                    Custom
-                </NewQuestionButton>
-            </div>
-        </>
+        <div className="d-flex flex-wrap align-items-center justify-content-center gap-2">
+            <ButtonGroup>
+                <Button variant="outline-dark" disabled>
+                    <i className="d-block d-sm-none d-lg-block d-xl-none bi bi-plus-lg" />
+                    <span className="d-none d-sm-block d-lg-none d-xl-block">Add new</span>
+                </Button>
+                <NewQuestionButton kind="match-area" />
+                <NewQuestionButton kind="match-point" />
+                <NewQuestionButton kind="measure" />
+                <NewQuestionButton kind="radar" />
+                <NewQuestionButton kind="thermometer" />
+                <NewQuestionButton kind="tentacles" />
+                <NewQuestionButton kind="custom" />
+            </ButtonGroup>
+        </div>
     );
 }
 

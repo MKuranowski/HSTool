@@ -15,6 +15,7 @@
         "@nanostores/react": "^1.1.0",
         "@turf/turf": "^7.3.4",
         "bootstrap": "^5.3.8",
+        "bootstrap-icons": "^1.13.1",
         "leaflet": "^1.9.4",
         "nanostores": "^1.2.0",
         "react": "^19.2.4",
