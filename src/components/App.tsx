@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { Col, Container, Row, Tab, Tabs } from "react-bootstrap";
-import Map from "./Map";
+import GameMap from "./GameMap";
 import Questions from "./Questions";
 import Settings from "./Settings";
 import Stations from "./Stations";
@@ -15,7 +15,7 @@ function App() {
             <Container fluid>
                 <Row className="my-1 gy-1">
                     <Col lg={8}>
-                        <Map />
+                        <GameMap />
                     </Col>
                     <Col lg={4} className="tabs">
                         <Tabs defaultActiveKey="questions">

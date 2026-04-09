@@ -34,7 +34,7 @@ export function empty(seeker: Position): T {
 }
 
 export function answers(q: T): string[] {
-    return viableCandidates(q).features.map((c) => c.properties.name ?? c.properties.id);
+    return [NIL, ...viableCandidates(q).features.map((c) => c.properties.name ?? c.properties.id)];
 }
 
 function viableCandidates(q: T): T["candidates"] {
