@@ -9,7 +9,7 @@ import { MapContainer, TileLayer } from "react-leaflet";
 import * as palette from "../helper/pallete";
 import type { PropertiesWithName } from "../model/Geo";
 import * as Question from "../model/Question";
-import { $disabledStations, $preset, $stagingQuestion } from "../state";
+import { $disabledStations, $hidingZoneRadius, $preset, $stagingQuestion } from "../state";
 
 let stationsLayer: L.Layer | null = null;
 
@@ -116,6 +116,7 @@ export default function GameMap() {
     const preset = useStore($preset);
     const stagingQuestion = useStore($stagingQuestion);
     const disabledStations = useStore($disabledStations);
+    const hidingZoneRadius = useStore($hidingZoneRadius);
 
     const displayMap = useMemo(
         () => (
@@ -140,7 +141,7 @@ export default function GameMap() {
 
         const annotatedStations =
             stagingQuestion !== null
-                ? Question.categorize(stagingQuestion, visibleStations, 0)
+                ? Question.categorize(stagingQuestion, visibleStations, hidingZoneRadius)
                 : visibleStations;
 
         const answerToColor = new Map(
@@ -177,7 +178,7 @@ export default function GameMap() {
 
         if (stationsLayer) stationsLayer.removeFrom(map);
         stationsLayer = newLayer.addTo(map);
-    }, [map, preset, disabledStations, stagingQuestion]);
+    }, [map, preset, disabledStations, stagingQuestion, hidingZoneRadius]);
 
     return displayMap;
 }

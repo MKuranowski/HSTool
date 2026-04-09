@@ -16,6 +16,8 @@ export const $toast = atom<Readonly<{
     variant: BootstrapVariant;
 }> | null>(null);
 
+export const $hidingZoneRadius = persistentJSON("hidingZoneRadius", 0.5);
+
 export const $preset = persistentZod("preset", Preset.schema, {
     name: "Empty",
     stations: { type: "FeatureCollection", features: [] },
@@ -28,11 +30,12 @@ export const $questions = arrayAtom(persistentZod("questions", z.array(Question.
 export const $discardedStations = setAtom(persistentJSON("discardedStations", {}));
 
 export const $eliminatedStations = batched(
-    [$questions, $preset],
-    (questions, preset): Record<string, 1> => {
+    [$questions, $preset, $hidingZoneRadius],
+    (questions, preset, hidingZoneRadius): Record<string, 1> => {
         const eliminated: Record<string, 1> = {};
         for (const question of questions.filter((q) => q.answer !== undefined)) {
-            for (const station of Question.categorize(question, preset.stations, 0).features) {
+            const categorized = Question.categorize(question, preset.stations, hidingZoneRadius);
+            for (const station of categorized.features) {
                 if (!station.properties.possibleAnswers.includes(question.answer as string)) {
                     eliminated[station.properties.id] = 1;
                 }
