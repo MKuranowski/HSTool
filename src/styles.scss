@@ -24,6 +24,16 @@ $bootstrap-icons-font-dir: "bootstrap-icons/font/fonts";
     white-space: pre-line;
 }
 
+.make-marker-green {
+    // Default blue is around 207°. Green is 152°.
+    filter: hue-rotate(-55deg);
+}
+
+.make-marker-red {
+    // Default blue is around 207°. Red is 354°.
+    filter: hue-rotate(147deg);
+}
+
 @include media-breakpoint-up(lg) {
     .map {
         height: 98vh;
