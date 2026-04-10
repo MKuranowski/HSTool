@@ -3,6 +3,7 @@
 
 import * as MeasureQuestion from "../../model/Question/MeasureQuestion";
 import BinaryAnswerButtons from "./common/BinaryAnswerButtons";
+import CandidateSelector from "./common/CandidateSelector";
 import CommonButtons from "./common/CommonButtons";
 import PositionSelector from "./common/PositionSelector";
 
@@ -16,7 +17,7 @@ export default function MeasureQuestionForm({
     const [lon, lat] = q.seeker;
     return (
         <>
-            <p>TODO</p>
+            <CandidateSelector current={q.name} kind="measure" index={index} className="mb-2" />
             <PositionSelector lat={lat} lon={lon} index={index} className="mb-2" />
             <BinaryAnswerButtons
                 negative="closer"
