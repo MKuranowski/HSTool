@@ -8,6 +8,7 @@ import MatchAreaQuestionForm from "./MatchAreaQuestionForm";
 import MatchPointQuestionForm from "./MatchPointQuestionForm";
 import MeasureQuestionForm from "./MeasureQuestionForm";
 import RadarQuestionForm from "./RadarQuestionForm";
+import TentaclesQuestionForm from "./TentaclesQuestionForm";
 import ThermometerQuestionForm from "./ThermometerQuestionForm";
 
 export function QuestionForm({ q, index }: { q: Question.T; index: number | null }) {
@@ -27,8 +28,10 @@ export function QuestionForm({ q, index }: { q: Question.T; index: number | null
         case "thermometer":
             return <ThermometerQuestionForm q={q} index={index} />;
 
-        case "custom":
         case "tentacles":
+            return <TentaclesQuestionForm q={q} index={index} />;
+
+        case "custom":
             return (
                 <>
                     <p>Todo - form for {q.kind}</p>

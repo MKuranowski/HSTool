@@ -6,40 +6,8 @@ import { getQuestionState } from "../../helper/questionState";
 import * as ThermometerQuestion from "../../model/Question/ThermometerQuestion";
 import BinaryAnswerButtons from "./common/BinaryAnswerButtons";
 import CommonButtons from "./common/CommonButtons";
+import DistanceSelector from "./common/DistanceSelector";
 import PositionSelector from "./common/PositionSelector";
-
-function DistanceSelector({
-    distance,
-    index,
-    className,
-}: {
-    distance: number;
-    index: number | null;
-    className?: string;
-}) {
-    const [, getQuestion, setQuestion] = getQuestionState(index);
-    return (
-        <InputGroup className={className}>
-            <InputGroup.Text>Distance</InputGroup.Text>
-            <Form.Control
-                type="number"
-                min={0}
-                step={0.1}
-                value={distance}
-                onChange={(e) => {
-                    const value = parseFloat(e.target.value);
-                    if (Number.isNaN(value) || value < 0) return;
-
-                    const q = getQuestion();
-                    if (q && q.kind === "thermometer") {
-                        setQuestion({ ...q, distance: value });
-                    }
-                }}
-            />
-            <InputGroup.Text>km</InputGroup.Text>
-        </InputGroup>
-    );
-}
 
 function AzimuthSelector({
     azimuth,
@@ -85,7 +53,7 @@ export default function ThermometerQuestionForm({
     const [lon, lat] = q.seeker;
     return (
         <>
-            <DistanceSelector distance={q.distance} index={index} className="mb-2" />
+            <DistanceSelector value={q.distance} index={index} className="mb-2" />
             <AzimuthSelector azimuth={q.azimuth} index={index} className="mb-2" />
             <PositionSelector lat={lat} lon={lon} index={index} className="mb-2" />
             <BinaryAnswerButtons

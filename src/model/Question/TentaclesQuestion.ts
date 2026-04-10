@@ -8,7 +8,7 @@ import { mergePositions, withPossibleAnswers } from "../../helper/geo";
 import * as Geo from "../Geo";
 
 export type T = z.infer<typeof schema>;
-export const NIL = "(Nil Answer)";
+export const NIL = "(Nil answer)";
 
 export const schema = z.object({
     kind: z.literal("tentacles"),
@@ -34,7 +34,7 @@ export function empty(seeker: Position): T {
 }
 
 export function answers(q: T): string[] {
-    return [NIL, ...viableCandidates(q).features.map((c) => c.properties.name ?? c.properties.id)];
+    return [NIL, ...viableCandidates(q).features.map((c) => c.properties.id)];
 }
 
 function viableCandidates(q: T): T["candidates"] {
@@ -66,7 +66,7 @@ export function categorize<P extends { [name: string]: unknown }>(
         const closest = Math.min(...distances);
         matches.push(
             ...candidates
-                .map((c) => c.properties.name ?? c.properties.id)
+                .map((c) => c.properties.id)
                 .filter((_, i) => distances[i] <= closest + tolerance),
         );
 
