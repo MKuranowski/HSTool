@@ -124,7 +124,10 @@ test(RadarQuestion.categorize, () => {
 });
 
 test(ThermometerQuestion.categorize, () => {
-    const q: ThermometerQuestion.T = { kind: "thermometer", start: rootA, end: rootB };
+    const distance = turf.distance(rootA, rootB);
+    const azimuth = turf.bearingToAzimuth(turf.bearing(rootA, rootB));
+
+    const q: ThermometerQuestion.T = { kind: "thermometer", seeker: rootA, azimuth, distance };
 
     expect(
         ThermometerQuestion.categorize(q, stations, 0).features.map(

@@ -12,22 +12,27 @@ export type A = Exclude<T["answer"], undefined>;
 
 export const schema = z.object({
     kind: z.literal("thermometer"),
-    start: Geo.position,
-    end: Geo.position,
+    seeker: Geo.position,
+    azimuth: z.number().min(0).max(360),
+    distance: z.number().nonnegative(),
     answer: z.literal(["colder", "hotter"]).optional(),
 });
 
+export function getEndLocation(q: T): Position {
+    return turf.transformTranslate(turf.point(q.seeker), q.distance, q.azimuth).geometry
+        .coordinates;
+}
+
 export function name(q: T): string {
-    const d = turf.distance(q.start, q.end);
-    return `Thermometer: ${d.toFixed(1)} km`;
+    return `Thermometer: ${q.distance.toFixed(1)} km`;
 }
 
 export function empty(seeker: Position): T {
-    const end = turf.transformTranslate(turf.point(seeker), 1, 90).geometry.coordinates;
     return {
         kind: "thermometer",
-        start: seeker,
-        end,
+        seeker: seeker,
+        azimuth: 90,
+        distance: 1,
     };
 }
 
@@ -41,10 +46,11 @@ export function categorize<P extends { [name: string]: unknown }>(
     stations: FeatureCollection<Point, P>,
     tolerance: number,
 ): FeatureCollection<Point, P & { possibleAnswers: A[] }> {
+    const end = getEndLocation(q);
     return withPossibleAnswers(
         stations,
         binaryCategorizer(
-            (s) => turf.distance(s, q.start) - turf.distance(s, q.end),
+            (s) => turf.distance(s, q.seeker) - turf.distance(s, end),
             tolerance,
             "colder",
             "hotter",
