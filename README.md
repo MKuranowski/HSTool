@@ -6,7 +6,8 @@ HSTool is an under-construction tool for playing
 ## TODO
 
 - [x] Questions & station filtering
-- [ ] Permanent map overlay
+- [x] Permanent background overlay
+- [ ] Show hiding zones
 - [ ] Voronoi diagrams of staging questions
 - [ ] Timing
 - [ ] Alternative units
