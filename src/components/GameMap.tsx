@@ -3,17 +3,15 @@
 
 import { useStore } from "@nanostores/react";
 import * as turf from "@turf/turf";
-import type { Feature, Point } from "geojson";
+import type { FeatureCollection, Point } from "geojson";
 import * as L from "leaflet";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Circle, MapContainer, Marker, TileLayer } from "react-leaflet";
+import { useMemo, useRef } from "react";
+import { Circle, LayerGroup, MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import * as palette from "../helper/pallete";
 import type { PropertiesWithName } from "../model/Geo";
 import * as Question from "../model/Question";
 import * as ThermometerQuestion from "../model/Question/ThermometerQuestion";
 import { $disabledStations, $hidingZoneRadius, $preset, $stagingQuestion } from "../state";
-
-let stationsLayer: L.Layer | null = null;
 
 function rot(x: number, y: number, angleRadians: number): [number, number] {
     const sin = Math.sin(angleRadians);
@@ -113,6 +111,61 @@ function stationIcon(colors?: string[]): HTMLDivElement {
     return _wrapInDiv(icon.cloneNode(true));
 }
 
+function StationLayer() {
+    const preset = useStore($preset);
+    const stagingQuestion = useStore($stagingQuestion);
+    const disabledStations = useStore($disabledStations);
+    const hidingZoneRadius = useStore($hidingZoneRadius);
+
+    const visibleStations = {
+        type: "FeatureCollection" as const,
+        features: preset.stations.features.filter(
+            (s) => !Object.hasOwn(disabledStations, s.properties.id),
+        ),
+    };
+
+    const annotatedStations: FeatureCollection<
+        Point,
+        PropertiesWithName & { possibleAnswers?: string[] }
+    > =
+        stagingQuestion !== null
+            ? Question.categorize(stagingQuestion, visibleStations, hidingZoneRadius)
+            : visibleStations;
+
+    const answerToColor = new Map(
+        stagingQuestion !== null
+            ? Question.answers(stagingQuestion).map(
+                  (a, idx) => [a, palette.getNthColor(idx)] as const,
+              )
+            : [],
+    );
+
+    return (
+        <LayerGroup>
+            {annotatedStations.features.map((s) => {
+                const [lon, lat] = s.geometry.coordinates;
+
+                const colors = s.properties.possibleAnswers
+                    ? s.properties.possibleAnswers.map(
+                          (a) => answerToColor.get(a) ?? palette.primary,
+                      )
+                    : undefined;
+
+                const icon = L.divIcon({
+                    html: stationIcon(colors),
+                    className: "",
+                });
+
+                return (
+                    <Marker key={s.properties.id} position={[lat, lon]} icon={icon}>
+                        <Popup>{s.properties.name}</Popup>
+                    </Marker>
+                );
+            })}
+        </LayerGroup>
+    );
+}
+
 function QuestionMarker() {
     const stagingQuestion = useStore($stagingQuestion);
     const markerRef = useRef<L.Marker | null>(null);
@@ -197,75 +250,15 @@ function ThermometerSecondaryMarker() {
 }
 
 export default function GameMap() {
-    const [map, setMap] = useState<L.Map | null>(null);
-    const preset = useStore($preset);
-    const stagingQuestion = useStore($stagingQuestion);
-    const disabledStations = useStore($disabledStations);
-    const hidingZoneRadius = useStore($hidingZoneRadius);
-
-    const displayMap = useMemo(
-        () => (
-            <MapContainer center={[52.2, 21.0]} zoom={13} className="map" ref={setMap}>
-                <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <QuestionMarker />
-                <ThermometerSecondaryMarker />
-            </MapContainer>
-        ),
-        [],
+    return (
+        <MapContainer center={[52.2, 21.0]} zoom={13} className="map">
+            <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <QuestionMarker />
+            <ThermometerSecondaryMarker />
+            <StationLayer />
+        </MapContainer>
     );
-
-    useEffect(() => {
-        if (!map) return;
-        const visibleStations = {
-            type: "FeatureCollection" as const,
-            features: preset.stations.features.filter(
-                (s) => !Object.hasOwn(disabledStations, s.properties.id),
-            ),
-        };
-
-        const annotatedStations =
-            stagingQuestion !== null
-                ? Question.categorize(stagingQuestion, visibleStations, hidingZoneRadius)
-                : visibleStations;
-
-        const answerToColor = new Map(
-            stagingQuestion !== null
-                ? Question.answers(stagingQuestion).map(
-                      (a, idx) => [a, palette.getNthColor(idx)] as const,
-                  )
-                : [],
-        );
-
-        const newLayer = L.geoJSON(annotatedStations, {
-            pointToLayer(fRaw, latlng) {
-                const f = fRaw as Feature<
-                    Point,
-                    { id: string; name: string; possibleAnswers?: string[] }
-                >;
-
-                const colors = f.properties.possibleAnswers
-                    ? f.properties.possibleAnswers.map(
-                          (a) => answerToColor.get(a) ?? palette.primary,
-                      )
-                    : undefined;
-
-                const icon = L.divIcon({
-                    html: stationIcon(colors),
-                    className: "",
-                });
-                const m = L.marker(latlng, { icon });
-                const name = (f.properties as PropertiesWithName).name;
-                m.bindPopup(name);
-                return m;
-            },
-        });
-
-        if (stationsLayer) stationsLayer.removeFrom(map);
-        stationsLayer = newLayer.addTo(map);
-    }, [map, preset, disabledStations, stagingQuestion, hidingZoneRadius]);
-
-    return displayMap;
 }
