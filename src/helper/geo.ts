@@ -37,6 +37,24 @@ export function distanceToFeature(
 }
 
 /**
+ * Returns `true` if given point is in the provided Polygon or MultiPolygon.
+ *
+ * Workaround for turf not supporting booleanContains for MultiPolygons.
+ */
+export function areaContains(area: Polygon | MultiPolygon, pt: Point): boolean {
+    switch (area.type) {
+        case "Polygon":
+            return turf.booleanContains(area, pt);
+
+        case "MultiPolygon":
+            // turf.booleanContains(MultiPolygon, Point) doesn't work, see https://github.com/Turfjs/turf/issues/2975
+            return area.coordinates.some((polygonCoords) =>
+                turf.booleanContains(turf.polygon(polygonCoords), pt),
+            );
+    }
+}
+
+/**
  * Merges properties of a feature with the provided object.
  */
 export function withProperties<

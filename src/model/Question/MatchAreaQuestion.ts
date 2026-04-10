@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import * as turf from "@turf/turf";
 import type { Feature, FeatureCollection, MultiPolygon, Point, Polygon, Position } from "geojson";
 import * as z from "zod";
 import {
+    areaContains,
     binaryCategorizer,
     distanceToFeature,
     mergePositions,
@@ -49,9 +49,10 @@ export function answers(_q: T): A[] {
 export function seekerArea(
     q: T,
 ): Feature<Polygon | MultiPolygon, Geo.PropertiesWithID> | undefined {
-    const seeker = turf.point(q.seeker);
-
-    const candidates = q.candidates.features.filter((area) => turf.booleanContains(area, seeker));
+    const seeker = { type: "Point", coordinates: q.seeker } as const;
+    const candidates = q.candidates.features.filter((area) => {
+        return areaContains(area.geometry, seeker);
+    });
     if (candidates.length === 0) {
         console.warn(`Match ${q.name} - seekers are not in any area from the preset`);
     } else if (candidates.length > 1) {
