@@ -11,6 +11,6 @@ export const schema = z.object({
     stations: Geo.featureCollection(Geo.point, Geo.withName),
     points: z.record(z.string(), Geo.featureCollection(Geo.point, Geo.withID)).optional(),
     lines: z.record(z.string(), Geo.featureCollection(Geo.lineString, Geo.withID)).optional(),
-    areas: z.record(z.string(), Geo.feature(Geo.anyPolygon, Geo.withID)).optional(),
+    areas: z.record(z.string(), Geo.featureCollection(Geo.anyPolygon, Geo.withID)).optional(),
     overlay: Geo.anyFeatureCollection.optional(),
 });

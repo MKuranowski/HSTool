@@ -43,11 +43,9 @@ test(MatchAreaQuestion.categorize, () => {
 
     const q: MatchAreaQuestion.T = {
         kind: "match-area",
-        area: {
-            type: "Feature",
-            geometry: area.geometry,
-            properties: { id: "test-area" },
-        },
+        name: "artificial",
+        candidates: turf.featureCollection([turf.feature(area.geometry, { id: "test-area" })]),
+        seeker: rootA,
     };
 
     expect(

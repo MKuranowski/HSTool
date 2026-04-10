@@ -19,6 +19,11 @@ export const schema = z.object({
 });
 
 export function name(q: T): string {
+    if (q.candidates.features.length > 0) {
+        const match = turf.nearestPoint(q.seeker, q.candidates);
+        const matchName = match.properties.name ?? match.properties.id;
+        return `Match: ${q.name} (${matchName})`;
+    }
     return `Match: ${q.name}`;
 }
 
