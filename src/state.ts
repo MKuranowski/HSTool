@@ -34,7 +34,10 @@ export const $eliminatedStations = batched(
     [$questions, $preset, $hidingZoneRadius],
     (questions, preset, hidingZoneRadius): Record<string, 1> => {
         const eliminated: Record<string, 1> = {};
-        for (const question of questions.filter((q) => q.answer !== undefined)) {
+        const answeredQuestions = questions.filter(
+            (q) => q.kind !== "custom" && q.answer !== undefined,
+        );
+        for (const question of answeredQuestions) {
             const categorized = Question.categorize(question, preset.stations, hidingZoneRadius);
             for (const station of categorized.features) {
                 if (!station.properties.possibleAnswers.includes(question.answer as string)) {

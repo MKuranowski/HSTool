@@ -3,7 +3,7 @@
 
 import type { Variant } from "react-bootstrap/esm/types";
 import * as Question from "../../model/Question";
-import CommonButtons from "./common/CommonButtons";
+import CustomQuestionForm from "./CustomQuestionForm";
 import MatchAreaQuestionForm from "./MatchAreaQuestionForm";
 import MatchPointQuestionForm from "./MatchPointQuestionForm";
 import MeasureQuestionForm from "./MeasureQuestionForm";
@@ -32,12 +32,7 @@ export function QuestionForm({ q, index }: { q: Question.T; index: number | null
             return <TentaclesQuestionForm q={q} index={index} />;
 
         case "custom":
-            return (
-                <>
-                    <p>Todo - form for {q.kind}</p>
-                    <CommonButtons index={index} />
-                </>
-            );
+            return <CustomQuestionForm q={q} index={index} />;
     }
 }
 
