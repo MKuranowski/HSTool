@@ -3,7 +3,21 @@
 HSTool is an under-construction tool for playing
 [Jet Lag: The Game — Hide and Seek Transit Game](https://store.nebula.tv/collections/jetlag/products/hideandseek).
 
-## Running
+## TODO
+
+- [x] Questions & station filtering
+- [ ] Permanent map overlay
+- [ ] Voronoi diagrams of staging questions
+- [ ] Timing
+- [ ] Alternative units
+- [ ] Voronoi-based end game
+- [ ] Better state shareability:
+    - [ ] Questions and options as well; not just the Preset
+    - [ ] Load from URL
+    - [ ] Copy to clipboard
+    - [ ] Pastebin (?)
+
+## Development
 
 HSTool is a single-page application written using React, Bootstrap, Leaflet and Vite.
 [pnpm](https://pnpm.io/) is required to build and develop the application.
