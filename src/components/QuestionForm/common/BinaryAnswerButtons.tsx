@@ -54,16 +54,6 @@ export default function BinaryAnswerButtons({
 
     return (
         <ButtonGroup className="me-1">
-            <OverlayTrigger overlay={<Tooltip id={`${idPrefix}null`}>No answer</Tooltip>}>
-                <Button
-                    variant={answer === undefined ? "warning" : "outline-warning"}
-                    onClick={() => {
-                        setAnswer(index, undefined);
-                    }}
-                >
-                    <i className="bi bi-ban" />
-                </Button>
-            </OverlayTrigger>
             <OverlayTrigger overlay={<Tooltip id={`${idPrefix}neg`}>{labels[negative]}</Tooltip>}>
                 <Button
                     variant={answer === negative ? "success" : "outline-success"}
@@ -82,6 +72,16 @@ export default function BinaryAnswerButtons({
                     }}
                 >
                     <i className={icons[positive]} />
+                </Button>
+            </OverlayTrigger>
+            <OverlayTrigger overlay={<Tooltip id={`${idPrefix}null`}>No answer</Tooltip>}>
+                <Button
+                    variant={answer === undefined ? "secondary" : "outline-secondary"}
+                    onClick={() => {
+                        setAnswer(index, undefined);
+                    }}
+                >
+                    <i className="bi bi-ban" />
                 </Button>
             </OverlayTrigger>
         </ButtonGroup>
