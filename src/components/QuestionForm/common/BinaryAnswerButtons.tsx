@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { Button, ButtonGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { getQuestionPrefix } from "../../../helper/questionState";
 import { $questions, $stagingQuestion } from "../../../state";
 
 const labels = {
@@ -49,7 +50,7 @@ export default function BinaryAnswerButtons({
     answer?: string | undefined;
     index: number | null;
 }) {
-    const idPrefix = index === null ? "q-form-staging" : `q-form-${index.toFixed(0)}`;
+    const idPrefix = getQuestionPrefix(index);
 
     return (
         <ButtonGroup className="me-1">

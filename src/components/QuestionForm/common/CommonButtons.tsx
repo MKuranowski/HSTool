@@ -4,12 +4,13 @@
 import { useStore } from "@nanostores/react";
 import type { JSX } from "react";
 import { Button, ButtonGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { getQuestionPrefix } from "../../../helper/questionState";
 import { $questions, $stagingQuestion } from "../../../state";
 
 export default function CommonButtons({ index }: { index: number | null }) {
     const stagingQuestion = useStore($stagingQuestion);
     const buttons: JSX.Element[] = [];
-    const idPrefix = index === null ? `q-form-staging-` : `q-form-${index.toFixed(0)}-`;
+    const idPrefix = getQuestionPrefix(index);
 
     if (index === null) {
         buttons.push(

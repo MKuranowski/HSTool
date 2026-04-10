@@ -4,8 +4,8 @@
 import { useStore } from "@nanostores/react";
 import type { Feature, Point } from "geojson";
 import * as L from "leaflet";
-import { useEffect, useMemo, useState } from "react";
-import { MapContainer, TileLayer } from "react-leaflet";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { MapContainer, Marker, TileLayer } from "react-leaflet";
 import * as palette from "../helper/pallete";
 import type { PropertiesWithName } from "../model/Geo";
 import * as Question from "../model/Question";
@@ -111,6 +111,41 @@ function stationIcon(colors?: string[]): HTMLDivElement {
     return _wrapInDiv(icon.cloneNode(true));
 }
 
+function QuestionMarker() {
+    const stagingQuestion = useStore($stagingQuestion);
+    const markerRef = useRef<L.Marker | null>(null);
+    const eventHandlers = useMemo<L.LeafletEventHandlerFnMap>(
+        () => ({
+            dragend() {
+                const newPos = markerRef.current?.getLatLng();
+                if (newPos === undefined) return;
+
+                const q = $stagingQuestion.get();
+                if (q) {
+                    $stagingQuestion.set(Question.withPosition(q, [newPos.lng, newPos.lat]));
+                }
+            },
+        }),
+        [],
+    );
+
+    // Don't display the marker without a staging question
+    if (stagingQuestion === null || stagingQuestion.kind === "custom") {
+        return <></>;
+    }
+
+    const position = L.latLng(stagingQuestion.seeker[1], stagingQuestion.seeker[0]);
+
+    return (
+        <Marker
+            draggable={true}
+            eventHandlers={eventHandlers}
+            position={position}
+            ref={markerRef}
+        />
+    );
+}
+
 export default function GameMap() {
     const [map, setMap] = useState<L.Map | null>(null);
     const preset = useStore($preset);
@@ -125,6 +160,7 @@ export default function GameMap() {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
+                <QuestionMarker />
             </MapContainer>
         ),
         [],

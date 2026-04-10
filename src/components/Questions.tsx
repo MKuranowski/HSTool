@@ -11,10 +11,8 @@ import {
     Tooltip,
 } from "react-bootstrap";
 import * as Question from "../model/Question";
-import { $questions, $stagingQuestion } from "../state";
+import { $defaultMakerLocation, $questions, $stagingQuestion } from "../state";
 import { QuestionColor, QuestionForm, QuestionIcon, QuestionKindName } from "./QuestionForm";
-
-const ROOT = [21, 52.2];
 
 function NewQuestionButton({ kind }: { kind: Question.Kind }) {
     return (
@@ -22,7 +20,8 @@ function NewQuestionButton({ kind }: { kind: Question.Kind }) {
             <Button
                 variant={QuestionColor(kind)}
                 onClick={() => {
-                    $stagingQuestion.set(Question.empty(kind, ROOT));
+                    const root = $defaultMakerLocation.get();
+                    $stagingQuestion.set(Question.empty(kind, root));
                 }}
             >
                 <QuestionIcon kind={kind} hidden />

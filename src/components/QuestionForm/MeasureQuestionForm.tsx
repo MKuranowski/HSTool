@@ -4,6 +4,7 @@
 import * as MeasureQuestion from "../../model/Question/MeasureQuestion";
 import BinaryAnswerButtons from "./common/BinaryAnswerButtons";
 import CommonButtons from "./common/CommonButtons";
+import PositionSelector from "./common/PositionSelector";
 
 export default function MeasureQuestionForm({
     q,
@@ -12,9 +13,11 @@ export default function MeasureQuestionForm({
     q: MeasureQuestion.T;
     index: number | null;
 }) {
+    const [lon, lat] = q.seeker;
     return (
         <>
             <p>TODO</p>
+            <PositionSelector lat={lat} lon={lon} index={index} className="mb-2" />
             <BinaryAnswerButtons
                 negative="closer"
                 positive="further"

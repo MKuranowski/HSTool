@@ -17,7 +17,7 @@ function onPresetPaste(): void {
             $preset.set(presetSchemaJson.decode(content));
         })
         .catch((error: unknown) => {
-            console.log("Failed to read preset from clipboard:", error);
+            console.error("Failed to read preset from clipboard:", error);
             $toast.set({
                 header: "Failed to read preset",
                 body: toString(error),

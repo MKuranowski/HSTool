@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { persistentJSON } from "@nanostores/persistent";
+import * as turf from "@turf/turf";
 import { atom, batched } from "nanostores";
 import type { Variant as BootstrapVariant } from "react-bootstrap/esm/types";
 import * as z from "zod";
@@ -48,4 +49,18 @@ export const $eliminatedStations = batched(
 export const $disabledStations = batched(
     [$discardedStations, $eliminatedStations],
     (discarded, eliminated) => Object.assign({}, discarded, eliminated),
+);
+
+export const $defaultMakerLocation = batched(
+    [$preset, $disabledStations],
+    (preset, disabled): number[] => {
+        const enabledStations = preset.stations.features.filter(
+            (s) => !Object.hasOwn(disabled, s.properties.id),
+        );
+        const stations =
+            enabledStations.length > 0 ? turf.featureCollection(enabledStations) : preset.stations;
+        return stations.features.length > 0
+            ? turf.centerOfMass(stations).geometry.coordinates
+            : [0, 0];
+    },
 );
