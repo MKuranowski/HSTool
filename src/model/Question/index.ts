@@ -36,6 +36,8 @@ interface Submodule<T> {
         stations: FeatureCollection<Point, P>,
         tolerance: number,
     ): FeatureCollection<Point, P & { possibleAnswers: string[] }>;
+
+    withPosition(q: T, newPosition: (number | null)[]): T;
 }
 
 type Submodules = { [K in Kind]: Submodule<TLookup[K]> };
@@ -82,6 +84,10 @@ export function categorize<K extends Kind, P extends { [name: string]: unknown }
     tolerance: number,
 ): FeatureCollection<Point, P & { possibleAnswers: string[] }> {
     return submodules[q.kind].categorize(q, stations, tolerance);
+}
+
+export function withPosition<K extends Kind>(q: T<K>, newPosition: (number | null)[]): TLookup[K] {
+    return submodules[q.kind].withPosition(q, newPosition);
 }
 
 export const schema = z.discriminatedUnion("kind", [

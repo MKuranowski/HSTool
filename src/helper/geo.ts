@@ -107,3 +107,10 @@ export function withPossibleAnswers<
         return { possibleAnswers: categorize(s) };
     });
 }
+
+export function mergePositions(old: Position, new_: (null | number)[]): Position {
+    const len = Math.max(old.length, new_.length);
+    const merged = new Array<number>(len);
+    for (let i = 0; i < len; ++i) merged[i] = new_[i] ?? old[i];
+    return merged;
+}

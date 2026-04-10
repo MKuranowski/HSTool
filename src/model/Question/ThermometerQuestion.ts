@@ -4,7 +4,7 @@
 import * as turf from "@turf/turf";
 import type { FeatureCollection, Point, Position } from "geojson";
 import * as z from "zod";
-import { binaryCategorizer, withPossibleAnswers } from "../../helper/geo";
+import { binaryCategorizer, mergePositions, withPossibleAnswers } from "../../helper/geo";
 import * as Geo from "../Geo";
 
 export type T = z.infer<typeof schema>;
@@ -56,4 +56,8 @@ export function categorize<P extends { [name: string]: unknown }>(
             "hotter",
         ),
     );
+}
+
+export function withPosition(q: T, newPosition: (number | null)[]): T {
+    return { ...q, seeker: mergePositions(q.seeker, newPosition) };
 }

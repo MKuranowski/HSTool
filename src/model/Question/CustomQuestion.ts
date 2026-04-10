@@ -33,3 +33,8 @@ export function categorize<P extends { [name: string]: unknown }>(
 ): FeatureCollection<Point, P & { possibleAnswers: never[] }> {
     return withPossibleAnswers(stations, () => []);
 }
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function withPosition(q: T, _newPosition: (number | null)[]): T {
+    return q;
+}

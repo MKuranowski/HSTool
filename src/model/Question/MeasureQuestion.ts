@@ -3,7 +3,12 @@
 
 import type { FeatureCollection, Point, Position } from "geojson";
 import * as z from "zod";
-import { binaryCategorizer, distanceToFeature, withPossibleAnswers } from "../../helper/geo";
+import {
+    binaryCategorizer,
+    distanceToFeature,
+    mergePositions,
+    withPossibleAnswers,
+} from "../../helper/geo";
 import * as Geo from "../Geo";
 
 export type T = z.infer<typeof schema>;
@@ -62,4 +67,8 @@ export function categorize<P extends { [name: string]: unknown }>(
             "further",
         ),
     );
+}
+
+export function withPosition(q: T, newPosition: (number | null)[]): T {
+    return { ...q, seeker: mergePositions(q.seeker, newPosition) };
 }
