@@ -12,7 +12,7 @@ import * as Question from "./model/Question";
 /// Toast to display in the top-left corner of the UI
 export const $toast = atom<Readonly<{
     header: string;
-    body: string;
+    body?: string;
     variant: BootstrapVariant;
 }> | null>(null);
 

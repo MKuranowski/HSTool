@@ -20,7 +20,7 @@ export default function ToastManager() {
                 <Toast.Header>
                     <strong>{content.header}</strong>
                 </Toast.Header>
-                <Toast.Body>{content.body}</Toast.Body>
+                {content.body ? <Toast.Body>{content.body}</Toast.Body> : <></>};
             </Toast>
         ) : (
             <></>
