@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { persistentJSON } from "@nanostores/persistent";
+import { persistentBoolean, persistentJSON } from "@nanostores/persistent";
 import * as turf from "@turf/turf";
 import { atom, batched } from "nanostores";
 import type { Variant as BootstrapVariant } from "react-bootstrap/esm/types";
@@ -18,6 +18,7 @@ export const $toast = atom<Readonly<{
 }> | null>(null);
 
 export const $hidingZoneRadius = persistentJSON("hidingZoneRadius", 0.5);
+export const $showHidingZones = persistentBoolean("showHidingZones", false);
 
 export const $preset = persistentZod("preset", Preset.schema, {
     name: "Empty",

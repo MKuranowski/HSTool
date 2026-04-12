@@ -4,11 +4,21 @@
 import { useStore } from "@nanostores/react";
 import type { FeatureCollection, Point } from "geojson";
 import * as L from "leaflet";
-import { LayerGroup, Marker, Popup } from "react-leaflet";
+import { Circle, LayerGroup, Marker, Popup } from "react-leaflet";
 import * as palette from "../../helper/pallete";
 import type { PropertiesWithName } from "../../model/Geo";
 import * as Question from "../../model/Question";
-import { $disabledStations, $hidingZoneRadius, $preset, $stagingQuestion } from "../../state";
+import {
+    $disabledStations,
+    $hidingZoneRadius,
+    $preset,
+    $showHidingZones,
+    $stagingQuestion,
+} from "../../state";
+
+interface AnnotatedStationProperties extends PropertiesWithName {
+    possibleAnswers?: string[] | undefined;
+}
 
 function rot(x: number, y: number, angleRadians: number): [number, number] {
     const sin = Math.sin(angleRadians);
@@ -108,38 +118,42 @@ function stationIcon(colors?: string[]): HTMLDivElement {
     return _wrapInDiv(icon.cloneNode(true));
 }
 
-export function StationLayer() {
-    const preset = useStore($preset);
-    const stagingQuestion = useStore($stagingQuestion);
-    const disabledStations = useStore($disabledStations);
-    const hidingZoneRadius = useStore($hidingZoneRadius);
+function StationPopup({
+    properties,
+    answerToColor,
+}: {
+    properties: AnnotatedStationProperties;
+    answerToColor: Map<string, string>;
+}) {
+    // eslint-disable-next-line react-x/no-missing-key
+    const children = [<b>{properties.name}</b>, <br />];
 
-    const visibleStations = {
-        type: "FeatureCollection" as const,
-        features: preset.stations.features.filter(
-            (s) => !Object.hasOwn(disabledStations, s.properties.id),
-        ),
-    };
+    if (properties.possibleAnswers) {
+        children.push(
+            <>Possible answers:</>,
+            <ul>
+                {properties.possibleAnswers.map((a) => (
+                    <li key={a} color={answerToColor.get(a)}>
+                        {a}
+                    </li>
+                ))}
+            </ul>,
+        );
+    }
 
-    const annotatedStations: FeatureCollection<
-        Point,
-        PropertiesWithName & { possibleAnswers?: string[] }
-    > =
-        stagingQuestion !== null
-            ? Question.categorize(stagingQuestion, visibleStations, hidingZoneRadius)
-            : visibleStations;
+    return <Popup>{children}</Popup>;
+}
 
-    const answerToColor = new Map(
-        stagingQuestion !== null
-            ? Question.answers(stagingQuestion).map(
-                  (a, idx) => [a, palette.getNthColor(idx)] as const,
-              )
-            : [],
-    );
-
+export function StationIconLayer({
+    stations,
+    answerToColor = new Map(),
+}: {
+    stations: FeatureCollection<Point, AnnotatedStationProperties>;
+    answerToColor?: Map<string, string>;
+}) {
     return (
         <LayerGroup>
-            {annotatedStations.features.map((s) => {
+            {stations.features.map((s) => {
                 const [lon, lat] = s.geometry.coordinates;
 
                 const colors = s.properties.possibleAnswers
@@ -155,10 +169,74 @@ export function StationLayer() {
 
                 return (
                     <Marker key={s.properties.id} position={[lat, lon]} icon={icon}>
-                        <Popup>{s.properties.name}</Popup>
+                        <StationPopup properties={s.properties} answerToColor={answerToColor} />
                     </Marker>
                 );
             })}
         </LayerGroup>
     );
+}
+
+export function StationZoneLayer({
+    stations,
+    radius,
+    answerToColor = new Map(),
+}: {
+    stations: FeatureCollection<Point, AnnotatedStationProperties>;
+    radius: number;
+    answerToColor?: Map<string, string>;
+}) {
+    return (
+        <LayerGroup>
+            {stations.features.map((s) => {
+                const [lon, lat] = s.geometry.coordinates;
+
+                return (
+                    <Circle key={s.properties.id} center={[lat, lon]} radius={radius * 1000}>
+                        <StationPopup properties={s.properties} answerToColor={answerToColor} />
+                    </Circle>
+                );
+            })}
+        </LayerGroup>
+    );
+}
+
+export function StationLayer() {
+    const preset = useStore($preset);
+    const stagingQuestion = useStore($stagingQuestion);
+    const disabledStations = useStore($disabledStations);
+    const hidingZoneRadius = useStore($hidingZoneRadius);
+    const showHidingZones = useStore($showHidingZones);
+
+    const visibleStations = {
+        type: "FeatureCollection" as const,
+        features: preset.stations.features.filter(
+            (s) => !Object.hasOwn(disabledStations, s.properties.id),
+        ),
+    };
+
+    const annotatedStations: FeatureCollection<Point, AnnotatedStationProperties> =
+        stagingQuestion !== null
+            ? Question.categorize(stagingQuestion, visibleStations, hidingZoneRadius)
+            : visibleStations;
+
+    const answerToColor = new Map(
+        stagingQuestion !== null
+            ? Question.answers(stagingQuestion).map(
+                  (a, idx) => [a, palette.getNthColor(idx)] as const,
+              )
+            : [],
+    );
+
+    if (showHidingZones && hidingZoneRadius > 0) {
+        return (
+            <StationZoneLayer
+                stations={annotatedStations}
+                radius={hidingZoneRadius}
+                answerToColor={answerToColor}
+            />
+        );
+    }
+
+    return <StationIconLayer stations={annotatedStations} answerToColor={answerToColor} />;
 }

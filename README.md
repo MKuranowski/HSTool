@@ -7,7 +7,7 @@ HSTool is an under-construction tool for playing
 
 - [x] Questions & station filtering
 - [x] Permanent background overlay
-- [ ] Show hiding zones
+- [x] Show hiding zones
 - [ ] Voronoi diagrams of staging questions
 - [ ] Timing
 - [ ] Alternative units

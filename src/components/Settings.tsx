@@ -6,7 +6,7 @@ import { Button, Form, InputGroup, ListGroup } from "react-bootstrap";
 import { zodJson } from "../helper/store";
 import { toString } from "../helper/strings";
 import * as Preset from "../model/Preset";
-import { $hidingZoneRadius, $preset, $toast } from "../state";
+import { $hidingZoneRadius, $preset, $showHidingZones, $toast } from "../state";
 
 const presetSchemaJson = zodJson(Preset.schema);
 
@@ -58,6 +58,32 @@ export function HidingZoneRadiusInput() {
     );
 }
 
+export function ShowHidingZonesInput() {
+    const showHidingZones = useStore($showHidingZones);
+    return (
+        <InputGroup>
+            <InputGroup.Text>Show hiding zones</InputGroup.Text>
+            <span className="flex-fill"></span>
+            <Button
+                variant={showHidingZones ? "success" : "outline-success"}
+                onClick={() => {
+                    $showHidingZones.set(true);
+                }}
+            >
+                <i className="bi bi-check" />
+            </Button>
+            <Button
+                variant={showHidingZones ? "outline-danger" : "danger"}
+                onClick={() => {
+                    $showHidingZones.set(false);
+                }}
+            >
+                <i className="bi bi-x" />
+            </Button>
+        </InputGroup>
+    );
+}
+
 export default function Settings() {
     return (
         <ListGroup>
@@ -66,6 +92,7 @@ export default function Settings() {
             </ListGroup.Item>
             <ListGroup.Item>
                 <HidingZoneRadiusInput />
+                <ShowHidingZonesInput />
             </ListGroup.Item>
         </ListGroup>
     );

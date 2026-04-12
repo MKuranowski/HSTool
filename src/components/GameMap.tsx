@@ -17,9 +17,7 @@ export default function GameMap() {
             <Pane name="backgroundPane" style={{ zIndex: 210 }}>
                 <BackgroundOverlay />
             </Pane>
-            <Pane name="stationsPane" style={{ zIndex: 350 }}>
-                <StationLayer />
-            </Pane>
+            <StationLayer />
             <QuestionMarker />
             <ThermometerSecondaryMarker />
         </MapContainer>
