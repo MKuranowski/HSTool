@@ -2,11 +2,8 @@ name: Deploy to GitHub Pages
 
 on:
     workflow_dispatch:
-    workflow_run:
-        workflows: ["Unit Tests + Linters"]
+    push:
         branches: ["main"]
-        types:
-            - completed
 
 permissions:
     contents: read
@@ -23,7 +20,6 @@ jobs:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
         runs-on: ubuntu-latest
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
         steps:
             - uses: actions/checkout@v6
             - name: Install pnpm
