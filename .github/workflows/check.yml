@@ -1,0 +1,30 @@
+name: Unit Tests + Linters
+
+on:
+    push:
+        branches: ["main"]
+    pull_request:
+        branches: ["main"]
+    workflow_dispatch:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10
+                  cache: true
+            - name: Install node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 25
+                  cache: "pnpm"
+            - name: Install dependencies
+              run: pnpm install
+            - name: Run unit tests
+              run: pnpm test run
+            - name: Run linters
+              run: pnpm lint
