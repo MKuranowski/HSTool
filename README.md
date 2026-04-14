@@ -17,6 +17,13 @@ HSTool is an under-construction tool for playing
     - [ ] Load from URL
     - [ ] Copy to clipboard
     - [ ] Pastebin (?)
+- [ ] Palette gives out the same color past the end of pre-defined colors
+- [ ] Clean-up, organize and test the mess in helper/geo
+- [ ] Show answer names (not ids) in station popups when staging a question
+- [ ] Show thermometer end coordinates
+- [ ] Make every map layer toggleable (through leaflet's LayersControl)
+- [ ] MatchPointQuestion.categorize and ThermometerQuestion.categorize are completely wrong
+
 
 ## Development
 
