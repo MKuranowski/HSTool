@@ -2,9 +2,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import * as turf from "@turf/turf";
-import type { FeatureCollection, Point, Position } from "geojson";
+import type { BBox, FeatureCollection, MultiPolygon, Point, Polygon, Position } from "geojson";
 import * as z from "zod";
-import { binaryCategorizer, mergePositions, withPossibleAnswers } from "../../helper/geo";
+import {
+    binaryCategorizer,
+    isArea,
+    mergePositions,
+    soleDivision,
+    withPossibleAnswers,
+} from "../../helper/geo";
 import * as Geo from "../Geo";
 
 export type T = z.infer<typeof schema>;
@@ -39,6 +45,24 @@ export function categorize<P extends { [name: string]: unknown }>(
         stations,
         binaryCategorizer((s) => turf.distance(s, q.seeker) - q.radius, tolerance, "hit", "miss"),
     );
+}
+
+export function divideArea(
+    q: T,
+    extent: BBox,
+): FeatureCollection<Polygon | MultiPolygon, Geo.PropertiesWithID & { answer: A }> {
+    const hit = turf.bboxClip(turf.circle(q.seeker, q.radius), extent);
+    if (!isArea(hit)) return soleDivision(extent, "miss");
+
+    const miss = turf.difference(
+        turf.featureCollection<Polygon | MultiPolygon>([turf.bboxPolygon(extent), hit]),
+    );
+    if (miss === null) return soleDivision(extent, "hit");
+
+    return turf.featureCollection([
+        { ...hit, properties: { id: "hit", answer: "hit" } },
+        { ...miss, properties: { id: "miss", answer: "miss" } },
+    ]);
 }
 
 export function withPosition(q: T, newPosition: (number | null)[]): T {

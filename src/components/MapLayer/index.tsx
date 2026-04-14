@@ -5,3 +5,4 @@ export { BackgroundOverlay } from "./BackgroundOverlay";
 export { QuestionMarker } from "./QuestionMarker";
 export { StationLayer } from "./StationLayer";
 export { ThermometerSecondaryMarker } from "./ThermometerSecondaryMarker";
+export { default as VoronoiLayer } from "./VoronoiLayer";

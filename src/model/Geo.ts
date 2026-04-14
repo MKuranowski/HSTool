@@ -75,3 +75,6 @@ export function featureCollection<G extends z.ZodType, P extends z.ZodType>(
 
 export type PropertiesWithID = z.infer<typeof withID>;
 export type PropertiesWithName = z.infer<typeof withName>;
+export interface PropertiesWithAnswer extends PropertiesWithID {
+    answer: string;
+}

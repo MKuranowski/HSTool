@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import type { FeatureCollection, Point, Position } from "geojson";
+import type { BBox, FeatureCollection, Point, Position } from "geojson";
 import * as z from "zod";
 import { withPossibleAnswers } from "../../helper/geo";
 
@@ -32,6 +32,11 @@ export function categorize<P extends { [name: string]: unknown }>(
     stations: FeatureCollection<Point, P>,
 ): FeatureCollection<Point, P & { possibleAnswers: never[] }> {
     return withPossibleAnswers(stations, () => []);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function divideArea(_q: T, _extent: BBox): null {
+    return null;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -2,9 +2,23 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import * as turf from "@turf/turf";
-import type { FeatureCollection, Point, Position } from "geojson";
+import type {
+    BBox,
+    Feature,
+    FeatureCollection,
+    MultiPolygon,
+    Point,
+    Polygon,
+    Position,
+} from "geojson";
 import * as z from "zod";
-import { mergePositions, withPossibleAnswers } from "../../helper/geo";
+import {
+    isArea,
+    mergePositions,
+    soleDivision,
+    voronoi,
+    withPossibleAnswers,
+} from "../../helper/geo";
 import * as Geo from "../Geo";
 
 export type T = z.infer<typeof schema>;
@@ -72,6 +86,38 @@ export function categorize<P extends { [name: string]: unknown }>(
 
         return matches;
     });
+}
+
+export function divideArea(
+    q: T,
+    extent: BBox,
+): FeatureCollection<Polygon | MultiPolygon, Geo.PropertiesWithAnswer> {
+    // Figure out the candidates for tentacles - if there are none, the only possible answer is nil
+    const candidates = viableCandidates(q);
+    if (candidates.features.length === 0) return soleDivision(extent, NIL);
+
+    // Calculate the area where tentacles are effective
+    const effectiveCircle = turf.bboxClip(turf.circle(q.seeker, q.radius), extent);
+    if (!isArea(effectiveCircle)) return soleDivision(extent, NIL);
+
+    // Find if a nil answer is possible, and add it as a possible division
+    const divisions: Feature<Polygon | MultiPolygon, Geo.PropertiesWithAnswer>[] = [];
+    const nilArea = turf.difference(
+        turf.featureCollection<Polygon | MultiPolygon>([turf.bboxPolygon(extent), effectiveCircle]),
+    );
+    if (nilArea !== null) {
+        divisions.push({ ...nilArea, properties: { id: NIL, answer: NIL } });
+    }
+
+    // Add divisions by voronoi-ing the candidates in the effective circle
+    for (const area of voronoi(candidates, { extent: turf.bbox(effectiveCircle) }).features) {
+        const effectiveArea = turf.intersect(turf.featureCollection([area, effectiveCircle]), {
+            properties: { ...area.properties, answer: area.properties.id },
+        });
+        if (effectiveArea !== null) divisions.push(effectiveArea);
+    }
+
+    return turf.featureCollection(divisions);
 }
 
 export function withPosition(q: T, newPosition: (number | null)[]): T {

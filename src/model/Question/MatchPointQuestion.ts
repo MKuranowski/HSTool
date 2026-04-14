@@ -2,9 +2,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import * as turf from "@turf/turf";
-import type { FeatureCollection, Point, Position } from "geojson";
+import type { BBox, FeatureCollection, MultiPolygon, Point, Polygon, Position } from "geojson";
 import * as z from "zod";
-import { binaryCategorizer, mergePositions, withPossibleAnswers } from "../../helper/geo";
+import {
+    mergePositions,
+    nearestPointsToCircle,
+    voronoi,
+    withPossibleAnswers,
+    withPropertiesInCollection,
+} from "../../helper/geo";
 import * as Geo from "../Geo";
 
 export type T = z.infer<typeof schema>;
@@ -50,21 +56,34 @@ export function categorize<P extends { [name: string]: unknown }>(
         return withPossibleAnswers(stations, () => ["miss"]);
     }
 
-    const nearest = turf.nearestPoint(q.seeker, q.candidates);
-    return withPossibleAnswers(
-        stations,
-        binaryCategorizer(
-            (s) => {
-                const distances = q.candidates.features.map((c) => turf.distance(s, c));
-                const [distanceToMatched] = distances.splice(nearest.properties.featureIndex, 1);
-                const distanceToOther = Math.min(...distances);
-                return distanceToMatched - distanceToOther;
-            },
+    const seekerMatch = turf.nearestPoint(q.seeker, q.candidates);
+    return withPossibleAnswers(stations, (station) => {
+        const answers = new Set<A>();
+        nearestPointsToCircle(
+            q.candidates,
+            station.geometry.coordinates,
             tolerance,
-            "hit",
-            "miss",
-        ),
-    );
+        ).features.forEach((stationMatch) => {
+            const answer =
+                stationMatch.properties.id === seekerMatch.properties.id ? "hit" : "miss";
+            answers.add(answer);
+        });
+        return [...answers.keys()];
+    });
+}
+
+export function divideArea(
+    q: T,
+    extent: BBox,
+): FeatureCollection<Polygon | MultiPolygon, Geo.PropertiesWithID & { answer: A }> {
+    if (q.candidates.features.length === 0) {
+        return { type: "FeatureCollection" as const, features: [] };
+    }
+
+    const nearest = turf.nearestPoint(q.seeker, q.candidates);
+    return withPropertiesInCollection(voronoi(q.candidates, { extent }), (area) => ({
+        answer: area.properties.id === nearest.properties.id ? ("hit" as const) : ("miss" as const),
+    }));
 }
 
 export function withPosition(q: T, newPosition: (number | null)[]): T {

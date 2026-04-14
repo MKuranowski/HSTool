@@ -62,7 +62,7 @@ function fullCircle(color: string, radius: number = 1, opacity: number = 1): SVG
 }
 
 function _stationIcon(colors?: string[]): SVGSVGElement {
-    const size = 20;
+    const size = 16;
     const innerRadius = 0.7;
     const innerOpacity = 0.7;
     const outerRadius = 1;

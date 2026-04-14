@@ -2,9 +2,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import * as turf from "@turf/turf";
-import type { FeatureCollection, Point, Position } from "geojson";
+import type { BBox, FeatureCollection, MultiPolygon, Point, Polygon, Position } from "geojson";
 import * as z from "zod";
-import { binaryCategorizer, mergePositions, withPossibleAnswers } from "../../helper/geo";
+import {
+    mergePositions,
+    nearestPointsToCircle,
+    voronoi,
+    withPossibleAnswers,
+} from "../../helper/geo";
 import * as Geo from "../Geo";
 
 export type T = z.infer<typeof schema>;
@@ -46,15 +51,27 @@ export function categorize<P extends { [name: string]: unknown }>(
     stations: FeatureCollection<Point, P>,
     tolerance: number,
 ): FeatureCollection<Point, P & { possibleAnswers: A[] }> {
-    const end = getEndLocation(q);
-    return withPossibleAnswers(
-        stations,
-        binaryCategorizer(
-            (s) => turf.distance(s, q.seeker) - turf.distance(s, end),
-            tolerance,
-            "colder",
-            "hotter",
+    const start = turf.point(q.seeker, { answer: "colder" as A });
+    const end = turf.point(getEndLocation(q), { answer: "hotter" as A });
+    const candidates = turf.featureCollection([start, end]);
+
+    return withPossibleAnswers(stations, (station) =>
+        nearestPointsToCircle(candidates, station.geometry.coordinates, tolerance).features.map(
+            (stationMatch) => stationMatch.properties.answer,
         ),
+    );
+}
+
+export function divideArea(
+    q: T,
+    extent: BBox,
+): FeatureCollection<Polygon | MultiPolygon, Geo.PropertiesWithID & { answer: A }> {
+    return voronoi(
+        turf.featureCollection([
+            turf.point(q.seeker, { id: "colder", answer: "colder" as A }),
+            turf.point(getEndLocation(q), { id: "warmer", answer: "hotter" as A }),
+        ]),
+        { extent },
     );
 }
 

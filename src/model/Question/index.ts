@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import type { FeatureCollection, Point, Position } from "geojson";
+import type { BBox, FeatureCollection, MultiPolygon, Point, Polygon, Position } from "geojson";
 import * as z from "zod";
+import type { PropertiesWithAnswer } from "../Geo";
 import * as CustomQuestion from "./CustomQuestion";
 import * as MatchAreaQuestion from "./MatchAreaQuestion";
 import * as MatchPointQuestion from "./MatchPointQuestion";
@@ -36,6 +37,10 @@ interface Submodule<T> {
         stations: FeatureCollection<Point, P>,
         tolerance: number,
     ): FeatureCollection<Point, P & { possibleAnswers: string[] }>;
+    divideArea(
+        q: T,
+        extent: BBox,
+    ): FeatureCollection<Polygon | MultiPolygon, PropertiesWithAnswer> | null;
 
     withPosition(q: T, newPosition: (number | null)[]): T;
 }
@@ -84,6 +89,13 @@ export function categorize<K extends Kind, P extends { [name: string]: unknown }
     tolerance: number,
 ): FeatureCollection<Point, P & { possibleAnswers: string[] }> {
     return submodules[q.kind].categorize(q, stations, tolerance);
+}
+
+export function divideArea<K extends Kind>(
+    q: T<K>,
+    extent: BBox,
+): FeatureCollection<Polygon | MultiPolygon, PropertiesWithAnswer> | null {
+    return submodules[q.kind].divideArea(q, extent);
 }
 
 export function withPosition<K extends Kind>(q: T<K>, newPosition: (number | null)[]): TLookup[K] {

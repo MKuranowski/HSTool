@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { MapContainer, Pane, TileLayer } from "react-leaflet";
-import { QuestionMarker, StationLayer, ThermometerSecondaryMarker } from "./MapLayer";
+import { QuestionMarker, StationLayer, ThermometerSecondaryMarker, VoronoiLayer } from "./MapLayer";
 import { BackgroundOverlay } from "./MapLayer/BackgroundOverlay";
 
 export default function GameMap() {
@@ -16,6 +16,9 @@ export default function GameMap() {
             />
             <Pane name="backgroundPane" style={{ zIndex: 210 }}>
                 <BackgroundOverlay />
+            </Pane>
+            <Pane name="voronoiPane" style={{ zIndex: 220 }}>
+                <VoronoiLayer />
             </Pane>
             <StationLayer />
             <QuestionMarker />

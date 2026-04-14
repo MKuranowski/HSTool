@@ -1,7 +1,15 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import type { Feature, FeatureCollection, MultiPolygon, Point, Polygon, Position } from "geojson";
+import type {
+    BBox,
+    Feature,
+    FeatureCollection,
+    MultiPolygon,
+    Point,
+    Polygon,
+    Position,
+} from "geojson";
 import * as z from "zod";
 import {
     areaContains,
@@ -9,6 +17,7 @@ import {
     distanceToFeature,
     mergePositions,
     withPossibleAnswers,
+    withPropertiesInCollection,
 } from "../../helper/geo";
 import * as Geo from "../Geo";
 
@@ -86,6 +95,17 @@ export function categorize<P extends { [name: string]: unknown }>(
             "miss",
         ),
     );
+}
+
+export function divideArea(
+    q: T,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _extent: BBox,
+): FeatureCollection<Polygon | MultiPolygon, Geo.PropertiesWithID & { answer: A }> {
+    const match = seekerArea(q);
+    return withPropertiesInCollection(q.candidates, (area) => ({
+        answer: area.properties.id === match?.properties.id ? ("hit" as const) : ("miss" as const),
+    }));
 }
 
 export function withPosition(q: T, newPosition: (number | null)[]): T {

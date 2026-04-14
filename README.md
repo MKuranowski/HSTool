@@ -8,7 +8,7 @@ HSTool is an under-construction tool for playing
 - [x] Questions & station filtering
 - [x] Permanent background overlay
 - [x] Show hiding zones
-- [ ] Voronoi diagrams of staging questions
+- [x] Voronoi diagrams of staging questions
 - [ ] Timing
 - [ ] Alternative units
 - [ ] Voronoi-based end game
@@ -22,7 +22,6 @@ HSTool is an under-construction tool for playing
 - [ ] Show answer names (not ids) in station popups when staging a question
 - [ ] Show thermometer end coordinates
 - [ ] Make every map layer toggleable (through leaflet's LayersControl)
-- [ ] MatchPointQuestion.categorize and ThermometerQuestion.categorize are completely wrong
 
 
 ## Development
