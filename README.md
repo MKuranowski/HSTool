@@ -1,6 +1,6 @@
 # HSTool
 
-HSTool is an under-construction tool for playing
+HSTool is an under-construction tool for seekers playing
 [Jet Lag: The Game — Hide and Seek Transit Game](https://store.nebula.tv/collections/jetlag/products/hideandseek).
 
 ## TODO
@@ -21,8 +21,45 @@ HSTool is an under-construction tool for playing
 - [ ] Clean-up, organize and test the mess in helper/geo
 - [ ] Show answer names (not ids) in station popups when staging a question
 - [ ] Show thermometer end coordinates
-- [ ] Make every map layer toggleable (through leaflet's LayersControl)
+- [ ] Make every map layer toggleable (through Leaflet's LayersControl)
 
+## How to create a preset?
+
+In order to use HSTool, you need a *preset* defining all stations, airports, parks, libraries,
+cinemas, etc. Currently, the only way to load a preset into the tool is through the clipboard.
+
+Unfortunately, currently creating a preset requires technical skills, as you must be able
+to create a JSON file on your own, most likely with a little bit of scripting. The preset must
+conform to the following schema, described as a [TypeScript interface](https://www.typescriptlang.org/docs/handbook/interfaces.html)
+with the help of [GeoJSON types](https://www.npmjs.com/package/@types/geojson). IDs must be unique
+within each collection.
+
+```ts
+interface Preset {
+    name: string;
+
+    stations: FeatureCollection<Point, { id: string; name: string }>;
+
+    // Point collections can be used in "Match-Point", "Measure" and "Tentacle" questions.
+    // Examples include "Airports", "Cinemas" or "Parks".
+    points?: Record<string, FeatureCollection<Point, { id: string; name?: string }>>;
+
+    // Line collections can be used in "Measure" questions.
+    // Examples include "Coastline" or "International Borders".
+    lines?: Record<string, FeatureCollection<LineString, { id: string }>>;
+
+    // Area collections can be used in "Match-Area" questions.
+    // Examples include "Landmasses" or "3rd Admin Divisions".
+    // Polygons within each collection should not overlap.
+    areas?: Record<string, FeatureCollection<Polygon | MultiPolygon, { id: string; name?: string }>>;
+
+    // Overlay can be used to draw something immediately above map tiles,
+    // like transit lines available during the game.
+    // Features may be styled using simplestyle: https://github.com/mapbox/simplestyle-spec
+    // Point-like features are currently not displayed.
+    overlay?: FeatureCollection;
+}
+```
 
 ## Development
 
