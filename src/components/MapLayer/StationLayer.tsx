@@ -5,7 +5,7 @@ import { useStore } from "@nanostores/react";
 import type { FeatureCollection, Point } from "geojson";
 import * as L from "leaflet";
 import { Circle, LayerGroup, Marker, Popup } from "react-leaflet";
-import * as palette from "../../helper/pallete";
+import * as palette from "../../helper/palette";
 import type { PropertiesWithName } from "../../model/Geo";
 import * as Question from "../../model/Question";
 import {

@@ -9,7 +9,7 @@ import { useEffect, useRef } from "react";
 import { GeoJSON } from "react-leaflet";
 import { LayerGroup } from "react-leaflet";
 import { bufferBBox } from "../../helper/geo";
-import * as palette from "../../helper/pallete";
+import * as palette from "../../helper/palette";
 import type { PropertiesWithAnswer, PropertiesWithID } from "../../model/Geo";
 import * as Question from "../../model/Question";
 import { $disabledStations, $hidingZoneRadius, $preset, $stagingQuestion } from "../../state";

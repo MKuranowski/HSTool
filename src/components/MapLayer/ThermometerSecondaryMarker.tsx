@@ -6,7 +6,7 @@ import * as turf from "@turf/turf";
 import * as L from "leaflet";
 import { useMemo, useRef } from "react";
 import { Circle, Marker } from "react-leaflet";
-import * as palette from "../../helper/pallete";
+import * as palette from "../../helper/palette";
 import * as ThermometerQuestion from "../../model/Question/ThermometerQuestion";
 import { $stagingQuestion } from "../../state";
 
