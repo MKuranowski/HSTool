@@ -4,7 +4,7 @@
 import { useStore } from "@nanostores/react";
 import type { FeatureCollection, LineString, MultiPolygon, Point, Polygon } from "geojson";
 import { Dropdown, DropdownButton, InputGroup } from "react-bootstrap";
-import { getQuestionPrefix, getQuestionState } from "../../../helper/questionState";
+import { getQuestionPrefix, getQuestionState } from "../../../helper/ui";
 import type { PropertiesWithID } from "../../../model/Geo";
 import * as Preset from "../../../model/Preset";
 import { $preset } from "../../../state";

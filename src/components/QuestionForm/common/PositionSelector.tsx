@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { Button, Form, InputGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { getQuestionState } from "../../../helper/questionState";
+import { getQuestionState } from "../../../helper/ui";
 import { toString } from "../../../helper/strings";
 import * as Question from "../../../model/Question";
 import { $toast } from "../../../state";
 
 function onGpsButton(
-    getQuestion: () => Question.T | null | undefined,
+    getQuestion: () => Question.T | null,
     setQuestion: (q: Question.T) => void,
 ): void {
     $toast.set({ header: "Getting GPS location", variant: "primary" });
@@ -38,7 +38,7 @@ function onGpsButton(
     );
 }
 
-function onPositionCopy(getter: () => Question.T | null | undefined): void {
+function onPositionCopy(getter: () => Question.T | null): void {
     const q = getter();
     if (!q || q.kind === "custom") return;
 
@@ -56,7 +56,7 @@ function onPositionCopy(getter: () => Question.T | null | undefined): void {
 }
 
 function onPositionPaste(
-    getQuestion: () => Question.T | null | undefined,
+    getQuestion: () => Question.T | null,
     setQuestion: (q: Question.T) => void,
 ): void {
     navigator.clipboard

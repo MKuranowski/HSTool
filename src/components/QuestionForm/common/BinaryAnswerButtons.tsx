@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { Button, ButtonGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { getQuestionPrefix } from "../../../helper/questionState";
+import { getQuestionPrefix } from "../../../helper/ui";
 import { $questions, $stagingQuestion } from "../../../state";
 
 const labels = {

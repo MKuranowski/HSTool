@@ -16,6 +16,10 @@ export interface ArrayAtom<T> extends WritableAtom<T[]> {
     remove(index: number): T | undefined;
 }
 
+/**
+ * Wraps the provided nanostore's atom with an array to add helper methods
+ * that operate specifically on arrays.
+ */
 export function arrayAtom<T>(atom: WritableAtom<T[]>): ArrayAtom<T> {
     const copy: ArrayAtom<T> = {
         ...atom,
@@ -66,6 +70,10 @@ export interface SetAtom extends WritableAtom<Record<string, 1>> {
     remove(...keys: string[]): void;
 }
 
+/**
+ * Wraps the provided nanostore's atom with an object to add helper methods
+ * that operate specifically on sets of string keys.
+ */
 export function setAtom(atom: WritableAtom<Record<string, 1>>): SetAtom {
     const copy: SetAtom = {
         ...atom,
@@ -89,6 +97,10 @@ export function setAtom(atom: WritableAtom<Record<string, 1>>): SetAtom {
     return copy;
 }
 
+/**
+ * Creates a persistentAtom that automatically encodes and decodes the stored value
+ * in JSON by wrapping the provided schema in a {@link zodJson} codec.
+ */
 export function persistentZod<T extends z.ZodType>(
     name: string,
     schema: T,

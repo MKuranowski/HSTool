@@ -4,7 +4,7 @@
 import { useStore } from "@nanostores/react";
 import type { JSX } from "react";
 import { Button, ButtonGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { getQuestionPrefix } from "../../../helper/questionState";
+import { getQuestionPrefix } from "../../../helper/ui";
 import { $questions, $stagingQuestion } from "../../../state";
 
 export default function CommonButtons({ index }: { index: number | null }) {

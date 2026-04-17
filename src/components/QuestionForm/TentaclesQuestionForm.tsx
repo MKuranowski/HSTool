@@ -4,7 +4,7 @@
 import { useStore } from "@nanostores/react";
 import { useMemo } from "react";
 import { Dropdown, DropdownButton } from "react-bootstrap";
-import { getQuestionState } from "../../helper/questionState";
+import { getQuestionState } from "../../helper/ui";
 import * as TentaclesQuestion from "../../model/Question/TentaclesQuestion";
 import { $preset } from "../../state";
 import CandidateSelector from "./common/CandidateSelector";

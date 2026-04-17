@@ -22,7 +22,7 @@ export const earthRadiusKm = turf.earthRadius / 1000;
  * Calculates the distance from a Position to any other Feature.
  *
  * For non-point features, calculates the distance to the nearest edge of that feature.
- * If the position is within the feature, the returned distance negative.
+ * If the position is within the feature, the returned distance is negative.
  */
 export function distanceToFeature(
     pt: Position,

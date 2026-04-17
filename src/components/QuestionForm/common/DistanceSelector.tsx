@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { Form, InputGroup } from "react-bootstrap";
-import { getQuestionState } from "../../../helper/questionState";
+import { getQuestionState } from "../../../helper/ui";
 import * as Question from "../../../model/Question";
 
 function validQuestionKind(variant: "distance" | "radius", kind: Question.Kind): boolean {
