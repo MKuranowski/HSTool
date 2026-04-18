@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { Button, Form, InputGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { getQuestionState } from "../../../helper/ui";
 import { toString } from "../../../helper/strings";
+import { getQuestionState } from "../../../helper/ui";
 import * as Question from "../../../model/Question";
 import { $toast } from "../../../state";
 

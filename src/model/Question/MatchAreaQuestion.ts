@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import * as turf from "@turf/turf";
 import type {
     BBox,
     Feature,
@@ -12,7 +13,6 @@ import type {
 } from "geojson";
 import * as z from "zod";
 import {
-    areaContains,
     binaryCategorizer,
     distanceToFeature,
     mergePositions,
@@ -60,8 +60,9 @@ export function seekerArea(
 ): Feature<Polygon | MultiPolygon, Geo.PropertiesWithID> | undefined {
     const seeker = { type: "Point", coordinates: q.seeker } as const;
     const candidates = q.candidates.features.filter((area) => {
-        return areaContains(area.geometry, seeker);
+        return turf.booleanPointInPolygon(seeker, area);
     });
+
     if (candidates.length === 0) {
         console.warn(`Match ${q.name} - seekers are not in any area from the preset`);
     } else if (candidates.length > 1) {
