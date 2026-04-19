@@ -89,13 +89,33 @@ export default function PositionSelector({
     lon = 0,
     index,
     className,
+    isStart = false,
 }: {
     lat?: number;
     lon?: number;
     index: number | null;
     className?: string;
+    isStart?: boolean | undefined;
 }) {
     const [idPrefix, getQuestion, setQuestion] = getQuestionState(index);
+
+    const latIcon = isStart ? (
+        <>
+            φ<sub>0</sub>
+        </>
+    ) : (
+        <>φ</>
+    );
+    const lonIcon = isStart ? (
+        <>
+            λ<sub>0</sub>
+        </>
+    ) : (
+        <>λ</>
+    );
+    const latLabel = isStart ? "Start Latitude" : "Latitude";
+    const lonLabel = isStart ? "Start Longitude" : "Longitude";
+
     return (
         <InputGroup className={className}>
             <OverlayTrigger overlay={<Tooltip id={`${idPrefix}gps`}>Pull from GPS</Tooltip>}>
@@ -131,8 +151,8 @@ export default function PositionSelector({
                     <i className="bi bi-clipboard" />
                 </Button>
             </OverlayTrigger>
-            <OverlayTrigger overlay={<Tooltip id={`${idPrefix}lat`}>Latitude</Tooltip>}>
-                <InputGroup.Text>φ</InputGroup.Text>
+            <OverlayTrigger overlay={<Tooltip id={`${idPrefix}lat`}>{latLabel}</Tooltip>}>
+                <InputGroup.Text>{latIcon}</InputGroup.Text>
             </OverlayTrigger>
             <Form.Control
                 type="number"
@@ -150,8 +170,8 @@ export default function PositionSelector({
                     }
                 }}
             />
-            <OverlayTrigger overlay={<Tooltip id={`${idPrefix}lon`}>Longitude</Tooltip>}>
-                <InputGroup.Text>λ</InputGroup.Text>
+            <OverlayTrigger overlay={<Tooltip id={`${idPrefix}lon`}>{lonLabel}</Tooltip>}>
+                <InputGroup.Text>{lonIcon}</InputGroup.Text>
             </OverlayTrigger>
             <Form.Control
                 type="number"

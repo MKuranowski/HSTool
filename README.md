@@ -20,7 +20,7 @@ HSTool is an under-construction tool for seekers playing
 - [x] Palette gives out the same color past the end of pre-defined colors
 - [x] Clean-up, organize and test the mess in helper/geo
 - [ ] Show answer names (not ids) in station popups when staging a question
-- [ ] Show thermometer end coordinates
+- [x] Show thermometer end coordinates
 - [ ] Make every map layer toggleable (through Leaflet's LayersControl)
 
 ## How to create a preset?
