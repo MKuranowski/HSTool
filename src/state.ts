@@ -17,19 +17,25 @@ export const $toast = atom<Readonly<{
     variant: BootstrapVariant;
 }> | null>(null);
 
-export const $hidingZoneRadius = persistentJSON("hidingZoneRadius", 0.5);
-export const $showHidingZones = persistentBoolean("showHidingZones", false);
+export const $hidingZoneRadius = persistentJSON("hstool:hidingZoneRadius", 0.5);
+export const $showHidingZones = persistentBoolean("hstool:showHidingZones", false);
 
-export const $preset = persistentZod("preset", Preset.schema, {
+export const $preset = persistentZod("hstool:preset", Preset.schema, {
     name: "Empty",
     stations: { type: "FeatureCollection", features: [] },
 });
 
-export const $stagingQuestion = persistentZod("stagingQuestion", Question.schema.nullable(), null);
+export const $stagingQuestion = persistentZod(
+    "hstool:stagingQuestion",
+    Question.schema.nullable(),
+    null,
+);
 
-export const $questions = arrayAtom(persistentZod("questions", z.array(Question.schema), []));
+export const $questions = arrayAtom(
+    persistentZod("hstool:questions", z.array(Question.schema), []),
+);
 
-export const $discardedStations = setAtom(persistentJSON("discardedStations", {}));
+export const $discardedStations = setAtom(persistentJSON("hstool:discardedStations", {}));
 
 export const $eliminatedStations = batched(
     [$questions, $preset, $hidingZoneRadius],
