@@ -3,12 +3,13 @@
 
 import { persistentBoolean, persistentJSON } from "@nanostores/persistent";
 import * as turf from "@turf/turf";
-import { atom, batched } from "nanostores";
+import { atom, batched, onMount, task } from "nanostores";
 import type { Variant as BootstrapVariant } from "react-bootstrap/esm/types";
 import * as z from "zod";
 import { arrayAtom, persistentZod, setAtom } from "./helper/store";
 import * as Preset from "./model/Preset";
 import * as Question from "./model/Question";
+import defaultPresetUrl from "./presets/default.json?url";
 
 /// Toast to display in the top-left corner of the UI
 export const $toast = atom<Readonly<{
@@ -21,8 +22,27 @@ export const $hidingZoneRadius = persistentJSON("hstool:hidingZoneRadius", 0.5);
 export const $showHidingZones = persistentBoolean("hstool:showHidingZones", false);
 
 export const $preset = persistentZod("hstool:preset", Preset.schema, {
-    name: "Empty",
+    name: "(none)",
     stations: { type: "FeatureCollection", features: [] },
+});
+
+const $presetIsEmpty = () => {
+    const p = $preset.get();
+    return p.stations.features.length === 0 && p.name === "(none)";
+};
+
+onMount($preset, () => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    task(async () => {
+        if (!$presetIsEmpty()) return; // don't overwrite any existing presets
+
+        const resp = await fetch(defaultPresetUrl);
+        if (!resp.ok) return;
+        const defaultPreset = Preset.schema.parse(await resp.json());
+
+        if (!$presetIsEmpty()) return; // check again - maybe someone pasted a preset in-between
+        $preset.set(defaultPreset);
+    });
 });
 
 export const $stagingQuestion = persistentZod(
