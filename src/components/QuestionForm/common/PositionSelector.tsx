@@ -120,6 +120,7 @@ export default function PositionSelector({
         <InputGroup className={className}>
             <OverlayTrigger overlay={<Tooltip id={`${idPrefix}gps`}>Pull from GPS</Tooltip>}>
                 <Button
+                    size="sm"
                     onClick={() => {
                         onGpsButton(getQuestion, setQuestion);
                     }}
@@ -131,6 +132,7 @@ export default function PositionSelector({
                 overlay={<Tooltip id={`${idPrefix}gps-copy`}>Copy to clipboard</Tooltip>}
             >
                 <Button
+                    size="sm"
                     variant="secondary"
                     onClick={() => {
                         onPositionCopy(getQuestion);
@@ -143,6 +145,7 @@ export default function PositionSelector({
                 overlay={<Tooltip id={`${idPrefix}gps-paste`}>Paste from clipboard</Tooltip>}
             >
                 <Button
+                    size="sm"
                     variant="secondary"
                     onClick={() => {
                         onPositionPaste(getQuestion, setQuestion);

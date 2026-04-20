@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { Button, ButtonGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { getQuestionPrefix } from "../../../helper/ui";
-import { $questions, $stagingQuestion } from "../../../state";
+import { getQuestionState } from "../../../helper/ui";
+import * as Question from "../../../model/Question";
 
 const labels = {
     hit: "Hit",
@@ -23,22 +23,6 @@ const icons = {
     colder: "bi bi-thermometer-snow",
 } as const;
 
-function setAnswer(index: number | null, answer: string | undefined): void {
-    if (index === null) {
-        const q = $stagingQuestion.get();
-        if (q !== null) {
-            // @ts-expect-error it's the callers responsibility to provide valid answers
-            $stagingQuestion.set({ ...q, answer });
-        }
-    } else {
-        const q = $questions.get().at(index);
-        if (q !== undefined) {
-            // @ts-expect-error it's the callers responsibility to provide valid answers
-            $questions.replace(index, { ...q, answer });
-        }
-    }
-}
-
 export default function BinaryAnswerButtons({
     negative,
     positive,
@@ -50,15 +34,18 @@ export default function BinaryAnswerButtons({
     answer?: string | undefined;
     index: number | null;
 }) {
-    const idPrefix = getQuestionPrefix(index);
+    const [idPrefix, getQuestion, setQuestion] = getQuestionState(index);
 
     return (
-        <ButtonGroup className="me-1">
+        <ButtonGroup>
             <OverlayTrigger overlay={<Tooltip id={`${idPrefix}neg`}>{labels[negative]}</Tooltip>}>
                 <Button
                     variant={answer === negative ? "success" : "outline-success"}
                     onClick={() => {
-                        setAnswer(index, negative);
+                        const q = getQuestion();
+                        if (q) {
+                            setQuestion(Question.withAnswer(q, negative));
+                        }
                     }}
                 >
                     <i className={icons[negative]} />
@@ -68,7 +55,10 @@ export default function BinaryAnswerButtons({
                 <Button
                     variant={answer === positive ? "danger" : "outline-danger"}
                     onClick={() => {
-                        setAnswer(index, positive);
+                        const q = getQuestion();
+                        if (q) {
+                            setQuestion(Question.withAnswer(q, positive));
+                        }
                     }}
                 >
                     <i className={icons[positive]} />
@@ -78,7 +68,10 @@ export default function BinaryAnswerButtons({
                 <Button
                     variant={answer === undefined ? "secondary" : "outline-secondary"}
                     onClick={() => {
-                        setAnswer(index, undefined);
+                        const q = getQuestion();
+                        if (q) {
+                            setQuestion(Question.withAnswer(q, undefined));
+                        }
                     }}
                 >
                     <i className="bi bi-ban" />

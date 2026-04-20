@@ -5,21 +5,29 @@ import { useStore } from "@nanostores/react";
 import type { JSX } from "react";
 import { Button, ButtonGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { getQuestionPrefix } from "../../../helper/ui";
+import * as Question from "../../../model/Question";
 import { $questions, $stagingQuestion } from "../../../state";
+import TimeSelector from "./TimeSelector";
 
-export default function CommonButtons({ index }: { index: number | null }) {
+export function EditCommitButton({ index }: { index: number | null }) {
     const stagingQuestion = useStore($stagingQuestion);
-    const buttons: JSX.Element[] = [];
     const idPrefix = getQuestionPrefix(index);
 
     if (index === null) {
-        buttons.push(
+        return (
             <OverlayTrigger overlay={<Tooltip id={`${idPrefix}commit`}>Commit</Tooltip>}>
                 <Button
                     variant="primary"
                     onClick={() => {
                         const q = $stagingQuestion.get();
                         if (q !== null) {
+                            // When committing a question, mark all of its timestamps as
+                            // explicit to prevent any modifications. Fortunately, because
+                            // we're moving the question from one store to another it can
+                            // just be mutated.
+                            if (q.askedAt) q.askedAt.explicit = true;
+                            if (q.answeredAt) q.answeredAt.explicit = true;
+
                             $questions.push(q);
                             $stagingQuestion.set(null);
                         }
@@ -27,10 +35,10 @@ export default function CommonButtons({ index }: { index: number | null }) {
                 >
                     <i className="bi bi-arrow-bar-down" />
                 </Button>
-            </OverlayTrigger>,
+            </OverlayTrigger>
         );
     } else {
-        buttons.push(
+        return (
             <OverlayTrigger overlay={<Tooltip id={`${idPrefix}edit`}>Edit</Tooltip>}>
                 <Button
                     variant="primary"
@@ -44,26 +52,46 @@ export default function CommonButtons({ index }: { index: number | null }) {
                 >
                     <i className="bi bi-arrow-bar-up" />
                 </Button>
-            </OverlayTrigger>,
+            </OverlayTrigger>
         );
     }
+}
 
-    buttons.push(
-        <OverlayTrigger overlay={<Tooltip id={`${idPrefix}del`}>Delete</Tooltip>}>
-            <Button
-                variant="secondary"
-                onClick={() => {
-                    if (index === null) {
-                        $stagingQuestion.set(null);
-                    } else {
-                        $questions.remove(index);
-                    }
-                }}
-            >
-                <i className="bi bi-trash" />
-            </Button>
-        </OverlayTrigger>,
+export default function CommonButtons({
+    q,
+    index,
+    children,
+}: {
+    q: Question.T;
+    index: number | null;
+    children?: JSX.Element | undefined;
+}) {
+    const idPrefix = getQuestionPrefix(index);
+
+    return (
+        <>
+            <TimeSelector time={q.askedAt} index={index} variant="askedAt" className="mb-2" />
+            <TimeSelector time={q.answeredAt} index={index} variant="answeredAt" className="mb-2" />
+            <div className="d-inline-flex">
+                {children}
+                <ButtonGroup className="ms-1">
+                    <EditCommitButton index={index} />
+                    <OverlayTrigger overlay={<Tooltip id={`${idPrefix}del`}>Delete</Tooltip>}>
+                        <Button
+                            variant="secondary"
+                            onClick={() => {
+                                if (index === null) {
+                                    $stagingQuestion.set(null);
+                                } else {
+                                    $questions.remove(index);
+                                }
+                            }}
+                        >
+                            <i className="bi bi-trash" />
+                        </Button>
+                    </OverlayTrigger>
+                </ButtonGroup>
+            </div>
+        </>
     );
-
-    return <ButtonGroup>{buttons}</ButtonGroup>;
 }

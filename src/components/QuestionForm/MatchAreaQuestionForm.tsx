@@ -19,8 +19,14 @@ export default function MatchAreaQuestionForm({
         <>
             <CandidateSelector current={q.name} kind="match-area" index={index} className="mb-2" />
             <PositionSelector lat={lat} lon={lon} index={index} className="mb-2" />
-            <BinaryAnswerButtons negative="hit" positive="miss" answer={q.answer} index={index} />
-            <CommonButtons index={index} />
+            <CommonButtons q={q} index={index}>
+                <BinaryAnswerButtons
+                    negative="hit"
+                    positive="miss"
+                    answer={q.answer}
+                    index={index}
+                />
+            </CommonButtons>
         </>
     );
 }

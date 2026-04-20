@@ -19,13 +19,14 @@ export default function MeasureQuestionForm({
         <>
             <CandidateSelector current={q.name} kind="measure" index={index} className="mb-2" />
             <PositionSelector lat={lat} lon={lon} index={index} className="mb-2" />
-            <BinaryAnswerButtons
-                negative="closer"
-                positive="further"
-                answer={q.answer}
-                index={index}
-            />
-            <CommonButtons index={index} />
+            <CommonButtons q={q} index={index}>
+                <BinaryAnswerButtons
+                    negative="closer"
+                    positive="further"
+                    answer={q.answer}
+                    index={index}
+                />
+            </CommonButtons>
         </>
     );
 }

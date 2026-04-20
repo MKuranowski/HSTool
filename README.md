@@ -10,6 +10,9 @@ HSTool is an under-construction tool for seekers playing
 - [x] Show hiding zones
 - [x] Voronoi diagrams of staging questions
 - [ ] Timing
+    - [x] Save question timestamps
+    - [ ] Compute game time - including card bonuses and quick answer bonuses
+    - [ ] Update Question.askedAt when a question is copied to clipboard
 - [ ] Alternative units
 - [ ] Voronoi-based end game
 - [ ] Better state shareability:

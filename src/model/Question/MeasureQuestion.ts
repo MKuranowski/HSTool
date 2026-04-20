@@ -14,11 +14,12 @@ import {
     withPossibleAnswers,
 } from "../../helper/geo";
 import * as Geo from "../Geo";
+import * as base from "./base";
 
 export type T = z.infer<typeof schema>;
 export type A = Exclude<T["answer"], undefined>;
 
-export const schema = z.object({
+export const schema = base.schema.extend({
     kind: z.literal("measure"),
     name: z.string(),
     candidates: Geo.featureCollection(

@@ -102,6 +102,24 @@ export function withPosition<K extends Kind>(q: T<K>, newPosition: (number | nul
     return submodules[q.kind].withPosition(q, newPosition);
 }
 
+export function withAnswer<K extends Kind>(q: T<K>, answer: string | undefined): TLookup[K] {
+    if (answer === undefined) {
+        // Special case - remove `answer` and `answeredAt`
+        const copy = { ...q };
+        delete copy.answer;
+        delete copy.answeredAt;
+        return copy;
+    }
+
+    const validAnswers = answers(q);
+    if (validAnswers.length > 0 && !validAnswers.includes(answer)) {
+        throw new TypeError(`invalid answer for question ${name(q)}: ${answer}`);
+    }
+
+    const answeredAt = q.answeredAt?.explicit ? q.answeredAt : { t: new Date().toISOString() };
+    return { ...q, answer, answeredAt };
+}
+
 export const schema = z.discriminatedUnion("kind", [
     CustomQuestion.schema,
     MatchAreaQuestion.schema,

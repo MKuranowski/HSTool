@@ -4,10 +4,11 @@
 import type { BBox, FeatureCollection, Point, Position } from "geojson";
 import * as z from "zod";
 import { withPossibleAnswers } from "../../helper/geo";
+import * as base from "./base";
 
 export type T = z.infer<typeof schema>;
 
-export const schema = z.object({
+export const schema = base.schema.extend({
     kind: z.literal("custom"),
     name: z.string(),
     answer: z.string().optional(),

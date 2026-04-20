@@ -3,6 +3,7 @@
 
 import { Form, InputGroup } from "react-bootstrap";
 import { getQuestionState } from "../../helper/ui";
+import * as Question from "../../model/Question";
 import * as CustomQuestion from "../../model/Question/CustomQuestion";
 import CommonButtons from "./common/CommonButtons";
 
@@ -37,12 +38,12 @@ export default function CustomQuestionForm({
                     onChange={(e) => {
                         const q = getQuestion();
                         if (q && q.kind === "custom") {
-                            setQuestion({ ...q, answer: e.target.value });
+                            setQuestion(Question.withAnswer(q, e.target.value));
                         }
                     }}
                 />
             </InputGroup>
-            <CommonButtons index={index} />
+            <CommonButtons q={q} index={index} />
         </>
     );
 }

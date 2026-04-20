@@ -100,13 +100,14 @@ export default function ThermometerQuestionForm({
             <AzimuthSelector azimuth={q.azimuth} index={index} className="mb-2" />
             <PositionSelector lat={lat} lon={lon} index={index} className="mb-2" isStart />
             <EndPositionLabel lat={endLat} lon={endLon} index={index} />
-            <BinaryAnswerButtons
-                negative="colder"
-                positive="hotter"
-                answer={q.answer}
-                index={index}
-            />
-            <CommonButtons index={index} />
+            <CommonButtons q={q} index={index}>
+                <BinaryAnswerButtons
+                    negative="colder"
+                    positive="hotter"
+                    answer={q.answer}
+                    index={index}
+                />
+            </CommonButtons>
         </>
     );
 }
