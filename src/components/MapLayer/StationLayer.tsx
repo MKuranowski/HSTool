@@ -16,6 +16,8 @@ import {
     $stagingQuestion,
 } from "../../state";
 
+const MARKER_SIZE = 16;
+
 interface AnnotatedStationProperties extends PropertiesWithName {
     possibleAnswers?: string[] | undefined;
 }
@@ -44,25 +46,24 @@ function segmentedCircle(
         const path = `M 0 0 ${x1} ${y1} A ${radius} ${radius} 0 0 1 ${x2} ${y2}`;
 
         const elem = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        elem.setAttributeNS(null, "d", path);
-        elem.setAttributeNS(null, "fill", color);
-        elem.setAttributeNS(null, "fill-opacity", opacity.toString());
+        elem.setAttribute("d", path);
+        elem.setAttribute("fill", color);
+        elem.setAttribute("fill-opacity", opacity.toString());
         return elem;
     });
 }
 
 function fullCircle(color: string, radius: number = 1, opacity: number = 1): SVGCircleElement {
     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    circle.setAttributeNS(null, "cx", "1");
-    circle.setAttributeNS(null, "cy", "1");
-    circle.setAttributeNS(null, "r", radius.toString());
-    circle.setAttributeNS(null, "fill", color);
-    circle.setAttributeNS(null, "fill-opacity", opacity.toString());
+    circle.setAttribute("cx", "1");
+    circle.setAttribute("cy", "1");
+    circle.setAttribute("r", radius.toString());
+    circle.setAttribute("fill", color);
+    circle.setAttribute("fill-opacity", opacity.toString());
     return circle;
 }
 
 function _stationIcon(colors?: string[]): SVGSVGElement {
-    const size = 16;
     const innerRadius = 0.7;
     const innerOpacity = 0.7;
     const outerRadius = 1;
@@ -71,9 +72,10 @@ function _stationIcon(colors?: string[]): SVGSVGElement {
     colors = colors === undefined || colors.length === 0 ? [palette.primary] : colors;
 
     const root = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    root.setAttributeNS(null, "width", size.toString());
-    root.setAttributeNS(null, "height", size.toString());
-    root.setAttributeNS(null, "viewBox", "0 0 2 2");
+    root.setAttribute("width", MARKER_SIZE.toString());
+    root.setAttribute("height", MARKER_SIZE.toString());
+    root.setAttribute("viewBox", "0 0 2 2");
+    root.setAttribute("style", "display: block;");
 
     // Special case for single color. Angles more than 180° require different
     // elliptical curve parameters (large-arc-flag=1), while the code below
@@ -91,7 +93,7 @@ function _stationIcon(colors?: string[]): SVGSVGElement {
     const outerPoints = angles.map((a) => rot(0, -outerRadius, a));
 
     const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-    g.setAttributeNS(null, "transform", "translate(1,1)");
+    g.setAttribute("transform", "translate(1,1)");
     root.append(g);
 
     g.append(...segmentedCircle(outerPoints, colors, outerRadius, outerOpacity));
@@ -100,22 +102,16 @@ function _stationIcon(colors?: string[]): SVGSVGElement {
     return root;
 }
 
-function _wrapInDiv(...elem: Node[]): HTMLDivElement {
-    const d = document.createElement("div");
-    d.append(...elem);
-    return d;
-}
-
 const _stationIconMemo = new Map<string, SVGSVGElement>();
 
-function stationIcon(colors?: string[]): HTMLDivElement {
+function stationIcon(colors?: string[]): SVGSVGElement {
     const key = colors?.join(";") ?? "";
     const cached = _stationIconMemo.get(key);
-    if (cached !== undefined) return _wrapInDiv(cached.cloneNode(true));
+    if (cached !== undefined) return cached.cloneNode(true) as SVGSVGElement;
 
     const icon = _stationIcon(colors);
     _stationIconMemo.set(key, icon);
-    return _wrapInDiv(icon.cloneNode(true));
+    return icon;
 }
 
 function StationPopup({
@@ -163,8 +159,10 @@ export function StationIconLayer({
                     : undefined;
 
                 const icon = L.divIcon({
+                    // @ts-expect-error: Leaflet type hint is wrong, html can be anything accepted by HTMLDivElement.appendChild
                     html: stationIcon(colors),
                     className: "",
+                    iconSize: [MARKER_SIZE, MARKER_SIZE],
                 });
 
                 return (
