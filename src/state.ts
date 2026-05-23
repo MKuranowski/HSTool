@@ -18,6 +18,9 @@ export const $toast = atom<Readonly<{
     variant: BootstrapVariant;
 }> | null>(null);
 
+export const $answerTime = persistentJSON("hstool:answerTime", 5);
+export const $photoAnswerTime = persistentJSON("hstool:photoAnswerTime", 10);
+export const $quickAnswerMultiplier = persistentJSON("hstool:quickAnswerMultiplier", 0.0);
 export const $hidingZoneRadius = persistentJSON("hstool:hidingZoneRadius", 0.5);
 export const $showHidingZones = persistentBoolean("hstool:showHidingZones", false);
 
@@ -54,6 +57,10 @@ export const $stagingQuestion = persistentZod(
 export const $questions = arrayAtom(
     persistentZod("hstool:questions", z.array(Question.schema), []),
 );
+
+export const $startTime = persistentZod("hstool:startTime", z.iso.datetime().nullable(), null);
+export const $endTime = persistentZod("hstool:endTime", z.iso.datetime().nullable(), null);
+export const $timeBonus = persistentJSON("hstool:timeBonus", 0);
 
 export const $discardedStations = setAtom(persistentJSON("hstool:discardedStations", {}));
 

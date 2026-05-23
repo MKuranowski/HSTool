@@ -6,6 +6,7 @@ import GameMap from "./GameMap";
 import Questions from "./Questions";
 import Settings from "./Settings";
 import Stations from "./Stations";
+import Timing from "./Timing";
 import ToastManager from "./ToastManager";
 
 function App() {
@@ -24,6 +25,9 @@ function App() {
                             </Tab>
                             <Tab eventKey="stations" title="Stations">
                                 <Stations />
+                            </Tab>
+                            <Tab eventKey="timing" title="Timing">
+                                <Timing />
                             </Tab>
                             <Tab eventKey="settings" title="Settings">
                                 <Settings />

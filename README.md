@@ -11,7 +11,8 @@ HSTool is an under-construction tool for seekers playing
 - [x] Voronoi diagrams of staging questions
 - [ ] Timing
     - [x] Save question timestamps
-    - [ ] Compute game time - including card bonuses and quick answer bonuses
+    - [x] Compute game time - including card bonuses and quick answer bonuses
+    - [ ] Rest Periods
     - [ ] Update Question.askedAt when a question is copied to clipboard
 - [ ] Alternative units
 - [ ] Voronoi-based end game

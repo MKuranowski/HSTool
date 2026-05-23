@@ -2,11 +2,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { useStore } from "@nanostores/react";
-import { Button, Form, InputGroup, ListGroup } from "react-bootstrap";
+import { Button, Form, InputGroup, ListGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { zodJson } from "../helper/store";
 import { toString } from "../helper/strings";
 import * as Preset from "../model/Preset";
-import { $hidingZoneRadius, $preset, $showHidingZones, $toast } from "../state";
+import {
+    $answerTime,
+    $hidingZoneRadius,
+    $photoAnswerTime,
+    $preset,
+    $quickAnswerMultiplier,
+    $showHidingZones,
+    $toast,
+} from "../state";
 
 const presetSchemaJson = zodJson(Preset.schema);
 
@@ -38,12 +46,82 @@ export function PresetInput() {
     );
 }
 
+export function AnswerTimeInput({ photo = false }: { photo?: boolean | undefined }) {
+    const store = photo ? $photoAnswerTime : $answerTime;
+    const time = useStore(store);
+    const helper = photo ? (
+        <OverlayTrigger
+            flip
+            overlay={
+                <Tooltip id="photo-answer-time">
+                    Any custom question with the word &quot;photo&quot;
+                </Tooltip>
+            }
+        >
+            <i className="bi bi-question-circle" />
+        </OverlayTrigger>
+    ) : null;
+    return (
+        <InputGroup>
+            <InputGroup.Text className="column-gap-1">
+                {photo ? "Photo question answer time" : "Other question answer time"} {helper}
+            </InputGroup.Text>
+            <Form.Control
+                type="number"
+                min="0"
+                step="1"
+                defaultValue={time}
+                onChange={(e) => {
+                    const num = Number.parseFloat(e.target.value);
+                    if (!Number.isNaN(num)) store.set(num);
+                }}
+            />
+            <InputGroup.Text>min</InputGroup.Text>
+        </InputGroup>
+    );
+}
+
+export function QuickAnswerMultiplierInput() {
+    const multiplier = useStore($quickAnswerMultiplier);
+    return (
+        <InputGroup>
+            <InputGroup.Text className="column-gap-1">
+                Quick answer multiplier
+                <OverlayTrigger
+                    flip
+                    overlay={
+                        <Tooltip id="quick-answer-multiplier">
+                            Bonus time added to the hiding time for quick answering questions,
+                            calculated by truncating the answer time multiplied by this factor. For
+                            example, when set to 0.5, if the hider answers a photo question with 5
+                            minutes leftover, (⌊5*0.5⌋=⌊2.5⌋=) 2 minutes will be added to their
+                            hiding time. Set to 0 to disable.
+                        </Tooltip>
+                    }
+                >
+                    <i className="bi bi-question-circle" />
+                </OverlayTrigger>
+            </InputGroup.Text>
+            <Form.Control
+                type="number"
+                min="0"
+                step="0.1"
+                defaultValue={multiplier}
+                onChange={(e) => {
+                    const num = Number.parseFloat(e.target.value);
+                    if (!Number.isNaN(num)) $quickAnswerMultiplier.set(num);
+                }}
+            />
+        </InputGroup>
+    );
+}
+
 export function HidingZoneRadiusInput() {
     const hidingZoneRadius = useStore($hidingZoneRadius);
 
     return (
         <InputGroup>
-            <InputGroup.Text>Hiding zone radius (km)</InputGroup.Text>
+            <InputGroup.Text>Hiding zone radius</InputGroup.Text>
             <Form.Control
                 type="number"
                 min="0"
@@ -54,6 +132,7 @@ export function HidingZoneRadiusInput() {
                     if (!Number.isNaN(num)) $hidingZoneRadius.set(num);
                 }}
             />
+            <InputGroup.Text>km</InputGroup.Text>
         </InputGroup>
     );
 }
@@ -87,12 +166,15 @@ export function ShowHidingZonesInput() {
 export default function Settings() {
     return (
         <ListGroup>
-            <ListGroup.Item className="d-flex align-items-center">
-                <PresetInput />
-            </ListGroup.Item>
             <ListGroup.Item>
+                <AnswerTimeInput photo />
+                <AnswerTimeInput />
+                <QuickAnswerMultiplierInput />
                 <HidingZoneRadiusInput />
                 <ShowHidingZonesInput />
+            </ListGroup.Item>
+            <ListGroup.Item className="d-flex align-items-center">
+                <PresetInput />
             </ListGroup.Item>
         </ListGroup>
     );
