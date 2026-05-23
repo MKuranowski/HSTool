@@ -62,7 +62,7 @@ export function AnswerTimeInput({ photo = false }: { photo?: boolean | undefined
         </OverlayTrigger>
     ) : null;
     return (
-        <InputGroup>
+        <InputGroup className="mb-2">
             <InputGroup.Text className="column-gap-1">
                 {photo ? "Photo question answer time" : "Other question answer time"} {helper}
             </InputGroup.Text>
@@ -84,7 +84,7 @@ export function AnswerTimeInput({ photo = false }: { photo?: boolean | undefined
 export function QuickAnswerMultiplierInput() {
     const multiplier = useStore($quickAnswerMultiplier);
     return (
-        <InputGroup>
+        <InputGroup className="mb-2">
             <InputGroup.Text className="column-gap-1">
                 Quick answer multiplier
                 <OverlayTrigger
@@ -120,7 +120,7 @@ export function HidingZoneRadiusInput() {
     const hidingZoneRadius = useStore($hidingZoneRadius);
 
     return (
-        <InputGroup>
+        <InputGroup className="mb-2">
             <InputGroup.Text>Hiding zone radius</InputGroup.Text>
             <Form.Control
                 type="number"
