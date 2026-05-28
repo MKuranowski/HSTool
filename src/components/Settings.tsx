@@ -2,27 +2,46 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { useStore } from "@nanostores/react";
-import { Button, Form, InputGroup, ListGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { useState } from "react";
+import {
+    Button,
+    ButtonGroup,
+    Dropdown,
+    Form,
+    InputGroup,
+    ListGroup,
+    OverlayTrigger,
+    Tooltip,
+} from "react-bootstrap";
+import builtinPresetsIndexUrl from "/presets/index.json?url";
 import { zodJson } from "../helper/store";
 import { toString } from "../helper/strings";
 import * as Preset from "../model/Preset";
 import {
     $answerTime,
+    $builtinPresets,
     $hidingZoneRadius,
     $photoAnswerTime,
     $preset,
     $quickAnswerMultiplier,
     $showHidingZones,
     $toast,
+    clearGameState,
 } from "../state";
 
 const presetSchemaJson = zodJson(Preset.schema);
+const builtinPresetBaseUrl = builtinPresetsIndexUrl.substring(
+    0,
+    builtinPresetsIndexUrl.lastIndexOf("/") + 1,
+);
 
 function onPresetPaste(): void {
     navigator.clipboard
         .readText()
         .then((content) => {
             $preset.set(presetSchemaJson.decode(content));
+            clearGameState();
+            $toast.set({ header: "Preset loaded", variant: "success" });
         })
         .catch((error: unknown) => {
             console.error("Failed to read preset from clipboard:", error);
@@ -34,11 +53,70 @@ function onPresetPaste(): void {
         });
 }
 
+function BuiltinPresetSelect() {
+    const builtinPresets = useStore($builtinPresets);
+    const [selectedPreset, setSelectedPreset] = useState("");
+    if (Object.keys(builtinPresets).length === 0) return null;
+
+    return (
+        <Dropdown as={ButtonGroup} className="me-2">
+            <Button
+                variant="secondary"
+                disabled={selectedPreset === ""}
+                onClick={() => {
+                    const filename = builtinPresets[selectedPreset];
+                    if (!filename) {
+                        console.error(`Unknown builtin preset: ${JSON.stringify(selectedPreset)}`);
+                        return;
+                    }
+
+                    const url = builtinPresetBaseUrl + filename;
+                    fetch(url)
+                        .then((resp) => {
+                            // eslint-disable-next-line @typescript-eslint/only-throw-error
+                            if (!resp.ok) throw `${resp.status.toString()} ${resp.statusText}`;
+                            return resp.json();
+                        })
+                        .then((presetData) => {
+                            $preset.set(Preset.schema.parse(presetData));
+                            clearGameState();
+                            $toast.set({ header: "Preset loaded", variant: "success" });
+                        })
+                        .catch((error: unknown) => {
+                            console.error("Failed to load builtin preset:", error);
+                            $toast.set({
+                                header: "Failed to load builtin preset",
+                                body: toString(error),
+                                variant: "danger",
+                            });
+                        });
+                }}
+            >
+                {selectedPreset ? `Load ${selectedPreset}` : "Select builtin"}
+            </Button>
+            <Dropdown.Toggle split variant="secondary" />
+            <Dropdown.Menu>
+                {Object.keys(builtinPresets).map((name) => (
+                    <Dropdown.Item
+                        key={name}
+                        onClick={() => {
+                            setSelectedPreset(name);
+                        }}
+                    >
+                        {name}
+                    </Dropdown.Item>
+                ))}
+            </Dropdown.Menu>
+        </Dropdown>
+    );
+}
+
 export function PresetInput() {
     const preset = useStore($preset);
     return (
         <>
             <span className="flex-fill">Current preset: {preset.name}</span>
+            <BuiltinPresetSelect />
             <Button variant="primary" onClick={onPresetPaste}>
                 Paste
             </Button>

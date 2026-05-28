@@ -6,10 +6,10 @@ import * as turf from "@turf/turf";
 import { atom, batched, onMount, task } from "nanostores";
 import type { Variant as BootstrapVariant } from "react-bootstrap/esm/types";
 import * as z from "zod";
+import builtinPresetsIndexUrl from "/presets/index.json?url";
 import { arrayAtom, persistentZod, setAtom } from "./helper/store";
 import * as Preset from "./model/Preset";
 import * as Question from "./model/Question";
-import defaultPresetUrl from "./presets/default.json?url";
 
 /// Toast to display in the top-left corner of the UI
 export const $toast = atom<Readonly<{
@@ -24,6 +24,7 @@ export const $quickAnswerMultiplier = persistentJSON("hstool:quickAnswerMultipli
 export const $hidingZoneRadius = persistentJSON("hstool:hidingZoneRadius", 0.5);
 export const $showHidingZones = persistentBoolean("hstool:showHidingZones", false);
 
+export const $builtinPresets = atom<Record<string, string>>({});
 export const $preset = persistentZod("hstool:preset", Preset.schema, {
     name: "(none)",
     stations: { type: "FeatureCollection", features: [] },
@@ -34,17 +35,50 @@ const $presetIsEmpty = () => {
     return p.stations.features.length === 0 && p.name === "(none)";
 };
 
+onMount($builtinPresets, () => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    task(async () => {
+        const indexResp = await fetch(builtinPresetsIndexUrl);
+        if (!indexResp.ok) return;
+        const index = (await indexResp.json()) as Record<string, string>;
+        delete index[""];
+        $builtinPresets.set(index);
+    });
+});
+
 onMount($preset, () => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     task(async () => {
-        if (!$presetIsEmpty()) return; // don't overwrite any existing presets
+        // Check if a specific preset was requested
+        const url = new URL(window.location.href);
+        const forcePreset = url.searchParams.get("preset");
+        if (forcePreset !== null) {
+            url.searchParams.delete("preset");
+            window.history.replaceState(window.history.state, "", url.toString());
+        }
 
-        const resp = await fetch(defaultPresetUrl);
-        if (!resp.ok) return;
-        const defaultPreset = Preset.schema.parse(await resp.json());
+        // Don't overwrite any existing presets
+        if (!$presetIsEmpty() && !forcePreset) return;
 
-        if (!$presetIsEmpty()) return; // check again - maybe someone pasted a preset in-between
-        $preset.set(defaultPreset);
+        // Fetch the list of builtin presets
+        const indexResp = await fetch(builtinPresetsIndexUrl);
+        if (!indexResp.ok) return;
+        const index = (await indexResp.json()) as Record<string, string>;
+
+        // Fetch the specified preset
+        const defaultFilename = index[forcePreset ?? ""] ?? "";
+        if (!defaultFilename) return;
+
+        const defaultUrl =
+            builtinPresetsIndexUrl.substring(0, builtinPresetsIndexUrl.lastIndexOf("/") + 1) +
+            defaultFilename;
+        const defaultResp = await fetch(defaultUrl);
+        if (!defaultResp.ok) return;
+        const default_ = Preset.schema.parse(await defaultResp.json());
+
+        // Check again - maybe someone pasted a preset in-between
+        if (!$presetIsEmpty() && !forcePreset) return;
+        $preset.set(default_);
     });
 });
 
@@ -101,3 +135,12 @@ export const $defaultMakerLocation = batched(
             : [0, 0];
     },
 );
+
+export function clearGameState() {
+    $stagingQuestion.set(null);
+    $questions.set([]);
+    $startTime.set(null);
+    $endTime.set(null);
+    $timeBonus.set(0);
+    $discardedStations.set({});
+}
