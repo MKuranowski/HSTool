@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+// force the backwards-ass vite bundler to include **all** leaflet assets, not only the ones explicitly mentioned in leaflet.css
+import "leaflet/dist/images/marker-icon-2x.png";
+import "leaflet/dist/images/marker-shadow.png";
 import { MapContainer, Pane, TileLayer } from "react-leaflet";
 import { QuestionMarker, StationLayer, ThermometerSecondaryMarker, VoronoiLayer } from "./MapLayer";
 import { BackgroundOverlay } from "./MapLayer/BackgroundOverlay";
