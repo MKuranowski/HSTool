@@ -8,6 +8,7 @@ export type T = z.infer<typeof schema>;
 
 export const schema = z.object({
     name: z.string(),
+    hiding_radius: z.number().min(0).optional().default(0.5),
     stations: Geo.featureCollection(Geo.point, Geo.withName),
     points: z.record(z.string(), Geo.featureCollection(Geo.point, Geo.withID)).optional(),
     lines: z.record(z.string(), Geo.featureCollection(Geo.lineString, Geo.withID)).optional(),

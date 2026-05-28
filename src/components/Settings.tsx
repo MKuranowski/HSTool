@@ -204,7 +204,7 @@ export function HidingZoneRadiusInput() {
                 type="number"
                 min="0"
                 step="0.1"
-                defaultValue={hidingZoneRadius}
+                value={hidingZoneRadius}
                 onChange={(e) => {
                     const num = Number.parseFloat(e.target.value);
                     if (!Number.isNaN(num)) $hidingZoneRadius.set(num);

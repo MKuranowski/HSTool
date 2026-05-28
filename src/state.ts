@@ -3,7 +3,7 @@
 
 import { persistentBoolean, persistentJSON } from "@nanostores/persistent";
 import * as turf from "@turf/turf";
-import { atom, batched, onMount, task } from "nanostores";
+import { atom, batched, effect, onMount, task } from "nanostores";
 import type { Variant as BootstrapVariant } from "react-bootstrap/esm/types";
 import * as z from "zod";
 import builtinPresetsIndexUrl from "/presets/index.json?url";
@@ -27,6 +27,7 @@ export const $showHidingZones = persistentBoolean("hstool:showHidingZones", fals
 export const $builtinPresets = atom<Record<string, string>>({});
 export const $preset = persistentZod("hstool:preset", Preset.schema, {
     name: "(none)",
+    hiding_radius: 0.5,
     stations: { type: "FeatureCollection", features: [] },
 });
 
@@ -80,6 +81,10 @@ onMount($preset, () => {
         if (!$presetIsEmpty() && !forcePreset) return;
         $preset.set(default_);
     });
+});
+
+effect($preset, (p) => {
+    $hidingZoneRadius.set(p.hiding_radius);
 });
 
 export const $stagingQuestion = persistentZod(

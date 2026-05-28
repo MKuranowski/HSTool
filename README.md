@@ -42,6 +42,9 @@ within each collection.
 interface Preset {
     name: string;
 
+    // In kilometers, defaults to 0.5
+    hiding_radius?: number,
+
     stations: FeatureCollection<Point, { id: string; name: string }>;
 
     // Point collections can be used in "Match-Point", "Measure" and "Tentacle" questions.
