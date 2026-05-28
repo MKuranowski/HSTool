@@ -31,9 +31,12 @@ export const $preset = persistentZod("hstool:preset", Preset.schema, {
     stations: { type: "FeatureCollection", features: [] },
 });
 
-const $presetIsEmpty = () => {
+const canLoadBuiltinPreset = (forced: string): boolean => {
     const p = $preset.get();
-    return p.stations.features.length === 0 && p.name === "(none)";
+    return (
+        (p.stations.features.length === 0 && p.name === "(none)") ||
+        (forced !== "" && forced !== p.name)
+    );
 };
 
 onMount($builtinPresets, () => {
@@ -52,14 +55,14 @@ onMount($preset, () => {
     task(async () => {
         // Check if a specific preset was requested
         const url = new URL(window.location.href);
-        const forcePreset = url.searchParams.get("preset");
-        if (forcePreset !== null) {
+        const forcePreset = url.searchParams.get("preset") ?? "";
+        if (forcePreset !== "") {
             url.searchParams.delete("preset");
             window.history.replaceState(window.history.state, "", url.toString());
         }
 
         // Don't overwrite any existing presets
-        if (!$presetIsEmpty() && !forcePreset) return;
+        if (!canLoadBuiltinPreset(forcePreset)) return;
 
         // Fetch the list of builtin presets
         const indexResp = await fetch(builtinPresetsIndexUrl);
@@ -67,7 +70,7 @@ onMount($preset, () => {
         const index = (await indexResp.json()) as Record<string, string>;
 
         // Fetch the specified preset
-        const defaultFilename = index[forcePreset ?? ""] ?? "";
+        const defaultFilename = index[forcePreset] ?? "";
         if (!defaultFilename) return;
 
         const defaultUrl =
@@ -78,7 +81,8 @@ onMount($preset, () => {
         const default_ = Preset.schema.parse(await defaultResp.json());
 
         // Check again - maybe someone pasted a preset in-between
-        if (!$presetIsEmpty() && !forcePreset) return;
+        if (!canLoadBuiltinPreset(forcePreset)) return;
+        clearGameState();
         $preset.set(default_);
     });
 });
