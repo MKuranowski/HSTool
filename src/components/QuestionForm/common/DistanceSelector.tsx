@@ -5,11 +5,6 @@ import { Form, InputGroup } from "react-bootstrap";
 import { getQuestionState } from "../../../helper/ui";
 import * as Question from "../../../model/Question";
 
-function validQuestionKind(variant: "distance" | "radius", kind: Question.Kind): boolean {
-    if (variant === "radius") return kind === "radar" || kind === "tentacles";
-    return kind === "thermometer";
-}
-
 export default function DistanceSelector({
     value,
     variant = "distance",
@@ -35,8 +30,8 @@ export default function DistanceSelector({
                     if (Number.isNaN(value) || value < 0) return;
 
                     const q = getQuestion();
-                    if (q && validQuestionKind(variant, q.kind)) {
-                        setQuestion({ ...q, [variant]: value });
+                    if (q) {
+                        setQuestion(Question.withDistance(q, value));
                     }
                 }}
             />

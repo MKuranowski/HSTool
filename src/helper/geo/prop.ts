@@ -79,3 +79,10 @@ export function mergePositions(old: Position, new_: (null | number)[]): Position
     for (let i = 0; i < len; ++i) merged[i] = new_[i] ?? old[i];
     return merged;
 }
+
+export function hashCoords(
+    c: Position,
+    { precision = 6 }: { precision?: number | undefined } = {},
+): string {
+    return `${c[0].toFixed(precision)};${c[1].toFixed(precision)}`;
+}

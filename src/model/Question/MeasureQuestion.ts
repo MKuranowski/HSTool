@@ -13,10 +13,19 @@ import {
     soleDivision,
     withPossibleAnswers,
 } from "../../helper/geo";
+import { hashCoords } from "../../helper/geo/prop";
 import * as Geo from "../Geo";
 import * as base from "./base";
 
-export type T = z.infer<typeof schema>;
+export interface _Cache {
+    seekerDistance: number;
+    stationCategories: Map<string, A[]>;
+    division?:
+        | FeatureCollection<Polygon | MultiPolygon, Geo.PropertiesWithID & { answer: A }>
+        | undefined;
+}
+
+export type T = z.infer<typeof schema> & { _cache?: _Cache | undefined };
 export type A = Exclude<T["answer"], undefined>;
 
 export const schema = base.schema.extend({
@@ -53,31 +62,47 @@ export function calcDistance(q: T, root?: Position): number {
     return Math.min(...q.candidates.features.map((f) => distanceToFeature(root, f)));
 }
 
+export function calcSeekerDistance(q: T): number {
+    if (q._cache) return q._cache.seekerDistance;
+
+    const d = calcDistance(q);
+    q._cache = { seekerDistance: d, stationCategories: new Map() };
+    return d;
+}
+
 export function categorize<P extends { [name: string]: unknown }>(
     q: T,
     stations: FeatureCollection<Point, P>,
     tolerance: number,
 ): FeatureCollection<Point, P & { possibleAnswers: A[] }> {
-    const seekerDistance = calcDistance(q);
-    return withPossibleAnswers(
-        stations,
-        binaryCategorizer(
-            (s) => {
-                const stationDistance = calcDistance(q, s.geometry.coordinates);
-                return stationDistance - seekerDistance;
-            },
-            tolerance,
-            "closer",
-            "further",
-        ),
+    const seekerDistance = calcSeekerDistance(q);
+
+    const categorize = binaryCategorizer(
+        (s) => {
+            const stationDistance = calcDistance(q, s.geometry.coordinates);
+            return stationDistance - seekerDistance;
+        },
+        tolerance,
+        "closer",
+        "further",
     );
+
+    return withPossibleAnswers(stations, (s) => {
+        const key = hashCoords(s.geometry.coordinates);
+        let ans = q._cache?.stationCategories.get(key);
+        if (ans !== undefined) return ans;
+
+        ans = categorize(s);
+        if (q._cache) q._cache.stationCategories.set(key, ans);
+        return ans;
+    });
 }
 
-export function divideArea(
+function divideAreaInner(
     q: T,
     extent: BBox,
 ): FeatureCollection<Polygon | MultiPolygon, Geo.PropertiesWithID & { answer: A }> {
-    const distance = calcDistance(q);
+    const distance = calcSeekerDistance(q);
     const buffers = turf.buffer(q.candidates, distance);
     if (buffers === undefined || buffers.features.length === 0)
         return soleDivision(extent, "further");
@@ -107,6 +132,24 @@ export function divideArea(
     ]);
 }
 
+export function divideArea(
+    q: T,
+    extent: BBox,
+): FeatureCollection<Polygon | MultiPolygon, Geo.PropertiesWithID & { answer: A }> {
+    if (q._cache?.division !== undefined) return q._cache.division;
+
+    const division = divideAreaInner(q, extent);
+    if (q._cache === undefined)
+        throw new Error("Expected MeasureQuestion.divideAreaInner to set _cache, but it did not");
+    q._cache.division = division;
+    return division;
+}
+
 export function withPosition(q: T, newPosition: (number | null)[]): T {
-    return { ...q, seeker: mergePositions(q.seeker, newPosition) };
+    return { ...q, _cache: undefined, seeker: mergePositions(q.seeker, newPosition) };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function withDistance(q: T, _distance: number): T {
+    return q;
 }

@@ -25,7 +25,8 @@ export default function CustomQuestionForm({
                     onChange={(e) => {
                         const q = getQuestion();
                         if (q && q.kind === "custom") {
-                            setQuestion({ ...q, name: e.target.value });
+                            // NOTE: CustomQuestion has no cache, we can safely copy `q`
+                            setQuestion(CustomQuestion.withName(q, e.target.value));
                         }
                     }}
                 />

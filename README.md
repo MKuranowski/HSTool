@@ -91,6 +91,10 @@ programmers need to keep in mind that *stored* objects are immutable. `$object.g
 won't work, one must do `$object.set({ ...$object.get(), position: ... })`. Similar constraints
 apply to variables from `useStore`, on which mutations will not be propagated.
 
+Note that Questions can't changes by doing `{ ...question, attr: ... }`. Any modifications should
+be abstracted to the Question namespace (preferably to the KindQuestion namespace), where care
+must be taken to properly invalidate the `_cache` property.
+
 To help with stored objects which might be only partially mutated, use [nanostore's map](https://github.com/nanostores/nanostores?tab=readme-ov-file#maps),
 or helper mixins `arrayAtom` or `setAtom` from <src/helper/store.ts>.
 

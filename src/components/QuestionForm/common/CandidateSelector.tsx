@@ -65,8 +65,9 @@ function CandidatesList({
                         if (q && q.kind === kind) {
                             const candidates = selectViableCandidates(preset, kind, name);
                             if (candidates) {
+                                // TODO: Factor out Question.withCandidates
                                 // @ts-expect-error selectViableCandidates returns the correct geometries for given kind
-                                setQuestion({ ...q, name, candidates });
+                                setQuestion({ ...q, _cache: undefined, name, candidates });
                             }
                         }
                     }}

@@ -36,7 +36,7 @@ function AzimuthSelector({
 
                     const q = getQuestion();
                     if (q && q.kind === "thermometer") {
-                        setQuestion({ ...q, azimuth: value });
+                        setQuestion(ThermometerQuestion.withAzimuth(q, value));
                     }
                 }}
             />

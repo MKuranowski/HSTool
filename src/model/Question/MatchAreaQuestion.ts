@@ -19,10 +19,16 @@ import {
     withPossibleAnswers,
     withPropertiesInCollection,
 } from "../../helper/geo";
+import { hashCoords } from "../../helper/geo/prop";
 import * as Geo from "../Geo";
 import * as base from "./base";
 
-export type T = z.infer<typeof schema>;
+export interface _Cache {
+    seekerArea: Feature<Polygon | MultiPolygon, Geo.PropertiesWithID>;
+    stationCategories: Map<string, A[]>;
+}
+
+export type T = z.infer<typeof schema> & { _cache?: _Cache | undefined };
 export type A = Exclude<T["answer"], undefined>;
 
 export const schema = base.schema.extend({
@@ -59,6 +65,8 @@ export function answers(_q: T): A[] {
 export function seekerArea(
     q: T,
 ): Feature<Polygon | MultiPolygon, Geo.PropertiesWithID> | undefined {
+    if (q._cache?.seekerArea) return q._cache.seekerArea;
+
     const seeker = { type: "Point", coordinates: q.seeker } as const;
     const candidates = q.candidates.features.filter((area) => {
         return turf.booleanPointInPolygon(seeker, area);
@@ -72,6 +80,8 @@ export function seekerArea(
             candidates.map((c) => c.properties.name ?? c.properties.id),
         );
     }
+
+    q._cache = { seekerArea: candidates[0], stationCategories: new Map() };
     return candidates[0];
 }
 
@@ -88,15 +98,22 @@ export function categorize<P extends { [name: string]: unknown }>(
         return withPossibleAnswers(stations, () => ["miss"]);
     }
 
-    return withPossibleAnswers(
-        stations,
-        binaryCategorizer(
-            (s) => distanceToFeature(s.geometry.coordinates, match),
-            tolerance,
-            "hit",
-            "miss",
-        ),
+    const categorize = binaryCategorizer(
+        (s) => distanceToFeature(s.geometry.coordinates, match),
+        tolerance,
+        "hit",
+        "miss",
     );
+
+    return withPossibleAnswers(stations, (s) => {
+        const key = hashCoords(s.geometry.coordinates);
+        let ans = q._cache?.stationCategories.get(key);
+        if (ans !== undefined) return ans;
+
+        ans = categorize(s);
+        if (q._cache) q._cache.stationCategories.set(key, ans);
+        return ans;
+    });
 }
 
 export function divideArea(
@@ -111,5 +128,10 @@ export function divideArea(
 }
 
 export function withPosition(q: T, newPosition: (number | null)[]): T {
-    return { ...q, seeker: mergePositions(q.seeker, newPosition) };
+    return { ...q, _cache: undefined, seeker: mergePositions(q.seeker, newPosition) };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function withDistance(q: T, _distance: number): T {
+    return q;
 }

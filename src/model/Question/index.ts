@@ -43,6 +43,7 @@ interface Submodule<T> {
     ): FeatureCollection<Polygon | MultiPolygon, PropertiesWithAnswer> | null;
 
     withPosition(q: T, newPosition: (number | null)[]): T;
+    withDistance(q: T, newDistance: number): T;
 }
 
 type Submodules = { [K in Kind]: Submodule<TLookup[K]> };
@@ -102,7 +103,13 @@ export function withPosition<K extends Kind>(q: T<K>, newPosition: (number | nul
     return submodules[q.kind].withPosition(q, newPosition);
 }
 
+export function withDistance<K extends Kind>(q: T<K>, newDistance: number): TLookup[K] {
+    return submodules[q.kind].withDistance(q, newDistance);
+}
+
 export function withAnswer<K extends Kind>(q: T<K>, answer: string | undefined): TLookup[K] {
+    // NOTE: Changing the answer must never invalidate anything the question has cached
+
     if (answer === undefined) {
         // Special case - remove `answer` and `answeredAt`
         const copy = { ...q };

@@ -79,3 +79,11 @@ export function divideArea(
 export function withPosition(q: T, newPosition: (number | null)[]): T {
     return { ...q, seeker: mergePositions(q.seeker, newPosition) };
 }
+
+export function withDistance(q: T, distance: number): T {
+    return { ...q, distance };
+}
+
+export function withAzimuth(q: T, azimuth: number): T {
+    return { ...q, azimuth };
+}

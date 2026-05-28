@@ -44,3 +44,12 @@ export function divideArea(_q: T, _extent: BBox): null {
 export function withPosition(q: T, _newPosition: (number | null)[]): T {
     return q;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function withDistance(q: T, _distance: number): T {
+    return q;
+}
+
+export function withName(q: T, name: string): T {
+    return { ...q, name };
+}

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import type { NearestPoint } from "@turf/nearest-point";
 import * as turf from "@turf/turf";
 import type { BBox, FeatureCollection, MultiPolygon, Point, Polygon, Position } from "geojson";
 import * as z from "zod";
@@ -14,7 +15,11 @@ import {
 import * as Geo from "../Geo";
 import * as base from "./base";
 
-export type T = z.infer<typeof schema>;
+export interface _Cache {
+    seekerPoint: NearestPoint<Geo.PropertiesWithID>;
+}
+
+export type T = z.infer<typeof schema> & { _cache?: _Cache | undefined };
 export type A = Exclude<T["answer"], undefined>;
 
 export const schema = base.schema.extend({
@@ -27,7 +32,7 @@ export const schema = base.schema.extend({
 
 export function name(q: T): string {
     if (q.candidates.features.length > 0) {
-        const match = turf.nearestPoint(q.seeker, q.candidates);
+        const match = calcSeekerPoint(q);
         const matchName = match.properties.name ?? match.properties.id;
         return `Match: ${q.name} (${matchName})`;
     }
@@ -48,6 +53,15 @@ export function answers(_q: T): A[] {
     return ["hit", "miss"];
 }
 
+export function calcSeekerPoint(q: T): NearestPoint<Geo.PropertiesWithID> {
+    if (!q._cache) {
+        q._cache = {
+            seekerPoint: turf.nearestPoint(q.seeker, q.candidates),
+        };
+    }
+    return q._cache.seekerPoint;
+}
+
 export function categorize<P extends { [name: string]: unknown }>(
     q: T,
     stations: FeatureCollection<Point, P>,
@@ -57,7 +71,7 @@ export function categorize<P extends { [name: string]: unknown }>(
         return withPossibleAnswers(stations, () => ["miss"]);
     }
 
-    const seekerMatch = turf.nearestPoint(q.seeker, q.candidates);
+    const seekerMatch = calcSeekerPoint(q);
     return withPossibleAnswers(stations, (station) => {
         const answers = new Set<A>();
         nearestPointsToCircle(
@@ -81,12 +95,17 @@ export function divideArea(
         return { type: "FeatureCollection" as const, features: [] };
     }
 
-    const nearest = turf.nearestPoint(q.seeker, q.candidates);
+    const nearest = calcSeekerPoint(q);
     return withPropertiesInCollection(voronoi(q.candidates, { extent }), (area) => ({
         answer: area.properties.id === nearest.properties.id ? ("hit" as const) : ("miss" as const),
     }));
 }
 
 export function withPosition(q: T, newPosition: (number | null)[]): T {
-    return { ...q, seeker: mergePositions(q.seeker, newPosition) };
+    return { ...q, _cache: undefined, seeker: mergePositions(q.seeker, newPosition) };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function withDistance(q: T, _distance: number): T {
+    return q;
 }

@@ -22,7 +22,11 @@ import {
 import * as Geo from "../Geo";
 import * as base from "./base";
 
-export type T = z.infer<typeof schema>;
+export interface _Cache {
+    viableCandidates: T["candidates"];
+}
+
+export type T = z.infer<typeof schema> & { _cache?: _Cache | undefined };
 export const NIL = "(Nil answer)";
 
 export const schema = base.schema.extend({
@@ -53,9 +57,14 @@ export function answers(q: T): string[] {
 }
 
 function viableCandidates(q: T): T["candidates"] {
-    return turf.featureCollection(
-        q.candidates.features.filter((c) => turf.distance(c, q.seeker) < q.radius),
-    );
+    if (!q._cache) {
+        q._cache = {
+            viableCandidates: turf.featureCollection(
+                q.candidates.features.filter((c) => turf.distance(c, q.seeker) < q.radius),
+            ),
+        };
+    }
+    return q._cache.viableCandidates;
 }
 
 export function categorize<P extends { [name: string]: unknown }>(
@@ -122,5 +131,9 @@ export function divideArea(
 }
 
 export function withPosition(q: T, newPosition: (number | null)[]): T {
-    return { ...q, seeker: mergePositions(q.seeker, newPosition) };
+    return { ...q, _cache: undefined, seeker: mergePositions(q.seeker, newPosition) };
+}
+
+export function withDistance(q: T, distance: number): T {
+    return { ...q, _cache: undefined, radius: distance };
 }
