@@ -88,7 +88,7 @@ export function categorize<P extends { [name: string]: unknown }>(
     );
 
     return withPossibleAnswers(stations, (s) => {
-        const key = hashCoords(s.geometry.coordinates);
+        const key = `${hashCoords(s.geometry.coordinates)};${tolerance.toString()}`;
         let ans = q._cache?.stationCategories.get(key);
         if (ans !== undefined) return ans;
 
