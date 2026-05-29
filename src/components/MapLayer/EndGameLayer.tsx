@@ -4,6 +4,7 @@
 import { useStore } from "@nanostores/react";
 import * as turf from "@turf/turf";
 import type { Feature, FeatureCollection, MultiPolygon, Point, Polygon, Position } from "geojson";
+import type { PathOptions } from "leaflet";
 import { batched } from "nanostores";
 import { Circle, LayerGroup, Polygon as PolygonLayer, type PolygonProps } from "react-leaflet";
 import { bufferBBox } from "../../helper/geo";
@@ -49,6 +50,16 @@ const $endGameArea = batched(
     },
 );
 
+function getPathOptions(color: string = "#3388ff"): PathOptions {
+    return {
+        color,
+        weight: 2,
+        opacity: 0.4,
+        fillColor: color,
+        fillOpacity: 0.2,
+    };
+}
+
 function StationCircleLayer({ coords }: { coords: Position }) {
     const hidingZoneRadius = useStore($hidingZoneRadius);
     return (
@@ -84,14 +95,7 @@ function LeftoverArea() {
     if (endGameArea === null) return null;
     if (q === null)
         return (
-            <GeoJSONPolygonLayer
-                geometry={endGameArea.geometry}
-                pathOptions={{
-                    weight: 2,
-                    opacity: 0.4,
-                    fillOpacity: 0.2,
-                }}
-            />
+            <GeoJSONPolygonLayer geometry={endGameArea.geometry} pathOptions={getPathOptions()} />
         );
 
     const extent = bufferBBox(turf.bbox(endGameArea), 0.1);
@@ -99,7 +103,10 @@ function LeftoverArea() {
         Polygon | MultiPolygon,
         PropertiesWithAnswer & { color?: string }
     > | null = Question.divideArea(q, extent);
-    if (collection === null) return null;
+    if (collection === null || collection.features.length === 0)
+        return (
+            <GeoJSONPolygonLayer geometry={endGameArea.geometry} pathOptions={getPathOptions()} />
+        );
 
     // Figure out how to color areas
     const answerToColor = new Map(
@@ -113,6 +120,14 @@ function LeftoverArea() {
 
     return (
         <>
+            <GeoJSONPolygonLayer
+                geometry={endGameArea.geometry}
+                pathOptions={{
+                    color: "#3388ff",
+                    fillOpacity: 0.1,
+                    weight: 1,
+                }}
+            />
             <LayerGroup>
                 {collection.features.map((feature) => (
                     <GeoJSONPolygonLayer
