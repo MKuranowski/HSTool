@@ -37,7 +37,7 @@ const stations = turf.featureCollection([
     turf.point(stationC, { id: "C", name: "C" }),
 ]);
 
-test(MatchAreaQuestion.categorize, () => {
+test("MatchAreaQuestion.categorize", () => {
     const area = turf.buffer(turf.point(rootA), 7);
     if (area === undefined) throw new Error("turf.buffer around rootA is undefined");
 
@@ -61,7 +61,7 @@ test(MatchAreaQuestion.categorize, () => {
     ).toEqual([["hit"], ["miss"], ["hit", "miss"]]);
 });
 
-test(MatchPointQuestion.categorize, () => {
+test("MatchPointQuestion.categorize", () => {
     const q: MatchPointQuestion.T = {
         kind: "match-point",
         name: "airport",
@@ -82,7 +82,7 @@ test(MatchPointQuestion.categorize, () => {
     ).toEqual([["hit"], ["miss"], ["hit", "miss"]]);
 });
 
-test(MeasureQuestion.categorize, () => {
+test("MeasureQuestion.categorize", () => {
     const q: MeasureQuestion.T = {
         kind: "measure",
         name: "airport",
@@ -103,7 +103,7 @@ test(MeasureQuestion.categorize, () => {
     ).toEqual([["closer", "further"], ["closer"], ["further"]]);
 });
 
-test(RadarQuestion.categorize, () => {
+test("RadarQuestion.categorize", () => {
     const q: RadarQuestion.T = {
         kind: "radar",
         seeker: rootA,
@@ -121,7 +121,7 @@ test(RadarQuestion.categorize, () => {
     ).toEqual([["hit"], ["miss"], ["hit", "miss"]]);
 });
 
-test(ThermometerQuestion.categorize, () => {
+test("ThermometerQuestion.categorize", () => {
     const distance = turf.distance(rootA, rootB);
     const azimuth = turf.bearingToAzimuth(turf.bearing(rootA, rootB));
 
@@ -140,7 +140,7 @@ test(ThermometerQuestion.categorize, () => {
     ).toEqual([["colder"], ["hotter"], ["colder", "hotter"]]);
 });
 
-test(TentaclesQuestion.categorize, () => {
+test("TentaclesQuestion.categorize", () => {
     const root = [0.0, 0.0];
     const candidateA = translate(root, 1, 60);
     const candidateB = translate(root, 1, 180);
