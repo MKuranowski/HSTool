@@ -12,13 +12,8 @@ import type {
     Position,
 } from "geojson";
 import * as z from "zod";
-import {
-    binaryCategorizer,
-    distanceToFeature,
-    mergePositions,
-    withPossibleAnswers,
-    withPropertiesInCollection,
-} from "../../helper/geo";
+import { binaryCategorizer, withPossibleAnswers } from "../../helper/answer";
+import { distanceToFeature, mergePositions, withPropertiesInCollection } from "../../helper/geo";
 import { hashCoords } from "../../helper/geo/prop";
 import * as Geo from "../Geo";
 import * as base from "./base";

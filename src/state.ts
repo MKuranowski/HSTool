@@ -7,6 +7,7 @@ import { atom, batched, effect, onMount, task } from "nanostores";
 import type { Variant as BootstrapVariant } from "react-bootstrap/esm/types";
 import * as z from "zod";
 import builtinPresetsIndexUrl from "/presets/index.json?url";
+import { hasAnswer } from "./helper/answer";
 import { arrayAtom, persistentZod, setAtom } from "./helper/store";
 import * as Preset from "./model/Preset";
 import * as Question from "./model/Question";
@@ -117,7 +118,7 @@ export const $eliminatedStations = batched(
         for (const question of answeredQuestions) {
             const categorized = Question.categorize(question, preset.stations, hidingZoneRadius);
             for (const station of categorized.features) {
-                if (!station.properties.possibleAnswers.includes(question.answer as string)) {
+                if (!hasAnswer(station.properties.possibleAnswers, question.answer as string)) {
                     eliminated[station.properties.id] = 1;
                 }
             }

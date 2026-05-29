@@ -3,7 +3,7 @@
 
 import type { BBox, FeatureCollection, Point, Position } from "geojson";
 import * as z from "zod";
-import { withPossibleAnswers } from "../../helper/geo";
+import { withPossibleAnswers } from "../../helper/answer";
 import * as base from "./base";
 
 export type T = z.infer<typeof schema>;

@@ -3,6 +3,7 @@
 
 import type { BBox, FeatureCollection, MultiPolygon, Point, Polygon, Position } from "geojson";
 import * as z from "zod";
+import type { PossibleAnswer } from "../../helper/answer";
 import type { PropertiesWithAnswer } from "../Geo";
 import * as CustomQuestion from "./CustomQuestion";
 import * as MatchAreaQuestion from "./MatchAreaQuestion";
@@ -36,7 +37,7 @@ interface Submodule<T> {
         q: T,
         stations: FeatureCollection<Point, P>,
         tolerance: number,
-    ): FeatureCollection<Point, P & { possibleAnswers: string[] }>;
+    ): FeatureCollection<Point, P & { possibleAnswers: PossibleAnswer[] }>;
     divideArea(
         q: T,
         extent: BBox,
@@ -88,7 +89,7 @@ export function categorize<K extends Kind, P extends { [name: string]: unknown }
     q: T<K>,
     stations: FeatureCollection<Point, P>,
     tolerance: number,
-): FeatureCollection<Point, P & { possibleAnswers: string[] }> {
+): FeatureCollection<Point, P & { possibleAnswers: PossibleAnswer[] }> {
     return submodules[q.kind].categorize(q, stations, tolerance);
 }
 

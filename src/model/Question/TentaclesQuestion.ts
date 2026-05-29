@@ -12,13 +12,13 @@ import type {
     Position,
 } from "geojson";
 import * as z from "zod";
+import { type PossibleAnswer, withPossibleAnswers } from "../../helper/answer";
 import {
     isArea,
     mergePositions,
     nearestPointsToCircle,
     soleDivision,
     voronoi,
-    withPossibleAnswers,
 } from "../../helper/geo";
 import * as Geo from "../Geo";
 import * as base from "./base";
@@ -72,7 +72,7 @@ export function categorize<P extends { [name: string]: unknown }>(
     q: T,
     stations: FeatureCollection<Point, P>,
     tolerance: number,
-): FeatureCollection<Point, P & { possibleAnswers: string[] }> {
+): FeatureCollection<Point, P & { possibleAnswers: PossibleAnswer[] }> {
     const candidates = viableCandidates(q);
     // Shortcut - without any candidates only the nil answer is possible
     if (candidates.features.length === 0) return withPossibleAnswers(stations, () => [NIL]);
@@ -83,11 +83,13 @@ export function categorize<P extends { [name: string]: unknown }>(
         if (distanceToRoot > q.radius + tolerance) return [NIL];
 
         // Check which candidates could be returned
-        const matches = nearestPointsToCircle(
+        const matches: PossibleAnswer[] = nearestPointsToCircle(
             candidates,
             s.geometry.coordinates,
             tolerance,
-        ).features.map((c) => c.properties.id);
+        ).features.map((c) =>
+            c.properties.name ? [c.properties.id, c.properties.name] : c.properties.id,
+        );
 
         // Check if miss is possible
         if (distanceToRoot >= q.radius - tolerance) matches.unshift(NIL);

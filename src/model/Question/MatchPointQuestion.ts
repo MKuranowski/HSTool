@@ -5,11 +5,11 @@ import type { NearestPoint } from "@turf/nearest-point";
 import * as turf from "@turf/turf";
 import type { BBox, FeatureCollection, MultiPolygon, Point, Polygon, Position } from "geojson";
 import * as z from "zod";
+import { withPossibleAnswers } from "../../helper/answer";
 import {
     mergePositions,
     nearestPointsToCircle,
     voronoi,
-    withPossibleAnswers,
     withPropertiesInCollection,
 } from "../../helper/geo";
 import * as Geo from "../Geo";

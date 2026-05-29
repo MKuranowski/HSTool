@@ -5,6 +5,7 @@ import { useStore } from "@nanostores/react";
 import type { FeatureCollection, Point } from "geojson";
 import * as L from "leaflet";
 import { Circle, LayerGroup, Marker, Popup } from "react-leaflet";
+import { answerId, answerName, type PossibleAnswer } from "../../helper/answer";
 import * as palette from "../../helper/palette";
 import type { PropertiesWithName } from "../../model/Geo";
 import * as Question from "../../model/Question";
@@ -19,7 +20,7 @@ import {
 const MARKER_SIZE = 16;
 
 interface AnnotatedStationProperties extends PropertiesWithName {
-    possibleAnswers?: string[] | undefined;
+    possibleAnswers?: PossibleAnswer[] | undefined;
 }
 
 function rot(x: number, y: number, angleRadians: number): [number, number] {
@@ -128,11 +129,15 @@ function StationPopup({
         children.push(
             <>Possible answers:</>,
             <ul>
-                {properties.possibleAnswers.map((a) => (
-                    <li key={a} color={answerToColor.get(a)}>
-                        {a}
-                    </li>
-                ))}
+                {properties.possibleAnswers.map((a) => {
+                    const id = answerId(a);
+                    const name = answerName(a);
+                    return (
+                        <li key={id} color={answerToColor.get(id)}>
+                            {name}
+                        </li>
+                    );
+                })}
             </ul>,
         );
     }
@@ -154,7 +159,7 @@ export function StationIconLayer({
 
                 const colors = s.properties.possibleAnswers
                     ? s.properties.possibleAnswers.map(
-                          (a) => answerToColor.get(a) ?? palette.primary,
+                          (a) => answerToColor.get(answerId(a)) ?? palette.primary,
                       )
                     : undefined;
 

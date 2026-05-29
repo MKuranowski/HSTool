@@ -4,12 +4,8 @@
 import * as turf from "@turf/turf";
 import type { BBox, FeatureCollection, MultiPolygon, Point, Polygon, Position } from "geojson";
 import * as z from "zod";
-import {
-    mergePositions,
-    nearestPointsToCircle,
-    voronoi,
-    withPossibleAnswers,
-} from "../../helper/geo";
+import { withPossibleAnswers } from "../../helper/answer";
+import { mergePositions, nearestPointsToCircle, voronoi } from "../../helper/geo";
 import * as Geo from "../Geo";
 import * as base from "./base";
 

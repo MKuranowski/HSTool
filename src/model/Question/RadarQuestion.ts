@@ -4,13 +4,8 @@
 import * as turf from "@turf/turf";
 import type { BBox, FeatureCollection, MultiPolygon, Point, Polygon, Position } from "geojson";
 import * as z from "zod";
-import {
-    binaryCategorizer,
-    isArea,
-    mergePositions,
-    soleDivision,
-    withPossibleAnswers,
-} from "../../helper/geo";
+import { binaryCategorizer, withPossibleAnswers } from "../../helper/answer";
+import { isArea, mergePositions, soleDivision } from "../../helper/geo";
 import * as Geo from "../Geo";
 import * as base from "./base";
 

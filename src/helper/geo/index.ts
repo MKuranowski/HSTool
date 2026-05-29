@@ -3,11 +3,5 @@
 
 export { bufferBBox, isArea, isMultiPolygon, isPolygon, soleDivision } from "./area";
 export { distanceToFeature, nearestPointsToCircle } from "./dist";
-export {
-    binaryCategorizer,
-    mergePositions,
-    withPossibleAnswers,
-    withProperties,
-    withPropertiesInCollection,
-} from "./prop";
+export { mergePositions, withProperties, withPropertiesInCollection } from "./prop";
 export { voronoi } from "./voronoi";
