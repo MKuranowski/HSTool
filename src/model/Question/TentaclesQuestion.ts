@@ -15,6 +15,7 @@ import * as z from "zod";
 import {
     isArea,
     mergePositions,
+    nearestPointsToCircle,
     soleDivision,
     voronoi,
     withPossibleAnswers,
@@ -72,27 +73,24 @@ export function categorize<P extends { [name: string]: unknown }>(
     stations: FeatureCollection<Point, P>,
     tolerance: number,
 ): FeatureCollection<Point, P & { possibleAnswers: string[] }> {
-    const candidates = viableCandidates(q).features;
+    const candidates = viableCandidates(q);
     // Shortcut - without any candidates only the nil answer is possible
-    if (candidates.length === 0) return withPossibleAnswers(stations, () => [NIL]);
+    if (candidates.features.length === 0) return withPossibleAnswers(stations, () => [NIL]);
 
     return withPossibleAnswers(stations, (s) => {
         // Check if miss is the only option
         const distanceToRoot = turf.distance(s, q.seeker);
         if (distanceToRoot > q.radius + tolerance) return [NIL];
 
-        // Check if miss is possible
-        const matches: string[] = [];
-        if (distanceToRoot >= q.radius - tolerance) matches.push(NIL);
-
         // Check which candidates could be returned
-        const distances = candidates.map((c) => turf.distance(s, c));
-        const closest = Math.min(...distances);
-        matches.push(
-            ...candidates
-                .map((c) => c.properties.id)
-                .filter((_, i) => distances[i] <= closest + tolerance),
-        );
+        const matches = nearestPointsToCircle(
+            candidates,
+            s.geometry.coordinates,
+            tolerance,
+        ).features.map((c) => c.properties.id);
+
+        // Check if miss is possible
+        if (distanceToRoot >= q.radius - tolerance) matches.unshift(NIL);
 
         return matches;
     });

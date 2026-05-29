@@ -201,6 +201,31 @@ test("TentaclesQuestion.categorize", () => {
     ]);
 });
 
+test("TentaclesQuestion.categorize.covering", () => {
+    const root = [0.0, 0.0];
+    const candidateA = translate(root, 0.5, 270);
+    const candidateB = translate(root, 0.6, 270);
+
+    const q: TentaclesQuestion.T = {
+        kind: "tentacles",
+        name: "abstract",
+        candidates: turf.featureCollection([
+            turf.point(candidateA, { id: "A" }),
+            turf.point(candidateB, { id: "B" }),
+        ]),
+        seeker: root,
+        radius: 2,
+    };
+
+    const points = turf.featureCollection([turf.point(root, { id: "onlyA" })]);
+
+    expect(
+        TentaclesQuestion.categorize(q, points, 0.5).features.map(
+            (f) => f.properties.possibleAnswers,
+        ),
+    ).toEqual([["A"]]);
+});
+
 function translate(pt: Position, distance: number, direction: number): Position {
     return turf.transformTranslate(turf.point(pt), distance, direction).geometry.coordinates;
 }
