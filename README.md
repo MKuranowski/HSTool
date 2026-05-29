@@ -15,7 +15,7 @@ HSTool is an under-construction tool for seekers playing
     - [ ] Rest Periods
     - [ ] Update Question.askedAt when a question is copied to clipboard
 - [ ] Alternative units
-- [ ] Voronoi-based end game
+- [x] Voronoi-based end game
 - [ ] Better state shareability:
     - [ ] Questions and options as well; not just the Preset
     - [ ] Load from URL

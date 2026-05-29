@@ -11,7 +11,7 @@ import {
     Tooltip,
 } from "react-bootstrap";
 import * as Question from "../model/Question";
-import { $defaultMakerLocation, $questions, $stagingQuestion } from "../state";
+import { $defaultMakerLocation, $endGameStation, $questions, $stagingQuestion } from "../state";
 import { QuestionColor, QuestionForm, QuestionIcon, QuestionKindName } from "./QuestionForm";
 
 function NewQuestionButton({ kind }: { kind: Question.Kind }) {
@@ -21,7 +21,9 @@ function NewQuestionButton({ kind }: { kind: Question.Kind }) {
                 variant={QuestionColor(kind)}
                 onClick={() => {
                     const root = $defaultMakerLocation.get();
-                    $stagingQuestion.set(Question.empty(kind, root));
+                    const q = Question.empty(kind, root);
+                    q.inEndGame = $endGameStation.get() !== null;
+                    $stagingQuestion.set(q);
                 }}
             >
                 <QuestionIcon kind={kind} hidden />

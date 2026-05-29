@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { useStore } from "@nanostores/react";
-import type { FeatureCollection, Point } from "geojson";
+import type { Feature, FeatureCollection, Point } from "geojson";
 import * as L from "leaflet";
 import { Circle, LayerGroup, Marker, Popup } from "react-leaflet";
 import { answerId, answerName, type PossibleAnswer } from "../../helper/answer";
@@ -11,6 +11,7 @@ import type { PropertiesWithName } from "../../model/Geo";
 import * as Question from "../../model/Question";
 import {
     $disabledStations,
+    $endGameStation,
     $hidingZoneRadius,
     $preset,
     $showHidingZones,
@@ -116,20 +117,20 @@ function stationIcon(colors?: string[]): SVGSVGElement {
 }
 
 function StationPopup({
-    properties,
+    station,
     answerToColor,
 }: {
-    properties: AnnotatedStationProperties;
+    station: Feature<Point, AnnotatedStationProperties>;
     answerToColor: Map<string, string>;
 }) {
     // eslint-disable-next-line react-x/no-missing-key
-    const children = [<b>{properties.name}</b>, <br />];
+    const children = [<b>{station.properties.name}</b>, <br />];
 
-    if (properties.possibleAnswers) {
+    if (station.properties.possibleAnswers) {
         children.push(
             <>Possible answers:</>,
             <ul>
-                {properties.possibleAnswers.map((a) => {
+                {station.properties.possibleAnswers.map((a) => {
                     const id = answerId(a);
                     const name = answerName(a);
                     return (
@@ -139,8 +140,20 @@ function StationPopup({
                     );
                 })}
             </ul>,
+            <br />,
         );
     }
+
+    children.push(
+        <a
+            href="#"
+            onClick={() => {
+                $endGameStation.set(station);
+            }}
+        >
+            Start End Game
+        </a>,
+    );
 
     return <Popup>{children}</Popup>;
 }
@@ -172,7 +185,7 @@ export function StationIconLayer({
 
                 return (
                     <Marker key={s.properties.id} position={[lat, lon]} icon={icon}>
-                        <StationPopup properties={s.properties} answerToColor={answerToColor} />
+                        <StationPopup station={s} answerToColor={answerToColor} />
                     </Marker>
                 );
             })}
@@ -196,7 +209,7 @@ export function StationZoneLayer({
 
                 return (
                     <Circle key={s.properties.id} center={[lat, lon]} radius={radius * 1000}>
-                        <StationPopup properties={s.properties} answerToColor={answerToColor} />
+                        <StationPopup station={s} answerToColor={answerToColor} />
                     </Circle>
                 );
             })}

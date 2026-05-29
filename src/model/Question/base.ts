@@ -7,4 +7,5 @@ import * as Timestamp from "../Timestamp";
 export const schema = z.object({
     askedAt: Timestamp.schema.optional(),
     answeredAt: Timestamp.schema.optional(),
+    inEndGame: z.boolean().optional(),
 });

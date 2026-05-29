@@ -4,17 +4,38 @@
 // force the backwards-ass vite bundler to include **all** leaflet assets, not only the ones explicitly mentioned in leaflet.css
 import "leaflet/dist/images/marker-icon-2x.png";
 import "leaflet/dist/images/marker-shadow.png";
+import { useStore } from "@nanostores/react";
 import * as L from "leaflet";
 import { useEffect, useRef } from "react";
 import { MapContainer, Pane, TileLayer } from "react-leaflet";
 import * as Preset from "../model/Preset";
-import { $preset } from "../state";
-import { QuestionMarker, StationLayer, ThermometerSecondaryMarker, VoronoiLayer } from "./MapLayer";
-import { BackgroundOverlay } from "./MapLayer/BackgroundOverlay";
+import { $endGameStation, $preset } from "../state";
+import {
+    BackgroundOverlay,
+    EndGameLayer,
+    QuestionMarker,
+    StationLayer,
+    ThermometerSecondaryMarker,
+    VoronoiLayer,
+} from "./MapLayer";
 
 function getPresetBounds(p: Preset.T): L.LatLngBounds {
     return L.latLngBounds(
         p.stations.features.map((s) => s.geometry.coordinates.toReversed() as [number, number]),
+    );
+}
+
+function StationsLayer() {
+    const endGameStation = useStore($endGameStation);
+    return endGameStation ? (
+        <EndGameLayer s={endGameStation} />
+    ) : (
+        <>
+            <Pane name="voronoiPane" style={{ zIndex: 220 }}>
+                <VoronoiLayer />
+            </Pane>
+            <StationLayer />
+        </>
     );
 }
 
@@ -48,10 +69,7 @@ export default function GameMap() {
             <Pane name="backgroundPane" style={{ zIndex: 210 }}>
                 <BackgroundOverlay />
             </Pane>
-            <Pane name="voronoiPane" style={{ zIndex: 220 }}>
-                <VoronoiLayer />
-            </Pane>
-            <StationLayer />
+            <StationsLayer />
             <QuestionMarker />
             <ThermometerSecondaryMarker />
         </MapContainer>

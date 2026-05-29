@@ -9,6 +9,7 @@ import * as z from "zod";
 import builtinPresetsIndexUrl from "/presets/index.json?url";
 import { hasAnswer } from "./helper/answer";
 import { arrayAtom, persistentZod, setAtom } from "./helper/store";
+import * as Geo from "./model/Geo";
 import * as Preset from "./model/Preset";
 import * as Question from "./model/Question";
 
@@ -132,9 +133,17 @@ export const $disabledStations = batched(
     (discarded, eliminated) => Object.assign({}, discarded, eliminated),
 );
 
+export const $endGameStation = persistentZod(
+    "hstool:endGameStation",
+    Geo.feature(Geo.point, Geo.withName).nullable(),
+    null,
+);
+
 export const $defaultMakerLocation = batched(
-    [$preset, $disabledStations],
-    (preset, disabled): number[] => {
+    [$preset, $disabledStations, $endGameStation],
+    (preset, disabled, endGameStation): number[] => {
+        if (endGameStation !== null) return endGameStation.geometry.coordinates;
+
         const enabledStations = preset.stations.features.filter(
             (s) => !Object.hasOwn(disabled, s.properties.id),
         );

@@ -4,7 +4,7 @@
 import { useStore } from "@nanostores/react";
 import type { JSX } from "react";
 import { Button, ButtonGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { getQuestionPrefix } from "../../../helper/ui";
+import { getQuestionPrefix, getQuestionState } from "../../../helper/ui";
 import * as Question from "../../../model/Question";
 import { $questions, $stagingQuestion } from "../../../state";
 import TimeSelector from "./TimeSelector";
@@ -66,7 +66,7 @@ export default function CommonButtons({
     index: number | null;
     children?: JSX.Element | undefined;
 }) {
-    const idPrefix = getQuestionPrefix(index);
+    const [idPrefix, getQuestion, setQuestion] = getQuestionState(index);
 
     return (
         <>
@@ -76,6 +76,23 @@ export default function CommonButtons({
                 {children}
                 <ButtonGroup className="ms-1">
                     <EditCommitButton index={index} />
+                    <OverlayTrigger
+                        overlay={
+                            <Tooltip id={`${idPrefix}inEnd`}>
+                                When flag is filled - use this question in the end game
+                            </Tooltip>
+                        }
+                    >
+                        <Button
+                            variant="secondary"
+                            onClick={() => {
+                                const q = getQuestion();
+                                if (q !== null) setQuestion({ ...q, inEndGame: !q.inEndGame });
+                            }}
+                        >
+                            <i className={q.inEndGame ? "bi bi-flag-fill" : "bi bi-flag"} />
+                        </Button>
+                    </OverlayTrigger>
                     <OverlayTrigger overlay={<Tooltip id={`${idPrefix}del`}>Delete</Tooltip>}>
                         <Button
                             variant="secondary"
