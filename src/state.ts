@@ -57,6 +57,8 @@ onMount($builtinPresets, () => {
 onMount($preset, () => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     task(async () => {
+        if (typeof window === "undefined") return;
+
         // Check if a specific preset was requested
         const url = new URL(window.location.href);
         const forcePreset = url.searchParams.get("preset") ?? "";
