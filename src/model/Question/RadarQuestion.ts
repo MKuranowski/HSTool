@@ -6,6 +6,7 @@ import type { BBox, FeatureCollection, MultiPolygon, Point, Polygon, Position } 
 import * as z from "zod";
 import { binaryCategorizer, withPossibleAnswers } from "../../helper/answer";
 import { isArea, mergePositions, soleDivision } from "../../helper/geo";
+import { $circlePrecision } from "../../state";
 import * as Geo from "../Geo";
 import * as base from "./base";
 
@@ -47,7 +48,10 @@ export function divideArea(
     q: T,
     extent: BBox,
 ): FeatureCollection<Polygon | MultiPolygon, Geo.PropertiesWithID & { answer: A }> {
-    const hit = turf.bboxClip(turf.circle(q.seeker, q.radius), extent);
+    const hit = turf.bboxClip(
+        turf.circle(q.seeker, q.radius, { steps: $circlePrecision.get() }),
+        extent,
+    );
     if (!isArea(hit)) return soleDivision(extent, "miss");
 
     const miss = turf.difference(

@@ -20,6 +20,8 @@ export const $toast = atom<Readonly<{
     variant: BootstrapVariant;
 }> | null>(null);
 
+export const $circlePrecision = persistentJSON("hstool:circlePrecision", 256);
+
 export const $answerTime = persistentJSON("hstool:answerTime", 5);
 export const $photoAnswerTime = persistentJSON("hstool:photoAnswerTime", 10);
 export const $quickAnswerMultiplier = persistentJSON("hstool:quickAnswerMultiplier", 0.0);

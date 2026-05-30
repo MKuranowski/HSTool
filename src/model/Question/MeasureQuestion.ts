@@ -13,6 +13,7 @@ import {
     soleDivision,
 } from "../../helper/geo";
 import { hashCoords } from "../../helper/geo/prop";
+import { $circlePrecision } from "../../state";
 import * as Geo from "../Geo";
 import * as base from "./base";
 
@@ -102,7 +103,7 @@ function divideAreaInner(
     extent: BBox,
 ): FeatureCollection<Polygon | MultiPolygon, Geo.PropertiesWithID & { answer: A }> {
     const distance = calcSeekerDistance(q);
-    const buffers = turf.buffer(q.candidates, distance);
+    const buffers = turf.buffer(q.candidates, distance, { steps: $circlePrecision.get() });
     if (buffers === undefined || buffers.features.length === 0)
         return soleDivision(extent, "further");
 

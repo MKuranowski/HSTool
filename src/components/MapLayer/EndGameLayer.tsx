@@ -11,15 +11,28 @@ import { bufferBBox } from "../../helper/geo";
 import * as palette from "../../helper/palette";
 import type { PropertiesWithAnswer, PropertiesWithName } from "../../model/Geo";
 import * as Question from "../../model/Question";
-import { $endGameStation, $hidingZoneRadius, $questions, $stagingQuestion } from "../../state";
+import {
+    $circlePrecision,
+    $endGameStation,
+    $hidingZoneRadius,
+    $questions,
+    $stagingQuestion,
+} from "../../state";
 import { VoronoiExtraLayer } from "./VoronoiLayer";
 
 const $endGameArea = batched(
-    [$endGameStation, $hidingZoneRadius, $questions],
-    (endGameStation, hidingZoneRadius, questions): Feature<MultiPolygon> | null => {
+    [$endGameStation, $hidingZoneRadius, $questions, $circlePrecision],
+    (
+        endGameStation,
+        hidingZoneRadius,
+        questions,
+        circlePrecision,
+    ): Feature<MultiPolygon> | null => {
         if (endGameStation === null) return null;
 
-        let area: Feature<Polygon | MultiPolygon> = turf.circle(endGameStation, hidingZoneRadius);
+        let area: Feature<Polygon | MultiPolygon> = turf.circle(endGameStation, hidingZoneRadius, {
+            steps: circlePrecision,
+        });
 
         const extent = bufferBBox(turf.bbox(area), 0.1);
 

@@ -20,6 +20,7 @@ import * as Preset from "../model/Preset";
 import {
     $answerTime,
     $builtinPresets,
+    $circlePrecision,
     $hidingZoneRadius,
     $photoAnswerTime,
     $preset,
@@ -215,10 +216,31 @@ export function HidingZoneRadiusInput() {
     );
 }
 
+export function CirclePrecisionInput() {
+    const circlePrecision = useStore($circlePrecision);
+
+    return (
+        <InputGroup className="mb-2">
+            <InputGroup.Text>Circle Precision</InputGroup.Text>
+            <Form.Control
+                type="number"
+                min="16"
+                step="1"
+                value={circlePrecision}
+                onChange={(e) => {
+                    const num = Number.parseFloat(e.target.value);
+                    if (!Number.isNaN(num)) $circlePrecision.set(num);
+                }}
+            />
+            <InputGroup.Text>km</InputGroup.Text>
+        </InputGroup>
+    );
+}
+
 export function ShowHidingZonesInput() {
     const showHidingZones = useStore($showHidingZones);
     return (
-        <InputGroup>
+        <InputGroup className="mb-2">
             <InputGroup.Text>Show hiding zones</InputGroup.Text>
             <span className="flex-fill"></span>
             <Button
@@ -250,6 +272,7 @@ export default function Settings() {
                 <QuickAnswerMultiplierInput />
                 <HidingZoneRadiusInput />
                 <ShowHidingZonesInput />
+                <CirclePrecisionInput />
             </ListGroup.Item>
             <ListGroup.Item className="d-flex align-items-center">
                 <PresetInput />

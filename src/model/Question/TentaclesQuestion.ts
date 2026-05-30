@@ -20,6 +20,7 @@ import {
     soleDivision,
     voronoi,
 } from "../../helper/geo";
+import { $circlePrecision } from "../../state";
 import * as Geo from "../Geo";
 import * as base from "./base";
 
@@ -107,7 +108,10 @@ export function divideArea(
     if (candidates.features.length === 0) return soleDivision(extent, NIL);
 
     // Calculate the area where tentacles are effective
-    const effectiveCircle = turf.bboxClip(turf.circle(q.seeker, q.radius), extent);
+    const effectiveCircle = turf.bboxClip(
+        turf.circle(q.seeker, q.radius, { steps: $circlePrecision.get() }),
+        extent,
+    );
     if (!isArea(effectiveCircle)) return soleDivision(extent, NIL);
 
     // Find if a nil answer is possible, and add it as a possible division
