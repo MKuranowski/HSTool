@@ -1,13 +1,14 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
+/// <reference lib="deno.ns" />
 
+import { expect } from "@std/expect";
 import * as turf from "@turf/turf";
-import { expect, test } from "vitest";
 import { nearestPointsToCircle } from "./dist.ts";
 
 // no need to test distanceToFeature, we trust turf functions
 
-test("nearestPointsToCircle", () => {
+Deno.test("nearestPointsToCircle", () => {
     const root = turf.point([0, 0]);
     const radius = 2;
 

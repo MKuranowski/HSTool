@@ -96,8 +96,9 @@ export default function Questions() {
     useSignals();
 
     const stagingQuestion = $.stagingQuestion.value;
-    const stagingArea =
-        stagingQuestion === null ? <QuestionPicker /> : <QuestionStagingArea q={stagingQuestion} />;
+    const stagingArea = stagingQuestion === null
+        ? <QuestionPicker />
+        : <QuestionStagingArea q={stagingQuestion} />;
 
     return (
         <>

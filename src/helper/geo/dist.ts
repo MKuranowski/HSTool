@@ -63,7 +63,6 @@ export function nearestPointsToCircle<P extends GeoJsonProperties>(
     const distanceToBoundaryCached = (aIdx: number, bIdx: number): number => {
         if (aIdx === bIdx) return 0;
 
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         const key = aIdx <= bIdx ? `${aIdx}:${bIdx}` : `${bIdx}:${aIdx}`;
         const cached = distanceToBoundaryCache.get(key);
         if (cached !== undefined) return cached;
@@ -119,8 +118,7 @@ export function nearestPointsToCircle<P extends GeoJsonProperties>(
 function distanceToBoundary(distAX: number, distBX: number, distAB: number): number {
     if (distAB < 1e-9) return 0;
 
-    const sinDelta =
-        Math.abs(Math.cos(distAX / earthRadiusKm) - Math.cos(distBX / earthRadiusKm)) /
+    const sinDelta = Math.abs(Math.cos(distAX / earthRadiusKm) - Math.cos(distBX / earthRadiusKm)) /
         (2 * Math.sin(distAB / (2 * earthRadiusKm)));
     return Math.asin(Math.min(1, sinDelta)) * earthRadiusKm;
 }

@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
+/// <reference lib="deno.ns" />
 
-import { expect, test } from "vitest";
+import { expect } from "@std/expect";
 import { getNthColor } from "./palette.ts";
 
-test("getNthColor", () => {
+Deno.test("getNthColor", () => {
     const matrix = [
         [0, "#198754"],
         [10, "#9c5e31"],

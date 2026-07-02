@@ -31,8 +31,9 @@ export default function TimeSelector({
     const initialTimestamp = signal.peek();
     const initialValue = initialTimestamp ? initialTimestamp.formValue.peek() : undefined;
 
-    const lockDescription =
-        variant === "askedAt" ? "the question is shared" : "an answer is selected";
+    const lockDescription = variant === "askedAt"
+        ? "the question is shared"
+        : "an answer is selected";
 
     return (
         <InputGroup className={className}>
@@ -41,7 +42,6 @@ export default function TimeSelector({
                 type="datetime-local"
                 defaultValue={initialValue}
                 onChange={(e) => {
-                    // eslint-disable-next-line react-hooks/immutability
                     signal.value = new Timestamp(e.target.value, true);
                 }}
             />
@@ -67,7 +67,6 @@ export default function TimeSelector({
                 <Button
                     size="sm"
                     onClick={() => {
-                        // eslint-disable-next-line react-hooks/immutability
                         signal.value = new Timestamp(undefined, true);
                     }}
                 >

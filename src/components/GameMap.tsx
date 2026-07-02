@@ -28,9 +28,7 @@ function getMapBounds(stations: FeatureCollection<Point>): L.LatLngBounds {
 function StationsLayer() {
     useSignals();
     const endGameStation = $.endGameStation.value;
-    return endGameStation ? (
-        <EndGameLayer s={endGameStation} />
-    ) : (
+    return endGameStation ? <EndGameLayer s={endGameStation} /> : (
         <>
             <Pane name="voronoiPane" style={{ zIndex: 220 }}>
                 <VoronoiLayer />

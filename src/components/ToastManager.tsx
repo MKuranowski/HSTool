@@ -8,8 +8,8 @@ import $ from "../state.ts";
 export default function ToastManager() {
     useSignals();
     const toast = $.toast.value;
-    const element =
-        toast !== null ? (
+    const element = toast !== null
+        ? (
             <Toast
                 bg={toast.variant}
                 onClose={() => {
@@ -21,11 +21,10 @@ export default function ToastManager() {
                 <Toast.Header>
                     <strong>{toast.header}</strong>
                 </Toast.Header>
-                {toast.body ? <Toast.Body>{toast.body}</Toast.Body> : <></>};
+                {toast.body ? <Toast.Body>{toast.body}</Toast.Body> : null};
             </Toast>
-        ) : (
-            <></>
-        );
+        )
+        : null;
 
     return <ToastContainer className="fixed-top m-1">{element}</ToastContainer>;
 }

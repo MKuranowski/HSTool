@@ -22,7 +22,6 @@ export default function CustomQuestionForm({
                     type="text"
                     value={q.name.value}
                     onChange={(e) => {
-                        // eslint-disable-next-line react-hooks/immutability
                         q.name.value = e.target.value;
                     }}
                 />
@@ -33,7 +32,6 @@ export default function CustomQuestionForm({
                     type="text"
                     value={q.answer.value}
                     onChange={(e) => {
-                        // eslint-disable-next-line react-hooks/immutability
                         q.answer.value = e.target.value;
                     }}
                 />

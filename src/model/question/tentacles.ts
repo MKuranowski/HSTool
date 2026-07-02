@@ -56,7 +56,7 @@ export default class TentaclesQuestion extends WithCandidates(
                 (candidate) =>
                     distanceToFeature(this.seekers.value, candidate) < this.distance.value,
             ),
-        ),
+        )
     );
 
     override readonly answers = computed(() => [
@@ -112,9 +112,11 @@ export default class TentaclesQuestion extends WithCandidates(
         }
 
         // Add divisions by voronoi-ing the candidates in the effective circle
-        for (const area of voronoi(this.viableCandidates.value, {
-            extent: turf.bbox(effectiveCircle),
-        }).features) {
+        for (
+            const area of voronoi(this.viableCandidates.value, {
+                extent: turf.bbox(effectiveCircle),
+            }).features
+        ) {
             const effectiveArea = turf.intersect(turf.featureCollection([area, effectiveCircle]), {
                 properties: { ...area.properties, answer: featureToAnswer(area) },
             });

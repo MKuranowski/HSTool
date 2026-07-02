@@ -30,7 +30,7 @@ export default function DistanceSelector({
                 type="number"
                 min="0"
                 step="0.1"
-                required={true}
+                required
                 defaultValue={q.distance.peek()}
                 onChange={(e) => {
                     const num = Number.parseFloat(e.target.value);

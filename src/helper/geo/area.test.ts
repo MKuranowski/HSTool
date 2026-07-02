@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
+/// <reference lib="deno.ns" />
 
-import { expect, test } from "vitest";
+import { expect } from "@std/expect";
 import { bufferBBox, soleDivision } from "./area.ts";
 
-test("bufferBBox", () => {
+Deno.test("bufferBBox", () => {
     const [minLon, minLat, maxLon, maxLat] = bufferBBox([21, 51, 22, 52], 100);
     expect(minLon).toBeCloseTo(19.585, 3);
     expect(minLat).toBeCloseTo(50.101, 3);
@@ -12,7 +13,7 @@ test("bufferBBox", () => {
     expect(maxLat).toBeCloseTo(52.899, 3);
 });
 
-test("soleDivision", () => {
+Deno.test("soleDivision", () => {
     const collection = soleDivision([21, 51, 22, 52], { id: "square" });
     expect(collection.features.length).toStrictEqual(1);
 

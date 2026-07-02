@@ -176,7 +176,6 @@ export function jsonCodec<T extends z.ZodType>(schema: T) {
     return z.codec(z.string(), schema, {
         decode: (jsonString, ctx) => {
             try {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 return JSON.parse(jsonString);
             } catch (err) {
                 ctx.issues.push({

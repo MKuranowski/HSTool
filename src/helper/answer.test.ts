@@ -1,11 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
+/// <reference lib="deno.ns" />
 
+import { expect } from "@std/expect";
 import * as turf from "@turf/turf";
-import { expect, test } from "vitest";
 import { categorizeBinary, hasAnswer, withAnswers, withPossibleAnswers } from "./answer.ts";
 
-test("withPossibleAnswers", () => {
+Deno.test("withPossibleAnswers", () => {
     const c1 = turf.featureCollection([
         turf.point([20.97, 52.17], { iata: "WAW" }),
         turf.point([20.65, 52.45], { iata: "WMI" }),
@@ -28,7 +29,7 @@ test("withPossibleAnswers", () => {
     ]);
 });
 
-test("withAnswers", () => {
+Deno.test("withAnswers", () => {
     const c1 = turf.featureCollection([
         turf.point([20.97, 52.17], { id: "WAW" }),
         turf.point([20.65, 52.45], { id: "WMI" }),
@@ -49,7 +50,7 @@ test("withAnswers", () => {
     ]);
 });
 
-test("categorizeBinary", () => {
+Deno.test("categorizeBinary", () => {
     const ref = turf.point([21.01, 52.231]);
     const points = [
         turf.point([21.003, 52.229], { name: "Warszawa Centralna" }),
@@ -76,7 +77,7 @@ test("categorizeBinary", () => {
     ]);
 });
 
-test("hasAnswer", () => {
+Deno.test("hasAnswer", () => {
     expect(hasAnswer([{ id: "hit" }], "hit")).toEqual(true);
     expect(hasAnswer([{ id: "hit" }], "miss")).toEqual(false);
     expect(hasAnswer([{ id: "hit", name: "miss" }], "miss")).toEqual(false);

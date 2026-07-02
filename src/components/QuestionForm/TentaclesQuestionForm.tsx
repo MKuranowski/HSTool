@@ -15,7 +15,6 @@ export function TentaclesAnswerSelector({ q }: { q: TentaclesQuestion }) {
 
     const idToName = useComputed(() => {
         return new Map(
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             $.preset.points.value[q.candidatesName.value]?.features
                 .filter((f) => f.properties.name !== undefined)
                 .map((f) => [f.properties.id, f.properties.name] as const),

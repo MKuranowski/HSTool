@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { Col, Container, Row, Tab, Tabs } from "react-bootstrap";
-import GameMap from "./GameMap";
-import Questions from "./Questions";
-import Settings from "./Settings";
-import Stations from "./Stations";
-import Timing from "./Timing";
-import ToastManager from "./ToastManager";
+import GameMap from "./GameMap.tsx";
+import Questions from "./Questions.tsx";
+import Settings from "./Settings.tsx";
+import Stations from "./Stations.tsx";
+import Timing from "./Timing.tsx";
+import ToastManager from "./ToastManager.tsx";
 
 function App() {
     return (

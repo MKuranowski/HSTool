@@ -15,7 +15,6 @@ export function toString(obj: unknown): string {
     } else if (obj instanceof z.ZodError) {
         return `ZodError:\n${z.prettifyError(obj)}`;
     } else {
-        // eslint-disable-next-line @typescript-eslint/no-base-to-string
         return obj.toString();
     }
 }

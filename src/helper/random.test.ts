@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
+/// <reference lib="deno.ns" />
 
-import { expect, test } from "vitest";
+import { expect } from "@std/expect";
 import { randomColor, SFC32 } from "./random.ts";
 
-test("SFC32", () => {
+Deno.test("SFC32", () => {
     const rng = new SFC32({ a: 314159, b: 271828, c: 141421 });
     expect(rng.nextInt()).toEqual(585988);
     expect(rng.nextInt()).toEqual(1272791);
@@ -17,7 +18,7 @@ test("SFC32", () => {
     // expect(rng.nextFloat()).toBeCloseTo(0.0, 12);
 });
 
-test("randomColor", () => {
+Deno.test("randomColor", () => {
     const matrix = [
         [0.41421356237, "#6a09e6"],
         [0.31415926536, "#506cbd"],

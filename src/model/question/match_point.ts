@@ -63,10 +63,12 @@ export default class MatchPointQuestion extends WithCandidates(WithSeekers(BaseQ
     }
 
     override divideArea(extent: BBox): FeatureCollection<Area, Answered> | null {
-        return withAnswers(voronoi(this.candidates.value, { extent }), (area) =>
-            area.properties.id === this.seekersMatch.value?.properties.id
-                ? { id: "hit" }
-                : { id: "miss" },
+        return withAnswers(
+            voronoi(this.candidates.value, { extent }),
+            (area) =>
+                area.properties.id === this.seekersMatch.value?.properties.id
+                    ? { id: "hit" }
+                    : { id: "miss" },
         );
     }
 }

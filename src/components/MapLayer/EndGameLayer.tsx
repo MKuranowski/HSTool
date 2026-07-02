@@ -40,10 +40,9 @@ const $endGameArea = computed((): Feature<MultiPolygon> | null => {
             (area) => area.properties.answer.id !== q.answer.value,
         );
         if (mismatchedAreas.length === 0) continue;
-        const mismatchedArea =
-            mismatchedAreas.length > 1
-                ? turf.union(turf.featureCollection(mismatchedAreas))
-                : mismatchedAreas[0];
+        const mismatchedArea = mismatchedAreas.length > 1
+            ? turf.union(turf.featureCollection(mismatchedAreas))
+            : mismatchedAreas[0];
         if (mismatchedArea === null) continue;
 
         // Chop off the hiding zone where the answer wouldn't match
@@ -87,12 +86,13 @@ function GeoJSONPolygonLayer({
     geometry,
     ...rest
 }: Omit<PolygonProps, "positions"> & { geometry: Polygon | MultiPolygon }) {
-    const polygonsLonLat =
-        geometry.type === "Polygon" ? [geometry.coordinates] : geometry.coordinates;
+    const polygonsLonLat = geometry.type === "Polygon"
+        ? [geometry.coordinates]
+        : geometry.coordinates;
     const polygonsLatLon = polygonsLonLat.map((polygonLonLat) =>
         polygonLonLat.map((ringLonLat) =>
-            ringLonLat.map((coords) => coords.toReversed() as [number, number]),
-        ),
+            ringLonLat.map((coords) => coords.toReversed() as [number, number])
+        )
     );
     return <PolygonLayer {...rest} positions={polygonsLatLon} />;
 }
@@ -104,18 +104,20 @@ function LeftoverArea() {
     const q = $.stagingQuestion.value;
 
     if (endGameArea === null) return null;
-    if (q === null)
+    if (q === null) {
         return (
             <GeoJSONPolygonLayer geometry={endGameArea.geometry} pathOptions={getPathOptions()} />
         );
+    }
 
     const extent = bufferBBox(turf.bbox(endGameArea), 0.1);
-    const answerAreas: FeatureCollection<Area, Answered & { color?: string | undefined }> | null =
-        q.divideArea(extent);
-    if (answerAreas === null || answerAreas.features.length === 0)
+    const answerAreas: FeatureCollection<Area, Answered & { color?: string | undefined }> | null = q
+        .divideArea(extent);
+    if (answerAreas === null || answerAreas.features.length === 0) {
         return (
             <GeoJSONPolygonLayer geometry={endGameArea.geometry} pathOptions={getPathOptions()} />
         );
+    }
 
     // Figure out how to color answer-areas
     const answerToColor = new Map(q.answers.value.map((a, idx) => [a, palette.getNthColor(idx)]));

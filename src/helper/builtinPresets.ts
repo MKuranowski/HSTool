@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import * as z from "zod";
-import builtinPresetsIndexUrl from "/presets/index.json?url";
 import $ from "../state.ts";
 import { presetSchema } from "../wire/preset.ts";
 import { toString } from "./strings.ts";
 
 const recordSchema = z.record(z.string(), z.string());
 
+const builtinPresetsIndexUrl = "/HSTool/presets/index.json";
 const builtinPresetsBaseUrl = builtinPresetsIndexUrl.substring(
     0,
     builtinPresetsIndexUrl.lastIndexOf("/") + 1,
@@ -17,7 +17,6 @@ const builtinPresetsBaseUrl = builtinPresetsIndexUrl.substring(
 async function fetchBuiltinPresets(): Promise<[ReadonlyMap<string, URL>, URL | null]> {
     try {
         const resp = await fetch(builtinPresetsIndexUrl);
-        // eslint-disable-next-line @typescript-eslint/only-throw-error
         if (!resp.ok) throw `${resp.status.toString()} ${resp.statusText}`;
 
         const data = recordSchema.parse(await resp.json());

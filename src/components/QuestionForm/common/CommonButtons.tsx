@@ -7,7 +7,7 @@ import type { JSX } from "react";
 import { Button, ButtonGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { type Question } from "../../../model/question/index.ts";
 import $ from "../../../state.ts";
-import TimeSelector from "./TimeSelector";
+import TimeSelector from "./TimeSelector.tsx";
 
 export function EditCommitButton({ q, index }: { q: Question; index: number | null }) {
     useSignals();

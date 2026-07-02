@@ -35,7 +35,7 @@ export function ThermometerSecondaryMarker() {
     return (
         <>
             <Marker
-                draggable={true}
+                draggable
                 eventHandlers={eventHandlers}
                 position={[endLat, endLon]}
                 ref={markerRef}

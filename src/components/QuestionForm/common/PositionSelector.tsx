@@ -93,20 +93,20 @@ export default function PositionSelector({
         }
     });
 
-    const latIcon = isStart ? (
-        <>
-            φ<sub>0</sub>
-        </>
-    ) : (
-        <>φ</>
-    );
-    const lonIcon = isStart ? (
-        <>
-            λ<sub>0</sub>
-        </>
-    ) : (
-        <>λ</>
-    );
+    const latIcon = isStart
+        ? (
+            <>
+                φ<sub>0</sub>
+            </>
+        )
+        : <>φ</>;
+    const lonIcon = isStart
+        ? (
+            <>
+                λ<sub>0</sub>
+            </>
+        )
+        : <>λ</>;
     const latLabel = isStart ? "Start Latitude" : "Latitude";
     const lonLabel = isStart ? "Start Longitude" : "Longitude";
 
@@ -157,12 +157,13 @@ export default function PositionSelector({
                 min="-90"
                 max="90"
                 step="0.001"
-                required={true}
+                required
                 defaultValue={q.seekers.peek()[1]}
                 onChange={(e) => {
                     const num = Number.parseFloat(e.target.value);
-                    if (Number.isFinite(num) && num >= -90 && num <= 90)
+                    if (Number.isFinite(num) && num >= -90 && num <= 90) {
                         q.setSeekers([undefined, num]);
+                    }
                 }}
             />
             <OverlayTrigger overlay={<Tooltip id={`q-${q.id}-lon`}>{lonLabel}</Tooltip>}>
@@ -174,12 +175,13 @@ export default function PositionSelector({
                 min="-180"
                 max="180"
                 step="0.001"
-                required={true}
+                required
                 defaultValue={q.seekers.peek()[0]}
                 onChange={(e) => {
                     const num = Number.parseFloat(e.target.value);
-                    if (Number.isFinite(num) && num >= -180 && num <= 180)
+                    if (Number.isFinite(num) && num >= -180 && num <= 180) {
                         q.setSeekers([num, undefined]);
+                    }
                 }}
             />
         </InputGroup>

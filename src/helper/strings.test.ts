@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
+/// <reference lib="deno.ns" />
 
-import { expect, test } from "vitest";
+import { expect } from "@std/expect";
 import { toString } from "./strings.ts";
 
-test("toString", () => {
+Deno.test("toString", () => {
     const matrix = [
         ["hello", "hello"],
         [42, "42"],

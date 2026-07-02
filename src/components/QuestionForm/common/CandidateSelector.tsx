@@ -31,7 +31,6 @@ function getCandidatesCollection(
 ): FeatureCollection<Geometry, Identified> {
     for (const key of ["areas", "lines", "points"] as const) {
         const set = preset[key].peek()[name];
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (set !== undefined) return set;
     }
     return { type: "FeatureCollection", features: [] };

@@ -86,12 +86,12 @@ interface Preset {
 ## Development
 
 HSTool is a single-page application written using React, Bootstrap, Leaflet and Vite.
-[pnpm](https://pnpm.io/) is required to build and develop the application.
+[Deno](https://deno.com/) is required to build and develop the application.
 
-* `pnpm dev` starts the application in development mode with hot reload,
-* `pnpm test` runs unit tests,
-* `pnpm lint` checks the code,
-* `pnpm build` builds the application in release mode for distribution under the `dist` folder.
+* `deno task dev` starts the application in development mode with hot reload,
+* `deno task test` runs unit tests,
+* `deno task lint` checks the code,
+* `deno task build` builds the application in release mode for distribution under the `dist` folder.
 
 
 ## License

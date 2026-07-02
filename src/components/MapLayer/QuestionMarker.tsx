@@ -37,7 +37,7 @@ export function QuestionMarker() {
 
     return (
         <Marker
-            draggable={true}
+            draggable
             eventHandlers={eventHandlers}
             position={position}
             ref={markerRef}

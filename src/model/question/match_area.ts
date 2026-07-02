@@ -62,10 +62,12 @@ export default class MatchAreaQuestion extends WithCandidates(
     }
 
     override divideArea(_extent: BBox): FeatureCollection<Area, Answered> | null {
-        return withAnswers(this.candidates.value, (area) =>
-            area.properties.id === this.seekersMatch.value?.properties.id
-                ? { id: "hit" }
-                : { id: "miss" },
+        return withAnswers(
+            this.candidates.value,
+            (area) =>
+                area.properties.id === this.seekersMatch.value?.properties.id
+                    ? { id: "hit" }
+                    : { id: "miss" },
         );
     }
 }

@@ -5,7 +5,7 @@ import { useSignalEffect } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
 import { useRef } from "react";
 import { Button, Form, InputGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { toString } from "../../helper/strings";
+import { toString } from "../../helper/strings.ts";
 import { type ThermometerQuestion } from "../../model/question/index.ts";
 import $ from "../../state.ts";
 import BinaryAnswerButtons from "./common/BinaryAnswerButtons.tsx";
@@ -33,7 +33,7 @@ function AzimuthSelector({ q, className }: { q: ThermometerQuestion; className?:
                 max="360"
                 step="1"
                 defaultValue={q.azimuth.peek()}
-                required={true}
+                required
                 onChange={(e) => {
                     const num = Number.parseFloat(e.target.value);
                     if (Number.isFinite(num) && num >= 0 && num <= 360) q.setAzimuth(num);

@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
+/// <reference lib="deno.ns" />
 
+import { expect } from "@std/expect";
 import * as turf from "@turf/turf";
-import { expect, test } from "vitest";
 import { type Position } from "../geo.ts";
 import {
     MatchAreaQuestion,
@@ -39,7 +40,7 @@ const stations = turf.featureCollection([
     turf.point(stationC, { id: "C", name: "C" }),
 ]);
 
-test("MatchAreaQuestion.categorize", () => {
+Deno.test("MatchAreaQuestion.categorize", () => {
     const area = turf.buffer(turf.point(rootA), 7);
     if (area === undefined) throw new Error("turf.buffer around rootA is undefined");
 
@@ -58,7 +59,7 @@ test("MatchAreaQuestion.categorize", () => {
     ).toEqual([[{ id: "hit" }], [{ id: "miss" }], [{ id: "hit" }, { id: "miss" }]]);
 });
 
-test("MatchPointQuestion.categorize", () => {
+Deno.test("MatchPointQuestion.categorize", () => {
     const q = new MatchPointQuestion({
         candidates: roots,
         candidatesName: "airport",
@@ -74,7 +75,7 @@ test("MatchPointQuestion.categorize", () => {
     ).toEqual([[{ id: "hit" }], [{ id: "miss" }], [{ id: "hit" }, { id: "miss" }]]);
 });
 
-test("MeasureQuestion.categorize", () => {
+Deno.test("MeasureQuestion.categorize", () => {
     const q = new MeasureQuestion({
         candidates: roots,
         candidatesName: "airport",
@@ -90,7 +91,7 @@ test("MeasureQuestion.categorize", () => {
     ).toEqual([[{ id: "closer" }, { id: "further" }], [{ id: "closer" }], [{ id: "further" }]]);
 });
 
-test("RadarQuestion.categorize", () => {
+Deno.test("RadarQuestion.categorize", () => {
     const q = new RadarQuestion({
         seekers: rootA,
         distance: 7,
@@ -105,7 +106,7 @@ test("RadarQuestion.categorize", () => {
     ).toEqual([[{ id: "hit" }], [{ id: "miss" }], [{ id: "hit" }, { id: "miss" }]]);
 });
 
-test("ThermometerQuestion.categorize", () => {
+Deno.test("ThermometerQuestion.categorize", () => {
     const distance = turf.distance(rootA, rootB);
     const azimuth = turf.bearingToAzimuth(turf.bearing(rootA, rootB));
 
@@ -120,7 +121,7 @@ test("ThermometerQuestion.categorize", () => {
     ).toEqual([[{ id: "colder" }], [{ id: "hotter" }], [{ id: "colder" }, { id: "hotter" }]]);
 });
 
-test("TentaclesQuestion.categorize", () => {
+Deno.test("TentaclesQuestion.categorize", () => {
     const root: Position = [0.0, 0.0];
     const candidateA = translate(root, 1, 60);
     const candidateB = translate(root, 1, 180);
@@ -183,7 +184,7 @@ test("TentaclesQuestion.categorize", () => {
     ]);
 });
 
-test("TentaclesQuestion.categorize.covering", () => {
+Deno.test("TentaclesQuestion.categorize.covering", () => {
     const root: Position = [0.0, 0.0];
     const candidateA = translate(root, 0.5, 270);
     const candidateB = translate(root, 0.6, 270);

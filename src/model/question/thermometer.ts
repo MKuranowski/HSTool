@@ -85,7 +85,7 @@ export default class ThermometerQuestion extends WithDistance(WithSeekers(BaseQu
         turf.featureCollection([
             turf.point(this.seekers.value, { id: "colder" }),
             turf.point(this.endLocation.value, { id: "hotter" }),
-        ]),
+        ])
     );
 
     override categorize(center: turf.helpers.Coord, radius: number): Answer[] {

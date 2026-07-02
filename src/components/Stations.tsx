@@ -88,7 +88,7 @@ export function StationList() {
                     Station({
                         station,
                         isDiscarded: $.discardedStations.value.has(station.properties.id),
-                    }),
+                    })
                 )}
             </ListGroup>
         </>

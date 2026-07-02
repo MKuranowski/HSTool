@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
+/// <reference lib="deno.ns" />
 
-import { expect, test, vi } from "vitest";
-import { ArraySignal, MapSignal, SetSignal } from "./signal";
+import { expect, fn } from "@std/expect";
+import { ArraySignal, MapSignal, SetSignal } from "./signal.ts";
 
-test("ArraySignal", () => {
+Deno.test("ArraySignal", () => {
     const s = new ArraySignal<number>();
 
     expect(s.pop()).toStrictEqual(undefined);
@@ -31,7 +32,7 @@ test("ArraySignal", () => {
     expect(s.value).toEqual([-1, 0.25, 0.75]);
 });
 
-test("SetSignal", () => {
+Deno.test("SetSignal", () => {
     const s = new SetSignal<string>();
 
     s.add("foo").add("bar").add("baz");
@@ -45,7 +46,7 @@ test("SetSignal", () => {
     expect(s.value).toEqual(new Set());
 });
 
-test("MapSignal", () => {
+Deno.test("MapSignal", () => {
     const s = new MapSignal<number, string>();
 
     s.set(1, "I").set(2, "II").set(3, "III").set(4, "IV").set(5, "V");
@@ -82,7 +83,7 @@ test("MapSignal", () => {
         ]),
     );
 
-    const stringer = vi.fn((num: number) => "V" + "I".repeat(num - 5));
+    const stringer = fn((num: number) => "V" + "I".repeat(num - 5)) as (_: number) => string;
 
     expect(s.getOrInsertComputed(5, stringer)).toEqual("V");
     expect(stringer).not.toHaveBeenCalled();

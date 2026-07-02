@@ -14,7 +14,7 @@ import {
     Tooltip,
 } from "react-bootstrap";
 import { loadPresetFromUrl } from "../helper/builtinPresets.ts";
-import { toString } from "../helper/strings";
+import { toString } from "../helper/strings.ts";
 import $, { jsonCodec } from "../state.ts";
 import { presetSchema } from "../wire/preset.ts";
 
@@ -107,18 +107,20 @@ export function AnswerTimeInput({ photo = false }: { photo?: boolean | undefined
         }
     });
 
-    const helper = photo ? (
-        <OverlayTrigger
-            flip
-            overlay={
-                <Tooltip id="photo-answer-time">
-                    Any custom question with the word &quot;photo&quot;
-                </Tooltip>
-            }
-        >
-            <i className="bi bi-question-circle" />
-        </OverlayTrigger>
-    ) : null;
+    const helper = photo
+        ? (
+            <OverlayTrigger
+                flip
+                overlay={
+                    <Tooltip id="photo-answer-time">
+                        Any custom question with the word &quot;photo&quot;
+                    </Tooltip>
+                }
+            >
+                <i className="bi bi-question-circle" />
+            </OverlayTrigger>
+        )
+        : null;
     return (
         <InputGroup className="mb-2">
             <InputGroup.Text className="column-gap-1">
@@ -131,7 +133,7 @@ export function AnswerTimeInput({ photo = false }: { photo?: boolean | undefined
                 min="0"
                 step="1"
                 defaultValue={signal.peek()}
-                required={true}
+                required
                 onChange={(e) => {
                     const num = Number.parseFloat(e.target.value);
                     if (!Number.isNaN(num) && num >= 0) signal.value = num;
@@ -178,7 +180,7 @@ export function QuickAnswerMultiplierInput() {
                 min="0"
                 step="0.1"
                 defaultValue={$.preset.quickAnswerMultiplier.peek()}
-                required={true}
+                required
                 onChange={(e) => {
                     const num = Number.parseFloat(e.target.value);
                     if (!Number.isNaN(num) && num >= 0) $.preset.quickAnswerMultiplier.value = num;
@@ -208,7 +210,7 @@ export function HidingZoneRadiusInput() {
                 min="0"
                 step="0.1"
                 defaultValue={$.preset.hidingRadius.peek()}
-                required={true}
+                required
                 onChange={(e) => {
                     const num = Number.parseFloat(e.target.value);
                     if (!Number.isNaN(num)) $.preset.hidingRadius.value = num;

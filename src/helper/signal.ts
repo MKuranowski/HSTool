@@ -104,7 +104,6 @@ export class MapSignal<K, V> extends Signal<ReadonlyMap<K, V>> {
 
     getOrInsert(key: K, defaultValue: V): V {
         if (this.value.has(key)) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return this.value.get(key)!;
         }
         const copy = new Map(this.value);
@@ -115,7 +114,6 @@ export class MapSignal<K, V> extends Signal<ReadonlyMap<K, V>> {
 
     getOrInsertComputed(key: K, callback: (key: K) => V): V {
         if (this.value.has(key)) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return this.value.get(key)!;
         }
         const copy = new Map(this.value);

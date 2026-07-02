@@ -1,10 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* any is required for mixin classes */
+// deno-lint-ignore-file no-explicit-any
+// any is required for mixins in TypeScript, https://www.typescriptlang.org/docs/handbook/mixins.html
 
 import { batch, Signal } from "@preact/signals-react";
 import type { Feature, FeatureCollection, Geometry } from "geojson";

@@ -9,7 +9,7 @@ import { useEffect, useRef } from "react";
 import { GeoJSON } from "react-leaflet";
 import { LayerGroup } from "react-leaflet";
 import { bufferBBox } from "../../helper/geo/area.ts";
-import * as palette from "../../helper/palette";
+import * as palette from "../../helper/palette.ts";
 import type { Area } from "../../model/geo.ts";
 import type { Answered, Identified } from "../../model/props.ts";
 import { type Question } from "../../model/question/index.ts";
@@ -67,8 +67,9 @@ export function VoronoiAreaLayer({ q }: { q: Question }) {
     );
 
     // Compute the extent division
-    const collection: FeatureCollection<Area, Answered & { color?: string }> | null =
-        q.divideArea(extent);
+    const collection: FeatureCollection<Area, Answered & { color?: string }> | null = q.divideArea(
+        extent,
+    );
     if (collection === null) return null;
 
     // Figure out how to color areas

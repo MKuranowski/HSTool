@@ -1,9 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
+/// <reference lib="deno.ns" />
 
+import { expect } from "@std/expect";
 import * as turf from "@turf/turf";
 import type { MultiPolygon, Polygon, Position } from "geojson";
-import { expect, test } from "vitest";
 import { planarVoronoi } from "./voronoi.ts";
 
 function roundCoord(c: number): number {
@@ -33,7 +34,7 @@ function roundGeometry(geometry: Polygon | MultiPolygon): Polygon | MultiPolygon
     }
 }
 
-test("planarVoronoi", () => {
+Deno.test("planarVoronoi", () => {
     const points = turf.featureCollection([
         turf.point([20.5, 50.5], { id: "A" }),
         turf.point([20.5, 51.5], { id: "B" }),

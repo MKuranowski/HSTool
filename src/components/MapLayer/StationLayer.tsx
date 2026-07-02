@@ -25,15 +25,15 @@ function segmentedCircle(
     radius: number = 1,
     opacity: number = 1,
 ): SVGPathElement[] {
-    if (points.length !== colors.length)
+    if (points.length !== colors.length) {
         throw new Error("segmentedCircle: points and color must be the same length");
+    }
 
     return points.map((pt, idx) => {
         const [x1, y1] = pt;
         const [x2, y2] = points[(idx + 1) % points.length];
         const color = colors[idx];
 
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         const path = `M 0 0 ${x1} ${y1} A ${radius} ${radius} 0 0 1 ${x2} ${y2}`;
 
         const elem = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -112,7 +112,7 @@ function StationPopup({
     station: Feature<Point, AnnotatedStationProperties>;
     answerToColor: Map<string, string>;
 }) {
-    // eslint-disable-next-line react-x/no-missing-key
+    // deno-lint-ignore jsx-key
     const children = [<b>{station.properties.name}</b>, <br />];
 
     if (station.properties.possibleAnswers) {
@@ -160,8 +160,8 @@ export function StationIconLayer({
 
                 const colors = s.properties.possibleAnswers
                     ? s.properties.possibleAnswers.map(
-                          (a) => answerToColor.get(a.id) ?? palette.primary,
-                      )
+                        (a) => answerToColor.get(a.id) ?? palette.primary,
+                    )
                     : undefined;
 
                 const icon = L.divIcon({

@@ -1,0 +1,51 @@
+{
+    "tasks": {
+        "dev": "vite",
+        "build": "vite build",
+        "lint": "deno check && deno lint",
+        "test": "deno test -E",
+        "preview": "vite preview"
+    },
+    "imports": {
+        "@preact/signals-core": "npm:@preact/signals-core@^1.14.3",
+        "@preact/signals-react": "npm:@preact/signals-react@^3.10.2",
+        "@std/expect": "jsr:@std/expect@^1.0.19",
+        "@std/testing": "jsr:@std/testing@^1.0.19",
+        "@turf/nearest-point": "npm:@turf/nearest-point@^7.3.5",
+        "@turf/turf": "npm:@turf/turf@^7.3.4",
+        "@types/d3-delaunay": "npm:@types/d3-delaunay@^6.0.4",
+        "@types/leaflet": "npm:@types/leaflet@^1.9.21",
+        "@types/react": "npm:@types/react@^19.2.14",
+        "@types/react-dom": "npm:@types/react-dom@^19.2.3",
+        "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^6.0.1",
+        "bootstrap": "npm:bootstrap@^5.3.8",
+        "bootstrap-icons": "npm:bootstrap-icons@^1.13.1",
+        "d3-delaunay": "npm:d3-delaunay@^6.0.4",
+        "geojson": "npm:@types/geojson@^7946.0.16",
+        "leaflet": "npm:leaflet@^1.9.4",
+        "react": "npm:react@^19.2.4",
+        "react-bootstrap": "npm:react-bootstrap@^2.10.10",
+        "react-dom": "npm:react-dom@^19.2.4",
+        "react-leaflet": "npm:react-leaflet@^5.0.0",
+        "sass": "npm:sass@^1.98.0",
+        "uuid": "npm:uuid@^14.0.1",
+        "vite": "npm:vite@^8.0.1",
+        "zod": "npm:zod@^4.3.6"
+    },
+    "nodeModulesDir": "auto",
+    "compilerOptions": {
+        "jsx": "react-jsx",
+        "jsxImportSource": "react",
+        "lib": ["dom", "es2023"]
+    },
+    "fmt": {
+        "indentWidth": 4,
+        "lineWidth": 100,
+        "exclude": ["dist/", "public/presets/", "*.md"]
+    },
+    "lint": {
+        "rules": {
+            "exclude": ["no-window"]
+        }
+    }
+}

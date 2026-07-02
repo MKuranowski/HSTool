@@ -1,17 +1,18 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
+/// <reference lib="deno.ns" />
 
+import { expect } from "@std/expect";
 import * as turf from "@turf/turf";
-import { expect, test } from "vitest";
 import { withProperties, withPropertiesInCollection } from "./prop.ts";
 
-test("withProperties", () => {
+Deno.test("withProperties", () => {
     const f1 = turf.point([21, 52], { foo: "bar", spam: "eggs" });
     const f2 = withProperties(f1, { foo: "baz", universe: 42 });
     expect(f2.properties).toStrictEqual({ foo: "baz", spam: "eggs", universe: 42 });
 });
 
-test("withPropertiesInCollection", () => {
+Deno.test("withPropertiesInCollection", () => {
     const c1 = turf.featureCollection([
         turf.point([20.97, 52.17], { iata: "WAW" }),
         turf.point([20.65, 52.45], { iata: "WMI" }),
