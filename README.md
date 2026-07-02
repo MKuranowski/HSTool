@@ -43,20 +43,35 @@ interface Preset {
     name: string;
 
     // In kilometers, defaults to 0.5
-    hiding_radius?: number,
+    hidingRadius?: number,
+
+    // Time in minutes for the hider to answer a question, defaults to 5
+    answerTime?: number,
+
+    // Time in minutes for the hider to answer a photo question, defaults to 10
+    photoAnswerTime?: number,
+
+    // Multiplier for calculating time bonuses for quick answers, defaults to 0
+    // (disabled). The bonus is truncated (rounded down) to nearest minute for
+    // each question.
+    //
+    // For example, if a hider answers a photo question with 5 minutes left over,
+    // and this multiplier is set to 0.5, 2 minutes = ⌊2.5⌋ = ⌊5 * 0.5⌋ is added
+    // to their total hiding time.
+    quickAnswerMultiplier: number,
 
     stations: FeatureCollection<Point, { id: string; name: string }>;
 
     // Point collections can be used in "Match-Point", "Measure" and "Tentacle" questions.
-    // Examples include "Airports", "Cinemas" or "Parks".
+    // Examples include "airport", "cinema" or "park".
     points?: Record<string, FeatureCollection<Point, { id: string; name?: string }>>;
 
     // Line collections can be used in "Measure" questions.
-    // Examples include "Coastline" or "International Borders".
+    // Examples include "coastline" or "international border".
     lines?: Record<string, FeatureCollection<LineString, { id: string }>>;
 
     // Area collections can be used in "Match-Area" questions.
-    // Examples include "Landmasses" or "3rd Admin Divisions".
+    // Examples include "landmass" or "3rd admin division".
     // Polygons within each collection should not overlap.
     areas?: Record<string, FeatureCollection<Polygon | MultiPolygon, { id: string; name?: string }>>;
 
