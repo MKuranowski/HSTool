@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { useStore } from "@nanostores/react";
+import { useSignals } from "@preact/signals-react/runtime";
+import * as turf from "@turf/turf";
 import {
     Accordion,
     Button,
@@ -10,20 +11,47 @@ import {
     OverlayTrigger,
     Tooltip,
 } from "react-bootstrap";
-import * as Question from "../model/Question";
-import { $defaultMakerLocation, $endGameStation, $questions, $stagingQuestion } from "../state";
-import { QuestionColor, QuestionForm, QuestionIcon, QuestionKindName } from "./QuestionForm";
+import type { Position } from "../model/geo.ts";
+import {
+    createNewQuestion,
+    type Question,
+    questionHasSeekers,
+    type QuestionKind,
+} from "../model/question/index.ts";
+import $ from "../state.ts";
+import {
+    QuestionColor,
+    QuestionForm,
+    QuestionIcon,
+    QuestionKindName,
+} from "./QuestionForm/index.tsx";
 
-function NewQuestionButton({ kind }: { kind: Question.Kind }) {
+function computeInitialPinLocation(): Position {
+    // If in the end game - start the pin there
+    const endGameStation = $.endGameStation.peek();
+    if (endGameStation !== null) return endGameStation.geometry.coordinates as Position;
+
+    // Otherwise - set it to the center of mass of all leftover stations
+    const disabledStations = $.disabledStations.peek();
+    const activeStations = turf.featureCollection(
+        $.preset.stations.peek().features.filter((s) => !disabledStations.has(s.properties.id)),
+    );
+    if (activeStations.features.length === 0) return [0, 0];
+    return turf.centerOfMass(activeStations).geometry.coordinates as Position;
+}
+
+function NewQuestionButton({ kind }: { kind: QuestionKind }) {
     return (
         <OverlayTrigger overlay={<Tooltip id={`new-q-${kind}`}>{QuestionKindName(kind)}</Tooltip>}>
             <Button
                 variant={QuestionColor(kind)}
                 onClick={() => {
-                    const root = $defaultMakerLocation.get();
-                    const q = Question.empty(kind, root);
-                    q.inEndGame = $endGameStation.get() !== null;
-                    $stagingQuestion.set(q);
+                    const q = createNewQuestion(kind);
+                    q.inEndGame.value = $.endGameStation.peek() !== null;
+                    if (questionHasSeekers(q)) {
+                        q.seekers.value = computeInitialPinLocation();
+                    }
+                    $.stagingQuestion.value = q;
                 }}
             >
                 <QuestionIcon kind={kind} hidden />
@@ -32,10 +60,11 @@ function NewQuestionButton({ kind }: { kind: Question.Kind }) {
     );
 }
 
-function QuestionStagingArea({ q }: { q: Question.T }) {
+function QuestionStagingArea({ q }: { q: Question }) {
+    useSignals();
     return (
         <ListGroup>
-            <ListGroup.Item variant={QuestionColor(q.kind)}>{Question.name(q)}</ListGroup.Item>
+            <ListGroup.Item variant={QuestionColor(q.kind)}>{q.name}</ListGroup.Item>
             <ListGroup.Item>
                 <QuestionForm q={q} index={null} />
             </ListGroup.Item>
@@ -64,24 +93,23 @@ function QuestionPicker() {
 }
 
 export default function Questions() {
-    const questions = useStore($questions);
-    const stagingQuestion = useStore($stagingQuestion);
+    useSignals();
+
+    const stagingQuestion = $.stagingQuestion.value;
+    const stagingArea =
+        stagingQuestion === null ? <QuestionPicker /> : <QuestionStagingArea q={stagingQuestion} />;
 
     return (
         <>
-            {stagingQuestion === null ? (
-                <QuestionPicker />
-            ) : (
-                <QuestionStagingArea q={stagingQuestion} />
-            )}
+            {stagingArea}
             <hr />
             <Accordion>
-                {questions.map((q, idx) => {
-                    const key = `question-${idx.toFixed(0)}`;
+                {$.questions.value.map((q, idx) => {
+                    const key = `question-${q.id}`;
                     return (
                         <Accordion.Item key={key} eventKey={key}>
                             <Accordion.Header className="overflow-x-scroll">
-                                {Question.name(q)}
+                                {q.name}
                             </Accordion.Header>
                             <Accordion.Body>
                                 <QuestionForm q={q} index={idx} />

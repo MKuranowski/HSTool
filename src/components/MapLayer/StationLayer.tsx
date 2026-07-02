@@ -1,28 +1,17 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { useStore } from "@nanostores/react";
+import { useSignals } from "@preact/signals-react/runtime";
 import type { Feature, FeatureCollection, Point } from "geojson";
 import * as L from "leaflet";
 import { Circle, LayerGroup, Marker, Popup } from "react-leaflet";
-import { answerId, answerName, type PossibleAnswer } from "../../helper/answer";
-import * as palette from "../../helper/palette";
-import type { PropertiesWithName } from "../../model/Geo";
-import * as Question from "../../model/Question";
-import {
-    $disabledStations,
-    $endGameStation,
-    $hidingZoneRadius,
-    $preset,
-    $showHidingZones,
-    $stagingQuestion,
-} from "../../state";
+import * as palette from "../../helper/palette.ts";
+import type { Named, WithPossibleAnswers } from "../../model/props.ts";
+import $ from "../../state.ts";
 
 const MARKER_SIZE = 16;
 
-interface AnnotatedStationProperties extends PropertiesWithName {
-    possibleAnswers?: PossibleAnswer[] | undefined;
-}
+type AnnotatedStationProperties = Named & Partial<WithPossibleAnswers>;
 
 function rot(x: number, y: number, angleRadians: number): [number, number] {
     const sin = Math.sin(angleRadians);
@@ -131,10 +120,9 @@ function StationPopup({
             <>Possible answers:</>,
             <ul>
                 {station.properties.possibleAnswers.map((a) => {
-                    const id = answerId(a);
-                    const name = answerName(a);
+                    const name = a.name ?? a.id;
                     return (
-                        <li key={id} color={answerToColor.get(id)}>
+                        <li key={a.id} color={answerToColor.get(a.id)}>
                             {name}
                         </li>
                     );
@@ -148,7 +136,7 @@ function StationPopup({
         <a
             href="#"
             onClick={() => {
-                $endGameStation.set(station);
+                $.endGameStation.value = station;
             }}
         >
             Start End Game
@@ -172,7 +160,7 @@ export function StationIconLayer({
 
                 const colors = s.properties.possibleAnswers
                     ? s.properties.possibleAnswers.map(
-                          (a) => answerToColor.get(answerId(a)) ?? palette.primary,
+                          (a) => answerToColor.get(a.id) ?? palette.primary,
                       )
                     : undefined;
 
@@ -218,29 +206,28 @@ export function StationZoneLayer({
 }
 
 export function StationLayer() {
-    const preset = useStore($preset);
-    const stagingQuestion = useStore($stagingQuestion);
-    const disabledStations = useStore($disabledStations);
-    const hidingZoneRadius = useStore($hidingZoneRadius);
-    const showHidingZones = useStore($showHidingZones);
+    useSignals();
+
+    const stagingQuestion = $.stagingQuestion.value;
+    const disabledStations = $.disabledStations.value;
+    const hidingZoneRadius = $.preset.hidingRadius.value;
+    const showHidingZones = $.preferences.showHidingZones.value;
 
     const visibleStations = {
         type: "FeatureCollection" as const,
-        features: preset.stations.features.filter(
-            (s) => !Object.hasOwn(disabledStations, s.properties.id),
+        features: $.preset.stations.value.features.filter(
+            (s) => !disabledStations.has(s.properties.id),
         ),
     };
 
     const annotatedStations: FeatureCollection<Point, AnnotatedStationProperties> =
         stagingQuestion !== null
-            ? Question.categorize(stagingQuestion, visibleStations, hidingZoneRadius)
+            ? stagingQuestion.categorizeFeatures(visibleStations, hidingZoneRadius)
             : visibleStations;
 
     const answerToColor = new Map(
         stagingQuestion !== null
-            ? Question.answers(stagingQuestion).map(
-                  (a, idx) => [a, palette.getNthColor(idx)] as const,
-              )
+            ? stagingQuestion.answers.value.map((a, idx) => [a, palette.getNthColor(idx)] as const)
             : [],
     );
 

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import type { Feature, FeatureCollection, Geometry, Position } from "geojson";
+import type { Feature, FeatureCollection, Geometry } from "geojson";
 
 /**
  * Merges properties of a feature with the provided object.
@@ -32,22 +32,4 @@ export function withPropertiesInCollection<
         ...collection,
         features: collection.features.map((f) => withProperties(f, newProps(f))),
     };
-}
-
-/**
- * Merges two GeoJSON Positions into one; returning new_ members, unless their null -
- * in which case the corresponding entry from old is used.
- */
-export function mergePositions(old: Position, new_: (null | number)[]): Position {
-    const len = Math.max(old.length, new_.length);
-    const merged = new Array<number>(len);
-    for (let i = 0; i < len; ++i) merged[i] = new_[i] ?? old[i];
-    return merged;
-}
-
-export function hashCoords(
-    c: Position,
-    { precision = 6 }: { precision?: number | undefined } = {},
-): string {
-    return `${c[0].toFixed(precision)};${c[1].toFixed(precision)}`;
 }

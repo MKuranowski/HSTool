@@ -1,23 +1,18 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { useStore } from "@nanostores/react";
+import { useSignals } from "@preact/signals-react/runtime";
 import type { ReactNode } from "react";
 import { Button, Form, FormControl, InputGroup } from "react-bootstrap";
-import * as Timestamp from "../model/Timestamp";
-import {
-    $answerTime,
-    $endTime,
-    $photoAnswerTime,
-    $questions,
-    $quickAnswerMultiplier,
-    $startTime,
-    $timeBonus,
-} from "../state";
-import FormStack from "./other/FormStack";
+import { dateToFormValue } from "../model/timestamp.ts";
+import $ from "../state.ts";
+import FormStack from "./other/FormStack.tsx";
 
-function msToMin(ms: number): number {
-    return Math.trunc(ms / 60_000);
+function formatDuration(minutes: number | null): string {
+    if (minutes === null) return "-";
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return `${h.toFixed(0)}:${m.toFixed(0).padStart(2, "0")}`;
 }
 
 function FakeFormControl({ children }: { children?: ReactNode | undefined }) {
@@ -29,30 +24,31 @@ function FakeFormControl({ children }: { children?: ReactNode | undefined }) {
 }
 
 function TimeSelectorInput({ end = false }: { end?: boolean | undefined }) {
-    const store = end ? $endTime : $startTime;
-    const time = useStore(store);
+    useSignals();
+    const signal = end ? $.timing.endTime : $.timing.startTime;
+    const time = signal.value;
 
     let invalid = false;
     if (end && time) {
-        const startTime = $startTime.get();
+        const startTime = $.timing.startTime.value;
         // XXX: ISO timestamps can be compared as strings for ordering
-        invalid = startTime ? time < startTime : true;
+        invalid = startTime === null || time < startTime;
     }
 
     return (
         <>
             <Form.Control
                 type="datetime-local"
-                value={time ? Timestamp.toFormValue({ t: time, explicit: false }) : undefined}
+                value={time ? dateToFormValue(time) : undefined}
                 isInvalid={invalid}
                 onChange={(e) => {
-                    store.set(Timestamp.fromFormValue(e.target.value).t);
+                    signal.value = new Date(e.target.value);
                 }}
             />
             <Button
                 size="sm"
                 onClick={() => {
-                    store.set(new Date().toISOString());
+                    signal.value = new Date();
                 }}
             >
                 <i className="bi bi-clock" />
@@ -62,17 +58,17 @@ function TimeSelectorInput({ end = false }: { end?: boolean | undefined }) {
 }
 
 function TimeBonusInput() {
-    const bonus = useStore($timeBonus);
+    useSignals();
     return (
         <>
             <Form.Control
                 type="number"
                 min="0"
                 step="1"
-                defaultValue={bonus}
+                defaultValue={$.timing.timeBonus.value}
                 onChange={(e) => {
                     const num = Number.parseFloat(e.target.value);
-                    if (!Number.isNaN(num)) $timeBonus.set(num);
+                    if (!Number.isNaN(num)) $.timing.timeBonus.value = num;
                 }}
             />
             <InputGroup.Text>min</InputGroup.Text>
@@ -81,53 +77,26 @@ function TimeBonusInput() {
 }
 
 function ComputationStack() {
-    const start = useStore($startTime);
-    const end = useStore($endTime);
-    const questions = useStore($questions);
-    const expectedAnswerTime = useStore($answerTime);
-    const expectedPhotoAnswerTime = useStore($photoAnswerTime);
-    const quickAnswerMultiplier = useStore($quickAnswerMultiplier);
-    const bonuses = useStore($timeBonus);
-
-    if (!start || !end || end < start) return null;
-
-    const base = msToMin(Date.parse(end) - Date.parse(start));
-    let quickAnswers = 0;
-    let slowAnswers = 0;
-
-    for (const q of questions) {
-        if (q.askedAt === undefined || q.answeredAt === undefined || q.answeredAt.t < q.askedAt.t)
-            continue;
-
-        const answerTime = msToMin(Date.parse(q.answeredAt.t) - Date.parse(q.askedAt.t));
-        const isPhoto = q.kind === "custom" && /\bphotos?\b/im.test(q.name);
-        const timeDelta = (isPhoto ? expectedPhotoAnswerTime : expectedAnswerTime) - answerTime;
-
-        quickAnswers += Math.trunc(Math.max(0, timeDelta) * quickAnswerMultiplier);
-        slowAnswers += Math.min(0, timeDelta);
-    }
-
-    const total = base + bonuses + quickAnswers + slowAnswers;
-
+    useSignals();
     return (
         <FormStack>
             <FormStack.Row label="Base Time">
-                <FakeFormControl>{base}</FakeFormControl>
-                <InputGroup.Text>min</InputGroup.Text>
+                <FakeFormControl>{formatDuration($.timing.baseTime.value)}</FakeFormControl>
             </FormStack.Row>
             <FormStack.Row label="Quick Answers">
-                <FakeFormControl>{quickAnswers}</FakeFormControl>
-                <InputGroup.Text>min</InputGroup.Text>
+                <FakeFormControl>
+                    {formatDuration($.timing.answerBonuses.value.quick)}
+                </FakeFormControl>
             </FormStack.Row>
             <FormStack.Row label="Slow Answers">
-                <FakeFormControl>{slowAnswers}</FakeFormControl>
-                <InputGroup.Text>min</InputGroup.Text>
+                <FakeFormControl>
+                    {formatDuration(-$.timing.answerBonuses.value.slow)}
+                </FakeFormControl>
             </FormStack.Row>
             <FormStack.Row label="Total">
                 <FakeFormControl>
-                    <strong>{total}</strong>
+                    <strong>{formatDuration($.timing.totalHidingTime.value)}</strong>
                 </FakeFormControl>
-                <InputGroup.Text>min</InputGroup.Text>
             </FormStack.Row>
         </FormStack>
     );

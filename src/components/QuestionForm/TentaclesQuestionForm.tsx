@@ -1,66 +1,50 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { useStore } from "@nanostores/react";
-import { useMemo } from "react";
+import { useComputed, useSignals } from "@preact/signals-react/runtime";
 import { Dropdown, DropdownButton } from "react-bootstrap";
-import { getQuestionState } from "../../helper/ui";
-import * as Question from "../../model/Question";
-import * as TentaclesQuestion from "../../model/Question/TentaclesQuestion";
-import { $preset } from "../../state";
-import CandidateSelector from "./common/CandidateSelector";
-import CommonButtons from "./common/CommonButtons";
-import DistanceSelector from "./common/DistanceSelector";
-import PositionSelector from "./common/PositionSelector";
+import { type TentaclesQuestion } from "../../model/question/index.ts";
+import $ from "../../state.ts";
+import CandidateSelector from "./common/CandidateSelector.tsx";
+import CommonButtons from "./common/CommonButtons.tsx";
+import DistanceSelector from "./common/DistanceSelector.tsx";
+import PositionSelector from "./common/PositionSelector.tsx";
 
-export function TentaclesAnswerSelector({
-    ids,
-    name,
-    current,
-    index,
-}: {
-    ids: string[];
-    name: string;
-    current?: string;
-    index: number | null;
-}) {
-    const preset = useStore($preset);
-    const idToName = useMemo(() => {
+export function TentaclesAnswerSelector({ q }: { q: TentaclesQuestion }) {
+    useSignals();
+
+    const idToName = useComputed(() => {
         return new Map(
-            preset.points?.[name]?.features
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            $.preset.points.value[q.candidatesName.value]?.features
                 .filter((f) => f.properties.name !== undefined)
                 .map((f) => [f.properties.id, f.properties.name] as const),
-        );
-    }, [preset, name]);
+        ) as ReadonlyMap<string, string>;
+    });
 
-    const [idPrefix, getQuestion, setQuestion] = getQuestionState(index);
-    const currentName = current !== undefined ? (idToName.get(current) ?? current) : "(No answer)";
+    const current = q.answer.value;
+    const currentName = idToName.value.get(current ?? "") ?? current ?? "(No answer)";
+
     return (
-        <DropdownButton id={`${idPrefix}answer`} title={currentName}>
+        <DropdownButton id={`q-${q.id}-answer`} title={currentName}>
             <Dropdown.Item
                 key="(no answer)"
                 active={current === undefined}
                 onClick={() => {
-                    const q = getQuestion();
-                    if (q && q.kind === "tentacles") {
-                        setQuestion(Question.withAnswer(q, undefined));
-                    }
+                    q.setAnswer(undefined);
                 }}
             >
                 (No answer)
             </Dropdown.Item>
-            {ids.map((id) => (
+            {q.answers.value.map((id) => (
                 <Dropdown.Item
                     key={id}
                     active={id === current}
                     onClick={() => {
-                        const q = getQuestion();
-                        if (q && q.kind === "tentacles") {
-                            setQuestion(Question.withAnswer(q, id));
-                        }
+                        q.setAnswer(id);
                     }}
                 >
-                    {idToName.get(id) ?? id}
+                    {idToName.value.get(id) ?? id}
                 </Dropdown.Item>
             ))}
         </DropdownButton>
@@ -71,22 +55,16 @@ export default function TentaclesQuestionForm({
     q,
     index,
 }: {
-    q: TentaclesQuestion.T;
+    q: TentaclesQuestion;
     index: number | null;
 }) {
-    const [lon, lat] = q.seeker;
     return (
         <>
-            <CandidateSelector current={q.name} kind="tentacles" index={index} className="mb-2" />
-            <DistanceSelector value={q.radius} variant="radius" index={index} className="mb-2" />
-            <PositionSelector lat={lat} lon={lon} index={index} className="mb-2" />
+            <CandidateSelector q={q} className="mb-2" />
+            <DistanceSelector q={q} className="mb-2" />
+            <PositionSelector q={q} className="mb-2" />
             <CommonButtons q={q} index={index}>
-                <TentaclesAnswerSelector
-                    ids={TentaclesQuestion.answers(q)}
-                    name={q.name}
-                    current={q.answer}
-                    index={index}
-                />
+                <TentaclesAnswerSelector q={q} />
             </CommonButtons>
         </>
     );

@@ -1,67 +1,60 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { useStore } from "@nanostores/react";
+import { computed } from "@preact/signals-react";
+import { useSignals } from "@preact/signals-react/runtime";
 import * as turf from "@turf/turf";
 import type { Feature, FeatureCollection, MultiPolygon, Point, Polygon, Position } from "geojson";
 import type { PathOptions } from "leaflet";
-import { batched } from "nanostores";
 import { Circle, LayerGroup, Polygon as PolygonLayer, type PolygonProps } from "react-leaflet";
-import { bufferBBox } from "../../helper/geo";
-import * as palette from "../../helper/palette";
-import type { PropertiesWithAnswer, PropertiesWithName } from "../../model/Geo";
-import * as Question from "../../model/Question";
-import {
-    $circlePrecision,
-    $endGameStation,
-    $hidingZoneRadius,
-    $questions,
-    $stagingQuestion,
-} from "../../state";
-import { VoronoiExtraLayer } from "./VoronoiLayer";
+import { bufferBBox } from "../../helper/geo/area.ts";
+import * as palette from "../../helper/palette.ts";
+import type { Area } from "../../model/geo.ts";
+import type { Answered, Named } from "../../model/props.ts";
+import $ from "../../state.ts";
+import { VoronoiExtraLayer } from "./VoronoiLayer.tsx";
 
-const $endGameArea = batched(
-    [$endGameStation, $hidingZoneRadius, $questions, $circlePrecision],
-    (
+const $endGameArea = computed((): Feature<MultiPolygon> | null => {
+    const endGameStation = $.endGameStation.value;
+    if (endGameStation === null) return null;
+
+    let area: Feature<Polygon | MultiPolygon> = turf.circle(
         endGameStation,
-        hidingZoneRadius,
-        questions,
-        circlePrecision,
-    ): Feature<MultiPolygon> | null => {
-        if (endGameStation === null) return null;
+        $.preset.hidingRadius.value,
+        { steps: $.preferences.circlePrecision.value },
+    );
 
-        let area: Feature<Polygon | MultiPolygon> = turf.circle(endGameStation, hidingZoneRadius, {
-            steps: circlePrecision,
-        });
+    const extent = bufferBBox(turf.bbox(area), 0.1);
 
-        const extent = bufferBBox(turf.bbox(area), 0.1);
+    for (const q of $.questions.value) {
+        // Ignore questions without answers or not applicable in the end game
+        if (q.answer.value === undefined) continue;
+        if (!q.inEndGame.value) continue;
 
-        for (const q of questions) {
-            if (q.answer === undefined) continue;
-            if (!q.inEndGame) continue;
+        // Divide the extent based on answers
+        const division = q.divideArea(extent);
+        if (division === null) continue;
 
-            const division = Question.divideArea(q, extent);
-            if (division === null) continue;
+        // Union all the answer-areas which don't match with hiders' answer
+        const mismatchedAreas = division.features.filter(
+            (area) => area.properties.answer.id !== q.answer.value,
+        );
+        if (mismatchedAreas.length === 0) continue;
+        const mismatchedArea =
+            mismatchedAreas.length > 1
+                ? turf.union(turf.featureCollection(mismatchedAreas))
+                : mismatchedAreas[0];
+        if (mismatchedArea === null) continue;
 
-            const unionCandidates = division.features.filter(
-                (area) => area.properties.answer !== q.answer,
-            );
-            if (unionCandidates.length === 0) return null;
-            const questionArea =
-                unionCandidates.length > 1
-                    ? turf.union(turf.featureCollection(unionCandidates))
-                    : unionCandidates[0];
-            if (questionArea === null) return null;
+        // Chop off the hiding zone where the answer wouldn't match
+        const newArea = turf.difference(turf.featureCollection([area, mismatchedArea]));
+        if (newArea === null) return null;
+        area = newArea;
+    }
 
-            const newArea = turf.difference(turf.featureCollection([area, questionArea]));
-            if (newArea === null) return null;
-            area = newArea;
-        }
-
-        if (area.geometry.type === "Polygon") return turf.multiPolygon([area.geometry.coordinates]);
-        return area as Feature<MultiPolygon>;
-    },
-);
+    if (area.geometry.type === "Polygon") return turf.multiPolygon([area.geometry.coordinates]);
+    return area as Feature<MultiPolygon>;
+});
 
 function getPathOptions(color: string = "#3388ff"): PathOptions {
     return {
@@ -74,11 +67,13 @@ function getPathOptions(color: string = "#3388ff"): PathOptions {
 }
 
 function StationCircleLayer({ coords }: { coords: Position }) {
-    const hidingZoneRadius = useStore($hidingZoneRadius);
+    useSignals();
+    const hidingRadius = $.preset.hidingRadius.value;
+
     return (
         <Circle
             center={[coords[1], coords[0]]}
-            radius={hidingZoneRadius * 1000}
+            radius={hidingRadius * 1000}
             pathOptions={{
                 color: "#000000",
                 dashArray: "16",
@@ -103,8 +98,11 @@ function GeoJSONPolygonLayer({
 }
 
 function LeftoverArea() {
-    const endGameArea = useStore($endGameArea);
-    const q = useStore($stagingQuestion);
+    useSignals();
+
+    const endGameArea = $endGameArea.value;
+    const q = $.stagingQuestion.value;
+
     if (endGameArea === null) return null;
     if (q === null)
         return (
@@ -112,23 +110,19 @@ function LeftoverArea() {
         );
 
     const extent = bufferBBox(turf.bbox(endGameArea), 0.1);
-    const collection: FeatureCollection<
-        Polygon | MultiPolygon,
-        PropertiesWithAnswer & { color?: string }
-    > | null = Question.divideArea(q, extent);
-    if (collection === null || collection.features.length === 0)
+    const answerAreas: FeatureCollection<Area, Answered & { color?: string | undefined }> | null =
+        q.divideArea(extent);
+    if (answerAreas === null || answerAreas.features.length === 0)
         return (
             <GeoJSONPolygonLayer geometry={endGameArea.geometry} pathOptions={getPathOptions()} />
         );
 
-    // Figure out how to color areas
-    const answerToColor = new Map(
-        Question.answers(q).map((a, idx) => [a, palette.getNthColor(idx)]),
-    );
+    // Figure out how to color answer-areas
+    const answerToColor = new Map(q.answers.value.map((a, idx) => [a, palette.getNthColor(idx)]));
 
-    // Add color to collection properties
-    collection.features.forEach((feature) => {
-        feature.properties.color = answerToColor.get(feature.properties.answer);
+    // Add appropriate color to each answer-area
+    answerAreas.features.forEach((feature) => {
+        feature.properties.color = answerToColor.get(feature.properties.answer.id);
     });
 
     return (
@@ -142,17 +136,11 @@ function LeftoverArea() {
                 }}
             />
             <LayerGroup>
-                {collection.features.map((feature) => (
+                {answerAreas.features.map((feature) => (
                     <GeoJSONPolygonLayer
                         key={feature.properties.id}
                         geometry={feature.geometry}
-                        pathOptions={{
-                            color: feature.properties.color ?? "",
-                            weight: 2,
-                            opacity: 0.4,
-                            fillColor: feature.properties.color ?? "",
-                            fillOpacity: 0.2,
-                        }}
+                        pathOptions={getPathOptions(feature.properties.color)}
                     />
                 ))}
             </LayerGroup>
@@ -161,7 +149,7 @@ function LeftoverArea() {
     );
 }
 
-export function EndGameLayer({ s }: { s: Feature<Point, PropertiesWithName> }) {
+export function EndGameLayer({ s }: { s: Feature<Point, Named> }) {
     return (
         <>
             <StationCircleLayer coords={s.geometry.coordinates} />;

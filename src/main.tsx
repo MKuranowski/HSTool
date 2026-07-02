@@ -5,11 +5,13 @@ import "./styles.scss";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./components/App.tsx";
+import { initializeBuiltinPresets } from "./helper/builtinPresets.ts";
 
 const root = document.getElementById("root");
 if (root === null) {
     throw new Error("No <div id='root'> element found - failed to render the app");
 } else {
+    await initializeBuiltinPresets();
     createRoot(root).render(
         <StrictMode>
             <App />

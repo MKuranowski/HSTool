@@ -1,15 +1,17 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { useStore } from "@nanostores/react";
+import { useSignals } from "@preact/signals-react/runtime";
 import * as L from "leaflet";
 import { useMemo, useRef } from "react";
 import { Marker } from "react-leaflet";
-import * as Question from "../../model/Question";
-import { $stagingQuestion } from "../../state";
+import { questionHasSeekers } from "../../model/question/index.ts";
+import $ from "../../state.ts";
 
 export function QuestionMarker() {
-    const stagingQuestion = useStore($stagingQuestion);
+    useSignals();
+    const stagingQuestion = $.stagingQuestion.value;
+
     const markerRef = useRef<L.Marker | null>(null);
     const eventHandlers = useMemo<L.LeafletEventHandlerFnMap>(
         () => ({
@@ -17,9 +19,9 @@ export function QuestionMarker() {
                 const newPos = markerRef.current?.getLatLng();
                 if (newPos === undefined) return;
 
-                const q = $stagingQuestion.get();
-                if (q) {
-                    $stagingQuestion.set(Question.withPosition(q, [newPos.lng, newPos.lat]));
+                const q = $.stagingQuestion.peek();
+                if (q && questionHasSeekers(q)) {
+                    q.setSeekers([newPos.lng, newPos.lat]);
                 }
             },
         }),
@@ -27,11 +29,11 @@ export function QuestionMarker() {
     );
 
     // Don't display the marker without a staging question
-    if (stagingQuestion === null || stagingQuestion.kind === "custom") {
+    if (stagingQuestion === null || !questionHasSeekers(stagingQuestion)) {
         return null;
     }
 
-    const position = L.latLng(stagingQuestion.seeker[1], stagingQuestion.seeker[0]);
+    const position = stagingQuestion.seekers.value.toReversed() as [number, number];
 
     return (
         <Marker

@@ -3,11 +3,11 @@
 
 import * as turf from "@turf/turf";
 import { expect, test } from "vitest";
-import { nearestPointsToCircle } from "./dist";
+import { nearestPointsToCircle } from "./dist.ts";
 
 // no need to test distanceToFeature, we trust turf functions
 
-test(nearestPointsToCircle, () => {
+test("nearestPointsToCircle", () => {
     const root = turf.point([0, 0]);
     const radius = 2;
 

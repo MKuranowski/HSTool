@@ -4,12 +4,12 @@
 // force the backwards-ass vite bundler to include **all** leaflet assets, not only the ones explicitly mentioned in leaflet.css
 import "leaflet/dist/images/marker-icon-2x.png";
 import "leaflet/dist/images/marker-shadow.png";
-import { useStore } from "@nanostores/react";
+import { useSignalEffect, useSignals } from "@preact/signals-react/runtime";
+import { useSignalRef } from "@preact/signals-react/utils";
+import type { FeatureCollection, Point } from "geojson";
 import * as L from "leaflet";
-import { useEffect, useRef } from "react";
 import { MapContainer, Pane, TileLayer } from "react-leaflet";
-import * as Preset from "../model/Preset";
-import { $endGameStation, $preset } from "../state";
+import $ from "../state.ts";
 import {
     BackgroundOverlay,
     EndGameLayer,
@@ -17,16 +17,17 @@ import {
     StationLayer,
     ThermometerSecondaryMarker,
     VoronoiLayer,
-} from "./MapLayer";
+} from "./MapLayer/index.ts";
 
-function getPresetBounds(p: Preset.T): L.LatLngBounds {
+function getMapBounds(stations: FeatureCollection<Point>): L.LatLngBounds {
     return L.latLngBounds(
-        p.stations.features.map((s) => s.geometry.coordinates.toReversed() as [number, number]),
+        stations.features.map((s) => s.geometry.coordinates.toReversed() as [number, number]),
     );
 }
 
 function StationsLayer() {
-    const endGameStation = useStore($endGameStation);
+    useSignals();
+    const endGameStation = $.endGameStation.value;
     return endGameStation ? (
         <EndGameLayer s={endGameStation} />
     ) : (
@@ -42,22 +43,17 @@ function StationsLayer() {
 export default function GameMap() {
     // See https://leafletjs.com/reference.html#map-overlaypane for Leaflet's pane z-indices
 
-    const map = useRef<L.Map | null>(null);
+    const map = useSignalRef<L.Map | null>(null);
 
-    useEffect(
-        () =>
-            $preset.listen((preset) => {
-                if (!map.current) return;
+    useSignalEffect(() => {
+        const bounds = getMapBounds($.preset.stations.value);
 
-                const bounds = getPresetBounds(preset);
-                if (bounds.isValid()) map.current.flyToBounds(bounds, { duration: 0.5 });
-            }),
-        [map],
-    );
+        if (!map.current) return;
+        if (bounds.isValid()) map.current.flyToBounds(bounds, { duration: 0.5 });
+    });
 
     // Initial coordinates
-    const preset = $preset.get();
-    const bounds = getPresetBounds(preset);
+    const bounds = getMapBounds($.preset.stations.peek());
     const center = bounds.isValid() ? bounds.getCenter() : L.latLng(0, 0);
 
     return (

@@ -2,15 +2,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { expect, test } from "vitest";
-import { toString } from "./strings";
+import { toString } from "./strings.ts";
 
-test.each([
-    ["hello", "hello"],
-    [42, "42"],
-    [true, "true"],
-    [new Error("failed"), "Error: failed"],
-    [null, "null"],
-    [undefined, "undefined"],
-])(toString, (obj, str) => {
-    expect(toString(obj)).toStrictEqual(str);
+test("toString", () => {
+    const matrix = [
+        ["hello", "hello"],
+        [42, "42"],
+        [true, "true"],
+        [new Error("failed"), "Error: failed"],
+        [null, "null"],
+        [undefined, "undefined"],
+    ] as const;
+
+    for (const [obj, expected] of matrix) {
+        expect(toString(obj)).toStrictEqual(expected);
+    }
 });

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import * as random from "./random";
+import { randomColor, SFC32 } from "./random.ts";
 
 export const primary = "#0d6efd";
 
@@ -42,9 +42,9 @@ const getArbitraryColorMemo = new Map<number, string>();
  * a well-known PRN and running it `index` times.
  */
 function getArbitraryColorInner(index: number): string {
-    const rng = new random.SFC32({ ...sfcSeed });
+    const rng = new SFC32({ ...sfcSeed });
     for (let i = 0; i < index; ++i) rng.nextInt();
-    return random.color(rng.nextFloat());
+    return randomColor(rng.nextFloat());
 }
 
 /**

@@ -1,31 +1,25 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import * as MatchPointQuestion from "../../model/Question/MatchPointQuestion";
-import BinaryAnswerButtons from "./common/BinaryAnswerButtons";
-import CandidateSelector from "./common/CandidateSelector";
-import CommonButtons from "./common/CommonButtons";
-import PositionSelector from "./common/PositionSelector";
+import { type MatchPointQuestion } from "../../model/question/index.ts";
+import BinaryAnswerButtons from "./common/BinaryAnswerButtons.tsx";
+import CandidateSelector from "./common/CandidateSelector.tsx";
+import CommonButtons from "./common/CommonButtons.tsx";
+import PositionSelector from "./common/PositionSelector.tsx";
 
 export default function MatchPointQuestionForm({
     q,
     index,
 }: {
-    q: MatchPointQuestion.T;
+    q: MatchPointQuestion;
     index: number | null;
 }) {
-    const [lon, lat] = q.seeker;
     return (
         <>
-            <CandidateSelector current={q.name} kind="match-point" index={index} className="mb-2" />
-            <PositionSelector lat={lat} lon={lon} index={index} className="mb-2" />
+            <CandidateSelector q={q} className="mb-2" />
+            <PositionSelector q={q} className="mb-2" />
             <CommonButtons q={q} index={index}>
-                <BinaryAnswerButtons
-                    negative="hit"
-                    positive="miss"
-                    answer={q.answer}
-                    index={index}
-                />
+                <BinaryAnswerButtons q={q} />
             </CommonButtons>
         </>
     );

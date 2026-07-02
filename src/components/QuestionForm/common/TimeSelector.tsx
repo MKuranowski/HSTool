@@ -1,22 +1,36 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import { useSignalEffect } from "@preact/signals-react";
+import { useSignals } from "@preact/signals-react/runtime";
+import { useRef } from "react";
 import { Button, Form, InputGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { getQuestionState } from "../../../helper/ui";
-import * as Timestamp from "../../../model/Timestamp";
+import type { Question } from "../../../model/question/index.ts";
+import Timestamp from "../../../model/timestamp.ts";
 
 export default function TimeSelector({
-    time,
-    index,
+    q,
     variant = "askedAt",
     className,
 }: {
-    time?: Timestamp.T;
-    index: number | null;
+    q: Question;
     variant?: "askedAt" | "answeredAt";
     className?: string | undefined;
 }) {
-    const [idPrefix, getQuestion, setQuestion] = getQuestionState(index);
+    useSignals(); // needed for properly displaying the lock icon
+    const input = useRef<HTMLInputElement | null>(null);
+    const signal = q[variant];
+
+    useSignalEffect(() => {
+        const timestamp = signal.value;
+        if (input.current && timestamp && timestamp.formValue.value !== input.current.value) {
+            input.current.value = timestamp.formValue.value;
+        }
+    });
+
+    const initialTimestamp = signal.peek();
+    const initialValue = initialTimestamp ? initialTimestamp.formValue.peek() : undefined;
+
     const lockDescription =
         variant === "askedAt" ? "the question is shared" : "an answer is selected";
 
@@ -25,17 +39,15 @@ export default function TimeSelector({
             <InputGroup.Text>{variant === "askedAt" ? "Asked at" : "Answered at"}</InputGroup.Text>
             <Form.Control
                 type="datetime-local"
-                value={time ? Timestamp.toFormValue(time) : undefined}
+                defaultValue={initialValue}
                 onChange={(e) => {
-                    const q = getQuestion();
-                    if (q) {
-                        setQuestion({ ...q, [variant]: Timestamp.fromFormValue(e.target.value) });
-                    }
+                    // eslint-disable-next-line react-hooks/immutability
+                    signal.value = new Timestamp(e.target.value, true);
                 }}
             />
             <OverlayTrigger
                 overlay={
-                    <Tooltip id={`${idPrefix}${variant}-state`}>
+                    <Tooltip id={`q-${q.id}-${variant}-state`}>
                         If unlocked, this field will be automatically updated when {lockDescription}
                     </Tooltip>
                 }
@@ -44,28 +56,19 @@ export default function TimeSelector({
                     variant="secondary"
                     size="sm"
                     onClick={() => {
-                        if (!time) return;
-
-                        const q = getQuestion();
-                        if (q) {
-                            const newTime = { ...time, explicit: !time.explicit };
-                            setQuestion({ ...q, [variant]: newTime });
-                        }
+                        const t = signal.peek();
+                        if (t) t.explicit.value = !t.explicit.peek();
                     }}
                 >
-                    <i className={time?.explicit ? "bi bi-lock" : "bi bi-unlock2"} />
+                    <i className={signal.value?.explicit.value ? "bi bi-lock" : "bi bi-unlock2"} />
                 </Button>
             </OverlayTrigger>
-            <OverlayTrigger
-                overlay={<Tooltip id={`${idPrefix}${variant}-now`}>Set to now</Tooltip>}
-            >
+            <OverlayTrigger overlay={<Tooltip id={`q-${q.id}-${variant}-now`}>Set to now</Tooltip>}>
                 <Button
                     size="sm"
                     onClick={() => {
-                        const q = getQuestion();
-                        if (q) {
-                            setQuestion({ ...q, [variant]: Timestamp.now() });
-                        }
+                        // eslint-disable-next-line react-hooks/immutability
+                        signal.value = new Timestamp(undefined, true);
                     }}
                 >
                     <i className="bi bi-clock" />

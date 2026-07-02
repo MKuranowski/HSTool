@@ -1,38 +1,40 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import { useSignalEffect } from "@preact/signals-react";
+import { useRef } from "react";
 import { Form, InputGroup } from "react-bootstrap";
-import { getQuestionState } from "../../../helper/ui";
-import * as Question from "../../../model/Question";
+import { type QuestionWithDistance } from "../../../model/question/index.ts";
 
 export default function DistanceSelector({
-    value,
-    variant = "distance",
-    index,
+    q,
     className,
 }: {
-    value: number;
-    variant?: "distance" | "radius";
-    index: number | null;
+    q: QuestionWithDistance;
     className?: string;
 }) {
-    const [, getQuestion, setQuestion] = getQuestionState(index);
+    // useSignals(); // not needed, changes are handled by useSignalEffect
+    const input = useRef<HTMLInputElement | null>(null);
+
+    useSignalEffect(() => {
+        if (input.current && q.distance.value !== input.current.valueAsNumber) {
+            input.current.valueAsNumber = q.distance.value;
+        }
+    });
+
     return (
         <InputGroup className={className}>
-            <InputGroup.Text>{variant === "distance" ? "Distance" : "Radius"}</InputGroup.Text>
+            <InputGroup.Text>Distance</InputGroup.Text>
             <Form.Control
+                ref={input}
                 type="number"
-                min={0}
-                step={0.1}
-                value={value}
+                min="0"
+                step="0.1"
+                required={true}
+                defaultValue={q.distance.peek()}
                 onChange={(e) => {
-                    const value = parseFloat(e.target.value);
-                    if (Number.isNaN(value) || value < 0) return;
-
-                    const q = getQuestion();
-                    if (q) {
-                        setQuestion(Question.withDistance(q, value));
-                    }
+                    const num = Number.parseFloat(e.target.value);
+                    if (Number.isFinite(num) && num >= 0) q.setDistance(num);
                 }}
             />
             <InputGroup.Text>km</InputGroup.Text>

@@ -1,17 +1,17 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { useStore } from "@nanostores/react";
+import { useSignals } from "@preact/signals-react/runtime";
 import type { Feature, Point } from "geojson";
 import { Button, ButtonGroup, ListGroup, OverlayTrigger, Stack, Tooltip } from "react-bootstrap";
-import type { PropertiesWithName } from "../model/Geo";
-import { $discardedStations, $eliminatedStations, $endGameStation, $preset } from "../state";
+import type { Named } from "../model/props.ts";
+import $ from "../state.ts";
 
 function Station({
     station,
     isDiscarded = false,
 }: {
-    station: Feature<Point, PropertiesWithName>;
+    station: Feature<Point, Named>;
     isDiscarded?: boolean;
 }) {
     return (
@@ -20,9 +20,9 @@ function Station({
                 <span
                     onClick={() => {
                         if (isDiscarded) {
-                            $discardedStations.remove(station.properties.id);
+                            $.discardedStations.delete(station.properties.id);
                         } else {
-                            $discardedStations.add(station.properties.id);
+                            $.discardedStations.add(station.properties.id);
                         }
                     }}
                     className={isDiscarded ? "strikethrough" : ""}
@@ -39,7 +39,7 @@ function Station({
                         variant="outline-secondary"
                         className="ms-auto"
                         onClick={() => {
-                            $endGameStation.set(station);
+                            $.endGameStation.value = station;
                         }}
                     >
                         <i className="bi bi-flag" />
@@ -51,12 +51,10 @@ function Station({
 }
 
 export function StationList() {
-    const preset = useStore($preset);
-    const discardedStations = useStore($discardedStations);
-    const eliminatedStations = useStore($eliminatedStations);
+    useSignals();
 
-    const stations = preset.stations.features.filter(
-        (s) => !Object.hasOwn(eliminatedStations, s.properties.id),
+    const stations = $.preset.stations.value.features.filter(
+        (s) => !$.eliminatedStations.value.has(s.properties.id),
     );
     const collator = new Intl.Collator();
     stations.sort((a, b) => collator.compare(a.properties.name, b.properties.name));
@@ -68,7 +66,7 @@ export function StationList() {
                     className="flex-grow-0"
                     variant="success"
                     onClick={() => {
-                        $discardedStations.set({});
+                        $.discardedStations.clear();
                     }}
                 >
                     Enable All
@@ -77,9 +75,9 @@ export function StationList() {
                     className="flex-grow-0"
                     variant="danger"
                     onClick={() => {
-                        const set: Record<string, 1> = {};
-                        $preset.get().stations.features.forEach((s) => (set[s.properties.id] = 1));
-                        $discardedStations.set(set);
+                        $.discardedStations.value = new Set(
+                            $.preset.stations.value.features.map((s) => s.properties.id),
+                        );
                     }}
                 >
                     Disable All
@@ -89,7 +87,7 @@ export function StationList() {
                 {stations.map((station) =>
                     Station({
                         station,
-                        isDiscarded: Object.hasOwn(discardedStations, station.properties.id),
+                        isDiscarded: $.discardedStations.value.has(station.properties.id),
                     }),
                 )}
             </ListGroup>
@@ -97,7 +95,7 @@ export function StationList() {
     );
 }
 
-export function EndGameStation({ s }: { s: Feature<Point, PropertiesWithName> }) {
+export function EndGameStation({ s }: { s: Feature<Point, Named> }) {
     return (
         <>
             <p>
@@ -107,7 +105,7 @@ export function EndGameStation({ s }: { s: Feature<Point, PropertiesWithName> })
                 size="sm"
                 variant="danger"
                 onClick={() => {
-                    $endGameStation.set(null);
+                    $.endGameStation.value = null;
                 }}
             >
                 Abandon End Game
@@ -117,6 +115,7 @@ export function EndGameStation({ s }: { s: Feature<Point, PropertiesWithName> })
 }
 
 export default function Stations() {
-    const endGameStation = useStore($endGameStation);
+    useSignals();
+    const endGameStation = $.endGameStation.value;
     return endGameStation ? <EndGameStation s={endGameStation} /> : <StationList />;
 }

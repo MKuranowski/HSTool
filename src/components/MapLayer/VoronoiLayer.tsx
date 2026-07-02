@@ -1,21 +1,22 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { useStore } from "@nanostores/react";
+import { useSignals } from "@preact/signals-react/runtime";
 import * as turf from "@turf/turf";
-import type { BBox, FeatureCollection, LineString, MultiPolygon, Point, Polygon } from "geojson";
+import type { BBox, FeatureCollection, LineString, Point } from "geojson";
 import * as L from "leaflet";
 import { useEffect, useRef } from "react";
 import { GeoJSON } from "react-leaflet";
 import { LayerGroup } from "react-leaflet";
-import { bufferBBox } from "../../helper/geo";
+import { bufferBBox } from "../../helper/geo/area.ts";
 import * as palette from "../../helper/palette";
-import type { PropertiesWithAnswer, PropertiesWithID } from "../../model/Geo";
-import * as Question from "../../model/Question";
-import { $disabledStations, $hidingZoneRadius, $preset, $stagingQuestion } from "../../state";
+import type { Area } from "../../model/geo.ts";
+import type { Answered, Identified } from "../../model/props.ts";
+import { type Question } from "../../model/question/index.ts";
+import $ from "../../state.ts";
 
 function stationsExtent(
-    stations: FeatureCollection<Point, PropertiesWithID>,
+    stations: FeatureCollection<Point, Identified>,
     isDisabled: (id: string) => boolean,
     hidingZoneRadius: number,
 ): BBox {
@@ -26,12 +27,8 @@ function stationsExtent(
     return bufferBBox(turf.bbox(activeStations), hidingZoneRadius);
 }
 
-function VoronoiAreaLayerInner({
-    data,
-}: {
-    data: FeatureCollection<Polygon | MultiPolygon, { color?: string }>;
-}) {
-    const layer = useRef<L.GeoJSON<{ color?: string }, Polygon | MultiPolygon>>(null);
+function VoronoiAreaLayerInner({ data }: { data: FeatureCollection<Area, { color?: string }> }) {
+    const layer = useRef<L.GeoJSON<{ color?: string }, Area>>(null);
 
     useEffect(() => {
         if (layer.current) {
@@ -58,32 +55,28 @@ function VoronoiAreaLayerInner({
     );
 }
 
-export function VoronoiAreaLayer({ q }: { q: Question.T }) {
+export function VoronoiAreaLayer({ q }: { q: Question }) {
+    useSignals();
+
     // Compute the extent over which division needs to be calculated
-    const preset = useStore($preset);
-    const disabledStations = useStore($disabledStations);
-    const hidingZoneRadius = useStore($hidingZoneRadius);
+    const disabledStations = $.disabledStations.value;
     const extent = stationsExtent(
-        preset.stations,
-        (id) => Object.hasOwn(disabledStations, id),
-        hidingZoneRadius,
+        $.preset.stations.value,
+        (id) => disabledStations.has(id),
+        $.preset.hidingRadius.value,
     );
 
     // Compute the extent division
-    const collection: FeatureCollection<
-        Polygon | MultiPolygon,
-        PropertiesWithAnswer & { color?: string }
-    > | null = Question.divideArea(q, extent);
+    const collection: FeatureCollection<Area, Answered & { color?: string }> | null =
+        q.divideArea(extent);
     if (collection === null) return null;
 
     // Figure out how to color areas
-    const answerToColor = new Map(
-        Question.answers(q).map((a, idx) => [a, palette.getNthColor(idx)]),
-    );
+    const answerToColor = new Map(q.answers.value.map((a, idx) => [a, palette.getNthColor(idx)]));
 
     // Add color to collection properties
     collection.features.forEach((feature) => {
-        feature.properties.color = answerToColor.get(feature.properties.answer);
+        feature.properties.color = answerToColor.get(feature.properties.answer.id);
     });
 
     // Draw the areas
@@ -93,9 +86,9 @@ export function VoronoiAreaLayer({ q }: { q: Question.T }) {
 function VoronoiExtraLayerInner({
     data,
 }: {
-    data: FeatureCollection<Point | LineString, PropertiesWithID>;
+    data: FeatureCollection<Point | LineString, Identified>;
 }) {
-    const layer = useRef<L.GeoJSON<PropertiesWithAnswer, Polygon | MultiPolygon>>(null);
+    const layer = useRef<L.GeoJSON<Identified>>(null);
 
     useEffect(() => {
         if (layer.current) {
@@ -119,13 +112,13 @@ function VoronoiExtraLayerInner({
                     fillColor: "#000000",
                     fillOpacity: 0.6,
                 });
-                const props = feature.properties as PropertiesWithID;
+                const props = feature.properties as Identified;
                 const span = document.createElement("span");
                 span.innerText = props.name ?? props.id;
                 return marker;
             }}
             onEachFeature={(feature, layer) => {
-                const props = feature.properties as PropertiesWithID;
+                const props = feature.properties as Identified;
                 const span = document.createElement("span");
                 span.innerText = props.name ?? props.id;
                 layer.bindPopup(span);
@@ -134,13 +127,15 @@ function VoronoiExtraLayerInner({
     );
 }
 
-export function VoronoiExtraLayer({ q }: { q: Question.T }) {
+export function VoronoiExtraLayer({ q }: { q: Question }) {
+    useSignals();
+
     switch (q.kind) {
         case "measure":
-            return <VoronoiExtraLayerInner data={q.candidates} />;
+            return <VoronoiExtraLayerInner data={q.candidates.value} />;
 
         case "tentacles":
-            return <VoronoiExtraLayerInner data={q.candidates} />;
+            return <VoronoiExtraLayerInner data={q.candidates.value} />;
 
         default:
             return null;
@@ -148,7 +143,8 @@ export function VoronoiExtraLayer({ q }: { q: Question.T }) {
 }
 
 export default function VoronoiLayer() {
-    const stagingQuestion = useStore($stagingQuestion);
+    useSignals();
+    const stagingQuestion = $.stagingQuestion.value;
     if (stagingQuestion === null || stagingQuestion.kind === "custom") return null;
     return (
         <LayerGroup>

@@ -1,26 +1,27 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { useStore } from "@nanostores/react";
+import { useSignals } from "@preact/signals-react/runtime";
 import { Toast, ToastContainer } from "react-bootstrap";
-import { $toast } from "../state";
+import $ from "../state.ts";
 
 export default function ToastManager() {
-    const content = useStore($toast);
+    useSignals();
+    const toast = $.toast.value;
     const element =
-        content !== null ? (
+        toast !== null ? (
             <Toast
-                bg={content.variant}
+                bg={toast.variant}
                 onClose={() => {
-                    $toast.set(null);
+                    $.toast.value = null;
                 }}
                 delay={5000}
                 autohide
             >
                 <Toast.Header>
-                    <strong>{content.header}</strong>
+                    <strong>{toast.header}</strong>
                 </Toast.Header>
-                {content.body ? <Toast.Body>{content.body}</Toast.Body> : <></>};
+                {toast.body ? <Toast.Body>{toast.body}</Toast.Body> : <></>};
             </Toast>
         ) : (
             <></>

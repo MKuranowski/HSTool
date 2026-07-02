@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { useStore } from "@nanostores/react";
+import { useSignals } from "@preact/signals-react/runtime";
 import { GeoJSON } from "react-leaflet";
-import { $preset } from "../../state";
+import $ from "../../state.ts";
 
 function s(x: unknown): string | undefined {
     switch (typeof x) {
@@ -40,12 +40,14 @@ function n(x: unknown): number | undefined {
 }
 
 export function BackgroundOverlay() {
-    const preset = useStore($preset);
-    if (preset.overlay === undefined) return null;
+    useSignals();
+
+    const overlay = $.preset.overlay.value;
+    if (overlay.features.length === 0) return null;
 
     return (
         <GeoJSON
-            data={preset.overlay}
+            data={overlay}
             interactive={false}
             style={(f) => {
                 if (typeof f?.properties !== "object") return {};

@@ -1,6 +1,6 @@
 {
 	"name": "Brno",
-	"hiding_radius": 0.5,
+	"hidingRadius": 0.5,
 	"stations": {
 		"type": "FeatureCollection",
 		"features": [

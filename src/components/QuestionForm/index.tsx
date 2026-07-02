@@ -2,16 +2,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import type { Variant } from "react-bootstrap/esm/types";
-import * as Question from "../../model/Question";
-import CustomQuestionForm from "./CustomQuestionForm";
-import MatchAreaQuestionForm from "./MatchAreaQuestionForm";
-import MatchPointQuestionForm from "./MatchPointQuestionForm";
-import MeasureQuestionForm from "./MeasureQuestionForm";
-import RadarQuestionForm from "./RadarQuestionForm";
-import TentaclesQuestionForm from "./TentaclesQuestionForm";
-import ThermometerQuestionForm from "./ThermometerQuestionForm";
+import { type Question, type QuestionKind } from "../../model/question/index.ts";
+import CustomQuestionForm from "./CustomQuestionForm.tsx";
+import MatchAreaQuestionForm from "./MatchAreaQuestionForm.tsx";
+import MatchPointQuestionForm from "./MatchPointQuestionForm.tsx";
+import MeasureQuestionForm from "./MeasureQuestionForm.tsx";
+import RadarQuestionForm from "./RadarQuestionForm.tsx";
+import TentaclesQuestionForm from "./TentaclesQuestionForm.tsx";
+import ThermometerQuestionForm from "./ThermometerQuestionForm.tsx";
 
-export function QuestionForm({ q, index }: { q: Question.T; index: number | null }) {
+export function QuestionForm({ q, index }: { q: Question; index: number | null }) {
     switch (q.kind) {
         case "match-area":
             return <MatchAreaQuestionForm q={q} index={index} />;
@@ -36,7 +36,7 @@ export function QuestionForm({ q, index }: { q: Question.T; index: number | null
     }
 }
 
-export function QuestionColor(kind: Question.Kind): Variant {
+export function QuestionColor(kind: QuestionKind): Variant {
     switch (kind) {
         case "custom":
             return "secondary";
@@ -59,13 +59,13 @@ export function QuestionIcon({
     kind,
     hidden,
 }: {
-    kind: Question.Kind;
+    kind: QuestionKind;
     hidden?: boolean | undefined;
 }) {
     return <i className={QuestionIconClass(kind)} aria-hidden={hidden} />;
 }
 
-export function QuestionIconClass(kind: Question.Kind): string {
+export function QuestionIconClass(kind: QuestionKind): string {
     switch (kind) {
         case "custom":
             return "bi bi-pencil";
@@ -84,7 +84,7 @@ export function QuestionIconClass(kind: Question.Kind): string {
     }
 }
 
-export function QuestionKindName(kind: Question.Kind): string {
+export function QuestionKindName(kind: QuestionKind): string {
     switch (kind) {
         case "custom":
             return "Custom";

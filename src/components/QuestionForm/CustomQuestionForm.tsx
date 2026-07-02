@@ -1,33 +1,29 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import { useSignals } from "@preact/signals-react/runtime";
 import { Form, InputGroup } from "react-bootstrap";
-import { getQuestionState } from "../../helper/ui";
-import * as Question from "../../model/Question";
-import * as CustomQuestion from "../../model/Question/CustomQuestion";
-import CommonButtons from "./common/CommonButtons";
+import { type CustomQuestion } from "../../model/question/index.ts";
+import CommonButtons from "./common/CommonButtons.tsx";
 
 export default function CustomQuestionForm({
     q,
     index,
 }: {
-    q: CustomQuestion.T;
+    q: CustomQuestion;
     index: number | null;
 }) {
-    const [, getQuestion, setQuestion] = getQuestionState(index);
+    useSignals();
     return (
         <>
             <InputGroup className="mb-2">
                 <InputGroup.Text>Name</InputGroup.Text>
                 <Form.Control
                     type="text"
-                    value={q.name}
+                    value={q.name.value}
                     onChange={(e) => {
-                        const q = getQuestion();
-                        if (q && q.kind === "custom") {
-                            // NOTE: CustomQuestion has no cache, we can safely copy `q`
-                            setQuestion(CustomQuestion.withName(q, e.target.value));
-                        }
+                        // eslint-disable-next-line react-hooks/immutability
+                        q.name.value = e.target.value;
                     }}
                 />
             </InputGroup>
@@ -35,12 +31,10 @@ export default function CustomQuestionForm({
                 <InputGroup.Text>Answer</InputGroup.Text>
                 <Form.Control
                     type="text"
-                    value={q.answer}
+                    value={q.answer.value}
                     onChange={(e) => {
-                        const q = getQuestion();
-                        if (q && q.kind === "custom") {
-                            setQuestion(Question.withAnswer(q, e.target.value));
-                        }
+                        // eslint-disable-next-line react-hooks/immutability
+                        q.answer.value = e.target.value;
                     }}
                 />
             </InputGroup>

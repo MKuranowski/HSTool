@@ -54,7 +54,7 @@ export class SFC32 {
 /**
  * Returns a random color, based on the provided seed (defaulting to `Math.random`).
  */
-export function color(seed?: number): string {
+export function randomColor(seed?: number): string {
     seed = seed ?? Math.random();
     return `#${((seed * 2 ** 24) | 0).toString(16).padStart(6, "0")}`;
 }

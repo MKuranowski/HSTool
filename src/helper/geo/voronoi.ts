@@ -12,7 +12,7 @@ import type {
     Point,
     Polygon,
 } from "geojson";
-import { bufferBBox } from "./area";
+import { bufferBBox } from "./area.ts";
 
 const defaultExtent: BBox = [-180, -90, 180, 90];
 
@@ -63,11 +63,12 @@ export function planarVoronoi<P extends GeoJsonProperties>(
         ...turf.toMercator(extent.slice(0, 2)),
         ...turf.toMercator(extent.slice(extentMaxOffset, extentMaxOffset + 2)),
     ];
-    if (extentMercator.length !== 4)
+    if (extentMercator.length !== 4) {
         throw new Error(
             "turf.toMercator returned unexpected number of dimensions: " +
                 `got ${(extentMercator.length / 2).toString()}, expected 2`,
         );
+    }
 
     // Project points to mercator, and flatten them to a Float64Array
     // NOTE: d3 expects [x0 y0 ...], while GeoJSON encodes positions as [y x].
@@ -102,10 +103,11 @@ export function planarVoronoi<P extends GeoJsonProperties>(
                     properties: point.properties,
                 },
             );
-            if (union === null)
+            if (union === null) {
                 throw new Error(
                     `turf.union(${current.geometry.type}, Polygon): got null, expected Polygon or MultiPolygon`,
                 );
+            }
 
             features[cell.index] = union;
         } else {

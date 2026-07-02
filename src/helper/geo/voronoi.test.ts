@@ -4,7 +4,7 @@
 import * as turf from "@turf/turf";
 import type { MultiPolygon, Polygon, Position } from "geojson";
 import { expect, test } from "vitest";
-import { planarVoronoi } from "./voronoi";
+import { planarVoronoi } from "./voronoi.ts";
 
 function roundCoord(c: number): number {
     return Math.round(c * 10) / 10;
@@ -33,7 +33,7 @@ function roundGeometry(geometry: Polygon | MultiPolygon): Polygon | MultiPolygon
     }
 }
 
-test(planarVoronoi, () => {
+test("planarVoronoi", () => {
     const points = turf.featureCollection([
         turf.point([20.5, 50.5], { id: "A" }),
         turf.point([20.5, 51.5], { id: "B" }),

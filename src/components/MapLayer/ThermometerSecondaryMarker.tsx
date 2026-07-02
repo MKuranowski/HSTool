@@ -1,39 +1,37 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { useStore } from "@nanostores/react";
-import * as turf from "@turf/turf";
+import { useSignals } from "@preact/signals-react/runtime";
 import * as L from "leaflet";
 import { useMemo, useRef } from "react";
 import { Circle, Marker } from "react-leaflet";
-import * as palette from "../../helper/palette";
-import * as ThermometerQuestion from "../../model/Question/ThermometerQuestion";
-import { $stagingQuestion } from "../../state";
+import * as palette from "../../helper/palette.ts";
+import $ from "../../state.ts";
 
 export function ThermometerSecondaryMarker() {
-    const stagingQuestion = useStore($stagingQuestion);
+    useSignals();
+
     const markerRef = useRef<L.Marker | null>(null);
     const eventHandlers = useMemo<L.LeafletEventHandlerFnMap>(
         () => ({
             dragend() {
-                const newPosLeaflet = markerRef.current?.getLatLng();
-                if (newPosLeaflet === undefined) return;
-                const newPos = [newPosLeaflet.lng, newPosLeaflet.lat];
+                const newPos = markerRef.current?.getLatLng();
+                if (newPos === undefined) return;
 
-                const q = $stagingQuestion.get();
-                if (!q || q.kind !== "thermometer") return;
-
-                const azimuth = turf.bearingToAzimuth(turf.bearing(q.seeker, newPos));
-                $stagingQuestion.set({ ...q, azimuth });
+                const q = $.stagingQuestion.peek();
+                if (q && q.kind === "thermometer") {
+                    q.setEndLocation([newPos.lng, newPos.lat]);
+                }
             },
         }),
         [],
     );
 
+    const stagingQuestion = $.stagingQuestion.value;
     if (!stagingQuestion || stagingQuestion.kind !== "thermometer") return null;
 
-    const [startLon, startLat] = stagingQuestion.seeker;
-    const [endLon, endLat] = ThermometerQuestion.getEndLocation(stagingQuestion);
+    const [startLon, startLat] = stagingQuestion.seekers.value;
+    const [endLon, endLat] = stagingQuestion.endLocation.value;
     return (
         <>
             <Marker
@@ -46,7 +44,7 @@ export function ThermometerSecondaryMarker() {
             <Circle
                 interactive={false}
                 center={[startLat, startLon]}
-                radius={stagingQuestion.distance * 1000}
+                radius={stagingQuestion.distance.value * 1000}
                 pathOptions={{
                     color: palette.palette[1],
                     opacity: 0.5,

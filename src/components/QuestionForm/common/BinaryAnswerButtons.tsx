@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import { useSignals } from "@preact/signals-react/runtime";
 import { Button, ButtonGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { getQuestionState } from "../../../helper/ui";
-import * as Question from "../../../model/Question";
+import type { BinaryQuestion } from "../../../model/question/index.ts";
 
 const labels = {
     hit: "Hit",
@@ -23,55 +23,37 @@ const icons = {
     colder: "bi bi-thermometer-snow",
 } as const;
 
-export default function BinaryAnswerButtons({
-    negative,
-    positive,
-    answer,
-    index,
-}: {
-    negative: "hit" | "closer" | "colder";
-    positive: "miss" | "further" | "hotter";
-    answer?: string | undefined;
-    index: number | null;
-}) {
-    const [idPrefix, getQuestion, setQuestion] = getQuestionState(index);
+export default function BinaryAnswerButtons({ q }: { q: BinaryQuestion }) {
+    useSignals();
+    const [negative, positive] = q.answers.value;
 
     return (
         <ButtonGroup>
-            <OverlayTrigger overlay={<Tooltip id={`${idPrefix}neg`}>{labels[negative]}</Tooltip>}>
+            <OverlayTrigger overlay={<Tooltip id={`q-${q.id}-neg`}>{labels[negative]}</Tooltip>}>
                 <Button
-                    variant={answer === negative ? "success" : "outline-success"}
+                    variant={q.answer.value === negative ? "success" : "outline-success"}
                     onClick={() => {
-                        const q = getQuestion();
-                        if (q) {
-                            setQuestion(Question.withAnswer(q, negative));
-                        }
+                        q.setAnswer(negative);
                     }}
                 >
                     <i className={icons[negative]} />
                 </Button>
             </OverlayTrigger>
-            <OverlayTrigger overlay={<Tooltip id={`${idPrefix}pos`}>{labels[positive]}</Tooltip>}>
+            <OverlayTrigger overlay={<Tooltip id={`q-${q.id}-pos`}>{labels[positive]}</Tooltip>}>
                 <Button
-                    variant={answer === positive ? "danger" : "outline-danger"}
+                    variant={q.answer.value === positive ? "danger" : "outline-danger"}
                     onClick={() => {
-                        const q = getQuestion();
-                        if (q) {
-                            setQuestion(Question.withAnswer(q, positive));
-                        }
+                        q.setAnswer(positive);
                     }}
                 >
                     <i className={icons[positive]} />
                 </Button>
             </OverlayTrigger>
-            <OverlayTrigger overlay={<Tooltip id={`${idPrefix}null`}>No answer</Tooltip>}>
+            <OverlayTrigger overlay={<Tooltip id={`q-${q.id}-null`}>No answer</Tooltip>}>
                 <Button
-                    variant={answer === undefined ? "secondary" : "outline-secondary"}
+                    variant={q.answer.value === undefined ? "secondary" : "outline-secondary"}
                     onClick={() => {
-                        const q = getQuestion();
-                        if (q) {
-                            setQuestion(Question.withAnswer(q, undefined));
-                        }
+                        q.setAnswer(undefined);
                     }}
                 >
                     <i className="bi bi-ban" />

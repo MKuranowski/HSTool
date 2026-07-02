@@ -10,7 +10,6 @@ import type {
     MultiPolygon,
     Point,
     Polygon,
-    Position,
 } from "geojson";
 
 const earthRadiusKm = turf.earthRadius / 1000;
@@ -22,7 +21,7 @@ const earthRadiusKm = turf.earthRadius / 1000;
  * If the position is within the feature, the returned distance is negative.
  */
 export function distanceToFeature(
-    pt: Position,
+    pt: turf.Coord,
     f: Feature<Point | LineString | Polygon | MultiPolygon>,
 ): number {
     switch (f.geometry.type) {
@@ -49,7 +48,7 @@ export function distanceToFeature(
  */
 export function nearestPointsToCircle<P extends GeoJsonProperties>(
     candidates: FeatureCollection<Point, P>,
-    root: Position,
+    root: turf.Coord,
     radius: number,
 ): FeatureCollection<Point, P> {
     // With at most 1 candidate, there's nothing to compute

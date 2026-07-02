@@ -3,15 +3,15 @@
 
 import * as turf from "@turf/turf";
 import { expect, test } from "vitest";
-import { mergePositions, withProperties, withPropertiesInCollection } from "./prop";
+import { withProperties, withPropertiesInCollection } from "./prop.ts";
 
-test(withProperties, () => {
+test("withProperties", () => {
     const f1 = turf.point([21, 52], { foo: "bar", spam: "eggs" });
     const f2 = withProperties(f1, { foo: "baz", universe: 42 });
     expect(f2.properties).toStrictEqual({ foo: "baz", spam: "eggs", universe: 42 });
 });
 
-test(withPropertiesInCollection, () => {
+test("withPropertiesInCollection", () => {
     const c1 = turf.featureCollection([
         turf.point([20.97, 52.17], { iata: "WAW" }),
         turf.point([20.65, 52.45], { iata: "WMI" }),
@@ -32,24 +32,4 @@ test(withPropertiesInCollection, () => {
             properties: { iata: "WMI", icao: "EPMO" },
         },
     ]);
-});
-
-test.each([
-    [
-        [21.01, 52.231],
-        [21.003, 52.229],
-        [21.003, 52.229],
-    ],
-    [
-        [21.01, 52.231],
-        [null, 52.229],
-        [21.01, 52.229],
-    ],
-    [
-        [21.01, 52.231, 100],
-        [21.003, 52.229],
-        [21.003, 52.229, 100],
-    ],
-])(mergePositions, (old, new_, expected) => {
-    expect(mergePositions(old, new_)).toStrictEqual(expected);
 });

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { expect, test } from "vitest";
-import { color, SFC32 } from "./random";
+import { randomColor, SFC32 } from "./random.ts";
 
 test("SFC32", () => {
     const rng = new SFC32({ a: 314159, b: 271828, c: 141421 });
@@ -17,11 +17,15 @@ test("SFC32", () => {
     // expect(rng.nextFloat()).toBeCloseTo(0.0, 12);
 });
 
-test.each([
-    [0.41421356237, "#6a09e6"],
-    [0.31415926536, "#506cbd"],
-    [0.27182818285, "#459688"],
-    [0, "#000000"],
-])(color, (seed, expectedColor) => {
-    expect(color(seed)).toEqual(expectedColor);
+test("randomColor", () => {
+    const matrix = [
+        [0.41421356237, "#6a09e6"],
+        [0.31415926536, "#506cbd"],
+        [0.27182818285, "#459688"],
+        [0, "#000000"],
+    ] as const;
+
+    for (const [seed, expected] of matrix) {
+        expect(randomColor(seed)).toEqual(expected);
+    }
 });

@@ -1,6 +1,6 @@
 {
 	"name": "Warsaw",
-	"hiding_radius": 0.4,
+	"hidingRadius": 0.4,
 	"stations": {
 		"type": "FeatureCollection",
 		"features": [

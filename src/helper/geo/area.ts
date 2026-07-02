@@ -2,22 +2,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import * as turf from "@turf/turf";
-import type {
-    BBox,
-    Feature,
-    FeatureCollection,
-    GeoJsonProperties,
-    Geometry,
-    MultiPolygon,
-    Polygon,
-} from "geojson";
+import type { BBox, Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
+import type { Area } from "../../model/geo.ts";
+import type { Answer, Answered } from "../../model/props.ts";
 
 /**
- * Checks if the provided feature has a Polygon or a MultiPolygon geometry.
+ * Returns true if the feature has Polygon or MultiPolygon geometry.
  */
-export function isArea<P extends GeoJsonProperties>(
-    f: Feature<Geometry, P>,
-): f is Feature<Polygon | MultiPolygon, P> {
+export function isArea(f: Feature): f is Feature<Area> {
     switch (f.geometry.type) {
         case "Polygon":
         case "MultiPolygon":
@@ -28,21 +20,7 @@ export function isArea<P extends GeoJsonProperties>(
     }
 }
 
-/**
- * Checks if the provided feature has a Polygon geometry.
- */
-export function isPolygon<P extends GeoJsonProperties>(
-    f: Feature<Geometry, P>,
-): f is Feature<Polygon, P> {
-    return f.geometry.type === "Polygon";
-}
-
-/**
- * Checks if the provided feature has a MultiPolygon geometry.
- */
-export function isMultiPolygon<P extends GeoJsonProperties>(
-    f: Feature<Geometry, P>,
-): f is Feature<MultiPolygon, P> {
+export function isMultiPolygon(f: Feature): f is Feature<MultiPolygon> {
     return f.geometry.type === "MultiPolygon";
 }
 
@@ -66,12 +44,12 @@ export function bufferBBox(b: BBox, distance: number): BBox {
  * Creates a FeatureCollection with a single Polygon ("division") covering the
  * entire provided bbox; annotated with the provided answer.
  */
-export function soleDivision<Answer extends string>(
-    extent: BBox,
-    answer: Answer,
-): FeatureCollection<Polygon, { id: Answer; answer: Answer }> {
+export function soleDivision(extent: BBox, answer: Answer): FeatureCollection<Polygon, Answered> {
     const polygon = turf.bboxPolygon(extent, {
-        properties: { id: answer, answer },
+        properties: {
+            id: answer.id,
+            answer,
+        },
     });
     return turf.featureCollection([polygon]);
 }

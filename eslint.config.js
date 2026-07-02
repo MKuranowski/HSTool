@@ -37,6 +37,7 @@ export default defineConfig([
                 { groups: [["^\\u0000", "^node:", "^@?\\w", "^", "^\\."]] },
             ],
             "simple-import-sort/exports": "error",
+            "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
         },
     },
 ]);
