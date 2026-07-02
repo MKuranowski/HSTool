@@ -3,6 +3,7 @@
 
 import { useSignals } from "@preact/signals-react/runtime";
 import type { FeatureCollection, Geometry } from "geojson";
+import type { ReactNode } from "react";
 import { Dropdown, DropdownButton, InputGroup } from "react-bootstrap";
 import type Preset from "../../../model/preset.ts";
 import type { Identified } from "../../../model/props.ts";
@@ -59,9 +60,11 @@ function CandidatesList({ q }: { q: QuestionWithCandidates }) {
 export default function CandidateSelector({
     q,
     className,
+    children,
 }: {
     q: QuestionWithCandidates;
     className?: string;
+    children?: ReactNode | undefined;
 }) {
     useSignals();
     return (
@@ -74,6 +77,7 @@ export default function CandidateSelector({
             >
                 <CandidatesList q={q} />
             </DropdownButton>
+            {children}
         </InputGroup>
     );
 }
