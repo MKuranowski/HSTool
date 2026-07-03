@@ -39,10 +39,14 @@ function TimeSelectorInput({ end = false }: { end?: boolean | undefined }) {
         <>
             <Form.Control
                 type="datetime-local"
-                value={time ? dateToFormValue(time) : undefined}
+                value={time ? dateToFormValue(time) : ""}
                 isInvalid={invalid}
                 onChange={(e) => {
-                    signal.value = new Date(e.target.value);
+                    if (e.target.value) {
+                        signal.value = new Date(e.target.value);
+                    } else {
+                        signal.value = null;
+                    }
                 }}
             />
             <Button

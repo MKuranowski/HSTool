@@ -19,6 +19,7 @@ export default function DistanceSelector({
     useSignalEffect(() => {
         if (input.current && q.distance.value !== input.current.valueAsNumber) {
             input.current.valueAsNumber = q.distance.value;
+            input.current.classList.remove("is-invalid");
         }
     });
 
@@ -30,11 +31,15 @@ export default function DistanceSelector({
                 type="number"
                 min="0"
                 step="0.1"
-                required
                 defaultValue={q.distance.peek()}
                 onChange={(e) => {
                     const num = Number.parseFloat(e.target.value);
-                    if (Number.isFinite(num) && num >= 0) q.setDistance(num);
+                    if (Number.isFinite(num) && num >= 0) {
+                        q.setDistance(num);
+                        input.current?.classList.remove("is-invalid");
+                    } else {
+                        input.current?.classList.add("is-invalid");
+                    }
                 }}
             />
             <InputGroup.Text>km</InputGroup.Text>

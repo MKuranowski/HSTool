@@ -20,6 +20,7 @@ function AzimuthSelector({ q, className }: { q: ThermometerQuestion; className?:
     useSignalEffect(() => {
         if (input.current && q.azimuth.value !== input.current.valueAsNumber) {
             input.current.valueAsNumber = q.azimuth.value;
+            input.current.classList.remove("is-invalid");
         }
     });
 
@@ -33,10 +34,14 @@ function AzimuthSelector({ q, className }: { q: ThermometerQuestion; className?:
                 max="360"
                 step="1"
                 defaultValue={q.azimuth.peek()}
-                required
                 onChange={(e) => {
                     const num = Number.parseFloat(e.target.value);
-                    if (Number.isFinite(num) && num >= 0 && num <= 360) q.setAzimuth(num);
+                    if (Number.isFinite(num) && num >= 0 && num <= 360) {
+                        q.setAzimuth(num);
+                        input.current?.classList.remove("is-invalid");
+                    } else {
+                        input.current?.classList.add("is-invalid");
+                    }
                 }}
             />
             <InputGroup.Text>°</InputGroup.Text>

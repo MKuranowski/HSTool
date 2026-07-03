@@ -84,12 +84,14 @@ export default function PositionSelector({
     useSignalEffect(() => {
         if (latInput.current && q.seekers.value[1] != latInput.current.valueAsNumber) {
             latInput.current.valueAsNumber = q.seekers.value[1];
+            latInput.current.classList.remove("is-invalid");
         }
     });
 
     useSignalEffect(() => {
         if (lonInput.current && q.seekers.value[0] != lonInput.current.valueAsNumber) {
             lonInput.current.valueAsNumber = q.seekers.value[0];
+            lonInput.current.classList.remove("is-invalid");
         }
     });
 
@@ -157,12 +159,14 @@ export default function PositionSelector({
                 min="-90"
                 max="90"
                 step="0.001"
-                required
                 defaultValue={q.seekers.peek()[1]}
                 onChange={(e) => {
                     const num = Number.parseFloat(e.target.value);
                     if (Number.isFinite(num) && num >= -90 && num <= 90) {
                         q.setSeekers([undefined, num]);
+                        latInput.current?.classList.remove("is-invalid");
+                    } else {
+                        latInput.current?.classList.add("is-invalid");
                     }
                 }}
             />
@@ -175,12 +179,14 @@ export default function PositionSelector({
                 min="-180"
                 max="180"
                 step="0.001"
-                required
                 defaultValue={q.seekers.peek()[0]}
                 onChange={(e) => {
                     const num = Number.parseFloat(e.target.value);
                     if (Number.isFinite(num) && num >= -180 && num <= 180) {
                         q.setSeekers([num, undefined]);
+                        lonInput.current?.classList.remove("is-invalid");
+                    } else {
+                        lonInput.current?.classList.add("is-invalid");
                     }
                 }}
             />

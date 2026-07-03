@@ -105,6 +105,7 @@ export function AnswerTimeInput({ photo = false }: { photo?: boolean | undefined
     useSignalEffect(() => {
         if (input.current && signal.value !== input.current.valueAsNumber) {
             input.current.valueAsNumber = signal.value;
+            input.current.classList.remove("is-invalid");
         }
     });
 
@@ -129,15 +130,18 @@ export function AnswerTimeInput({ photo = false }: { photo?: boolean | undefined
             </InputGroup.Text>
             <Form.Control
                 ref={input}
-                className="was-validated"
                 type="number"
                 min="0"
                 step="1"
                 defaultValue={signal.peek()}
-                required
                 onChange={(e) => {
                     const num = Number.parseFloat(e.target.value);
-                    if (!Number.isNaN(num) && num >= 0) signal.value = num;
+                    if (Number.isFinite(num) && num >= 0) {
+                        signal.value = num;
+                        input.current?.classList.remove("is-invalid");
+                    } else {
+                        input.current?.classList.add("is-invalid");
+                    }
                 }}
             />
             <InputGroup.Text>min</InputGroup.Text>
@@ -152,6 +156,7 @@ export function QuickAnswerMultiplierInput() {
     useSignalEffect(() => {
         if (input.current && input.current.valueAsNumber !== $.preset.quickAnswerMultiplier.value) {
             input.current.valueAsNumber = $.preset.quickAnswerMultiplier.value;
+            input.current.classList.remove("is-invalid");
         }
     });
 
@@ -176,15 +181,18 @@ export function QuickAnswerMultiplierInput() {
             </InputGroup.Text>
             <Form.Control
                 ref={input}
-                className="was-validated"
                 type="number"
                 min="0"
                 step="0.1"
                 defaultValue={$.preset.quickAnswerMultiplier.peek()}
-                required
                 onChange={(e) => {
                     const num = Number.parseFloat(e.target.value);
-                    if (!Number.isNaN(num) && num >= 0) $.preset.quickAnswerMultiplier.value = num;
+                    if (Number.isFinite(num) && num >= 0) {
+                        $.preset.quickAnswerMultiplier.value = num;
+                        input.current?.classList.remove("is-invalid");
+                    } else {
+                        input.current?.classList.add("is-invalid");
+                    }
                 }}
             />
         </InputGroup>
@@ -198,6 +206,7 @@ export function HidingZoneRadiusInput() {
     useSignalEffect(() => {
         if (input.current && input.current.valueAsNumber !== $.preset.hidingRadius.value) {
             input.current.valueAsNumber = $.preset.hidingRadius.value;
+            input.current.classList.remove("is-invalid");
         }
     });
 
@@ -214,7 +223,12 @@ export function HidingZoneRadiusInput() {
                 required
                 onChange={(e) => {
                     const num = Number.parseFloat(e.target.value);
-                    if (!Number.isNaN(num)) $.preset.hidingRadius.value = num;
+                    if (Number.isFinite(num) && num >= 0) {
+                        $.preset.hidingRadius.value = num;
+                        input.current?.classList.remove("is-invalid");
+                    } else {
+                        input.current?.classList.add("is-invalid");
+                    }
                 }}
             />
             <InputGroup.Text>km</InputGroup.Text>

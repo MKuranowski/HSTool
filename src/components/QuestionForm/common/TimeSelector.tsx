@@ -21,10 +21,28 @@ export default function TimeSelector({
     const input = useSignalRef<HTMLInputElement | null>(null);
     const signal = q[variant];
 
+    const isSequencedCorrectly = variant === "askedAt"
+        ? () => true
+        : () =>
+            q.askedAt.value === undefined || signal.value === undefined ||
+            signal.value.t.value >= q.askedAt.value.t.value;
+
     useSignalEffect(() => {
         const timestamp = signal.value;
         if (input.current && timestamp && timestamp.formValue.value !== input.current.value) {
             input.current.value = timestamp.formValue.value;
+        }
+
+        // Only remove invalid flag if the time is sequenced correctly.
+        // Note that this check must be outside of the above if statement, as that one
+        // is only entered when `signal` changes, while the sequencing check may rely on different
+        // signals.
+        if (input.current) {
+            if (isSequencedCorrectly()) {
+                input.current.classList.remove("is-invalid");
+            } else {
+                input.current.classList.add("is-invalid");
+            }
         }
     });
 
@@ -43,7 +61,21 @@ export default function TimeSelector({
                 type="datetime-local"
                 defaultValue={initialValue}
                 onChange={(e) => {
-                    signal.value = new Timestamp(e.target.value, true);
+                    let isValid = false;
+
+                    if (e.target.value) {
+                        signal.value = new Timestamp(e.target.value, true);
+                        isValid = isSequencedCorrectly();
+                    } else {
+                        signal.value = undefined;
+                        isValid = true;
+                    }
+
+                    if (isValid) {
+                        input.current?.classList.remove("is-invalid");
+                    } else {
+                        input.current?.classList.add("is-invalid");
+                    }
                 }}
             />
             <OverlayTrigger
