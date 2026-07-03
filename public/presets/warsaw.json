@@ -4851,7 +4851,7 @@
 		]
 	},
 	"points": {
-		"Airports": {
+		"airport": {
 			"type": "FeatureCollection",
 			"features": [
 				{
@@ -4884,7 +4884,7 @@
 				}
 			]
 		},
-		"Parks": {
+		"park": {
 			"type": "FeatureCollection",
 			"features": [
 				{
@@ -6541,7 +6541,7 @@
 				}
 			]
 		},
-		"Hospitals": {
+		"hospital": {
 			"type": "FeatureCollection",
 			"features": [
 				{
@@ -6994,7 +6994,7 @@
 				}
 			]
 		},
-		"Libraries": {
+		"library": {
 			"type": "FeatureCollection",
 			"features": [
 				{
@@ -9253,7 +9253,7 @@
 				}
 			]
 		},
-		"Consulate": {
+		"consulate": {
 			"type": "FeatureCollection",
 			"features": [
 				{
@@ -9454,7 +9454,7 @@
 				}
 			]
 		},
-		"Golf Courses": {
+		"golf course": {
 			"type": "FeatureCollection",
 			"features": [
 				{
@@ -9515,7 +9515,7 @@
 				}
 			]
 		},
-		"Museums": {
+		"museum": {
 			"type": "FeatureCollection",
 			"features": [
 				{
@@ -10248,7 +10248,7 @@
 				}
 			]
 		},
-		"Cinemas": {
+		"cinema": {
 			"type": "FeatureCollection",
 			"features": [
 				{
@@ -10577,7 +10577,7 @@
 		}
 	},
 	"lines": {
-		"Coastline": {
+		"coastline": {
 			"type": "FeatureCollection",
 			"features": [
 				{
@@ -11288,7 +11288,7 @@
 		}
 	},
 	"areas": {
-		"3rd Admin Divisions": {
+		"3rd admin div.": {
 			"type": "FeatureCollection",
 			"features": [
 				{
@@ -41567,7 +41567,7 @@
 				}
 			]
 		},
-		"4th Admin Divisions": {
+		"4th admin div.": {
 			"type": "FeatureCollection",
 			"features": [
 				{
@@ -108628,7 +108628,7 @@
 				}
 			]
 		},
-		"Landmasses": {
+		"landmass": {
 			"type": "FeatureCollection",
 			"features": [
 				{
