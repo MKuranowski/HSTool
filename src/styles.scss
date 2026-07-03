@@ -4,8 +4,24 @@ $bootstrap-icons-font-dir: "bootstrap-icons/font/fonts";
 @import "bootstrap-icons/font/bootstrap-icons";
 @import "leaflet/dist/leaflet.css";
 
+$tabs-min-width: 27.5rem;
+
+.app-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: map-get($spacers, 1) $grid-gutter-width;
+    padding: 0 calc(#{$grid-gutter-width} / 2);
+    margin: 1vh 0;
+    min-width: $tabs-min-width;
+}
+
 .map {
-    height: 85vh;
+    height: 80vh;
+}
+
+.tabs {
+    min-width: 0;
+    overflow-x: auto;
 }
 
 .strikethrough {
@@ -35,6 +51,10 @@ $bootstrap-icons-font-dir: "bootstrap-icons/font/fonts";
 }
 
 @include media-breakpoint-up(lg) {
+    .app-container {
+        grid-template-columns: minmax(0, 2fr) minmax($tabs-min-width, 1fr);
+    }
+
     .map {
         height: 98vh;
     }
