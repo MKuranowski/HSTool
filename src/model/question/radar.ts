@@ -43,9 +43,12 @@ export default class RadarQuestion extends WithDistance(WithSeekers(BaseQuestion
         );
     }
 
-    override divideArea(extent: BBox): FeatureCollection<Area, Answered> | null {
+    override divideArea(
+        extent: BBox,
+        circlePrecision: number = 512,
+    ): FeatureCollection<Area, Answered> | null {
         const hit = turf.bboxClip(
-            turf.circle(this.seekers.value, this.distance.value, { steps: 512 }),
+            turf.circle(this.seekers.value, this.distance.value, { steps: circlePrecision }),
             extent,
         );
         if (!isArea(hit)) return soleDivision(extent, { id: "miss" });

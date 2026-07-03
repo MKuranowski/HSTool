@@ -101,6 +101,7 @@ function LeftoverArea() {
     useSignals();
 
     const endGameArea = $endGameArea.value;
+    const circlePrecision = $.preferences.circlePrecision.value;
     const q = $.stagingQuestion.value;
 
     if (endGameArea === null) return null;
@@ -112,7 +113,7 @@ function LeftoverArea() {
 
     const extent = bufferBBox(turf.bbox(endGameArea), 0.1);
     const answerAreas: FeatureCollection<Area, Answered & { color?: string | undefined }> | null = q
-        .divideArea(extent);
+        .divideArea(extent, circlePrecision);
     if (answerAreas === null || answerAreas.features.length === 0) {
         return (
             <GeoJSONPolygonLayer geometry={endGameArea.geometry} pathOptions={getPathOptions()} />

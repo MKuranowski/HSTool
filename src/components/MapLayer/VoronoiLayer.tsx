@@ -6,8 +6,7 @@ import * as turf from "@turf/turf";
 import type { BBox, FeatureCollection, LineString, Point } from "geojson";
 import * as L from "leaflet";
 import { useEffect, useRef } from "react";
-import { GeoJSON } from "react-leaflet";
-import { LayerGroup } from "react-leaflet";
+import { GeoJSON, LayerGroup } from "react-leaflet";
 import { bufferBBox } from "../../helper/geo/area.ts";
 import * as palette from "../../helper/palette.ts";
 import type { Area } from "../../model/geo.ts";
@@ -60,6 +59,7 @@ export function VoronoiAreaLayer({ q }: { q: Question }) {
 
     // Compute the extent over which division needs to be calculated
     const disabledStations = $.disabledStations.value;
+    const circlePrecision = $.preferences.circlePrecision.value;
     const extent = stationsExtent(
         $.preset.stations.value,
         (id) => disabledStations.has(id),
@@ -69,6 +69,7 @@ export function VoronoiAreaLayer({ q }: { q: Question }) {
     // Compute the extent division
     const collection: FeatureCollection<Area, Answered & { color?: string }> | null = q.divideArea(
         extent,
+        circlePrecision,
     );
     if (collection === null) return null;
 

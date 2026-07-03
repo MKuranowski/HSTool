@@ -91,13 +91,16 @@ export default class TentaclesQuestion extends WithCandidates(
         return answers;
     }
 
-    override divideArea(extent: BBox): FeatureCollection<Area, Answered> | null {
+    override divideArea(
+        extent: BBox,
+        circlePrecision: number = 512,
+    ): FeatureCollection<Area, Answered> | null {
         // Figure out the candidates for tentacles - if there are none, the only possible answer is nil
         if (this.viableCandidates.value.features.length === 0) return soleDivision(extent, NIL);
 
         // Calculate the area where tentacles are effective
         const effectiveCircle = turf.bboxClip(
-            turf.circle(this.seekers.value, this.distance.value, { steps: 512 }),
+            turf.circle(this.seekers.value, this.distance.value, { steps: circlePrecision }),
             extent,
         );
         if (!isArea(effectiveCircle)) return soleDivision(extent, NIL);

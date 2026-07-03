@@ -57,9 +57,12 @@ export default class MeasureQuestion extends WithCandidates(
         );
     }
 
-    override divideArea(extent: BBox): FeatureCollection<Area, Answered> | null {
+    override divideArea(
+        extent: BBox,
+        circlePrecision: number = 512,
+    ): FeatureCollection<Area, Answered> | null {
         const buffers = turf.buffer(this.candidates.value, this.seekerDistance.value, {
-            steps: 512,
+            steps: circlePrecision,
         });
         if (buffers === undefined || buffers.features.length === 0) {
             return soleDivision(extent, { id: "further" });

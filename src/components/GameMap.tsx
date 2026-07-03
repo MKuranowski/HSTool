@@ -4,12 +4,14 @@
 // force the backwards-ass vite bundler to include **all** leaflet assets, not only the ones explicitly mentioned in leaflet.css
 import "leaflet/dist/images/marker-icon-2x.png";
 import "leaflet/dist/images/marker-shadow.png";
+
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import { useSignalRef } from "@preact/signals-react/utils";
 import type { FeatureCollection, Point } from "geojson";
 import * as L from "leaflet";
-import { MapContainer, Pane, TileLayer } from "react-leaflet";
+import { MapContainer, Pane } from "react-leaflet";
 import $ from "../state.ts";
+import BaseMapLayer from "./MapLayer/BaseMapLayer.tsx";
 import {
     BackgroundOverlay,
     EndGameLayer,
@@ -28,14 +30,22 @@ function getMapBounds(stations: FeatureCollection<Point>): L.LatLngBounds {
 function StationsLayer() {
     useSignals();
     const endGameStation = $.endGameStation.value;
-    return endGameStation ? <EndGameLayer s={endGameStation} /> : (
-        <>
-            <Pane name="voronoiPane" style={{ zIndex: 220 }}>
-                <VoronoiLayer />
-            </Pane>
-            <StationLayer />
-        </>
-    );
+    const showVoronoi = $.preferences.showMapDivisions.value;
+
+    if (endGameStation) {
+        return <EndGameLayer s={endGameStation} />;
+    } else if (!showVoronoi) {
+        return <StationLayer />;
+    } else {
+        return (
+            <>
+                <Pane name="voronoiPane" style={{ zIndex: 220 }}>
+                    <VoronoiLayer />
+                </Pane>
+                <StationLayer />
+            </>
+        );
+    }
 }
 
 export default function GameMap() {
@@ -56,10 +66,7 @@ export default function GameMap() {
 
     return (
         <MapContainer center={center} zoom={13} className="map" ref={map}>
-            <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
+            <BaseMapLayer />
             <Pane name="backgroundPane" style={{ zIndex: 210 }}>
                 <BackgroundOverlay />
             </Pane>

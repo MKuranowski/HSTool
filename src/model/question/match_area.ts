@@ -3,7 +3,7 @@
 
 import { computed, type ReadonlySignal, Signal } from "@preact/signals-react";
 import * as turf from "@turf/turf";
-import type { BBox, Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
+import type { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import { categorizeBinary, withAnswers } from "../../helper/answer.ts";
 import { distanceToFeature } from "../../helper/geo/dist.ts";
 import type { Area } from "../geo.ts";
@@ -61,7 +61,7 @@ export default class MatchAreaQuestion extends WithCandidates(
         return categorizeBinary(dist, radius, { id: "hit" }, { id: "miss" });
     }
 
-    override divideArea(_extent: BBox): FeatureCollection<Area, Answered> | null {
+    override divideArea(): FeatureCollection<Area, Answered> | null {
         return withAnswers(
             this.candidates.value,
             (area) =>

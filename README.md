@@ -25,7 +25,7 @@ HSTool is an under-construction tool for seekers playing
 - [x] Clean-up, organize and test the mess in helper/geo
 - [x] Show answer names (not ids) in station popups when staging a question
 - [x] Show thermometer end coordinates
-- [ ] Make every map layer toggleable (through Leaflet's LayersControl)
+- [x] Make every map layer toggleable ~~(through Leaflet's LayersControl)~~
 - [ ] Hider Mode
 
 ## How to create a preset?

@@ -147,9 +147,10 @@ export default abstract class BaseQuestion {
      * this method should return one area covering the entire extent.
      *
      * @param extent bounding box to divide
+     * @param circlePrecision number of vertices to use when approximating e.g. circles
      * @returns collection of subsets of extent corresponding to a single answer
      */
-    divideArea(_extent: BBox): FeatureCollection<Area, Answered> | null {
+    divideArea(_extent: BBox, _circlePrecision = 512): FeatureCollection<Area, Answered> | null {
         return null;
     }
 }
