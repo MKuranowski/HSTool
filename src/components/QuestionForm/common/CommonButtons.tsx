@@ -5,7 +5,10 @@ import { batch } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
 import type { JSX } from "react";
 import { Button, ButtonGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { questionToMessage } from "../../../helper/questionShare.ts";
+import { toString } from "../../../helper/strings.ts";
 import { type Question } from "../../../model/question/index.ts";
+import Timestamp from "../../../model/timestamp.ts";
 import $ from "../../../state.ts";
 import TimeSelector from "./TimeSelector.tsx";
 
@@ -57,6 +60,43 @@ export function EditCommitButton({ q, index }: { q: Question; index: number | nu
     }
 }
 
+export function ShareButton({ q }: { q: Question }) {
+    return (
+        <OverlayTrigger
+            overlay={
+                <Tooltip id={`q-${q.id}-share`}>Copy sharable question text to clipboard</Tooltip>
+            }
+        >
+            <Button
+                variant="secondary"
+                onClick={() => {
+                    // Update askedAt
+                    const askedAt = q.askedAt.value;
+                    if (askedAt === undefined) {
+                        q.askedAt.value = new Timestamp();
+                    } else {
+                        askedAt.update();
+                    }
+
+                    // Copy to clipboard
+                    navigator.clipboard
+                        .writeText(questionToMessage(q))
+                        .catch((error: unknown) => {
+                            console.error("Failed to paste question text:", error);
+                            $.toast.value = {
+                                header: "Failed to paste question text",
+                                body: toString(error),
+                                variant: "danger",
+                            };
+                        });
+                }}
+            >
+                <i className="bi bi-share" />
+            </Button>
+        </OverlayTrigger>
+    );
+}
+
 export default function CommonButtons({
     q,
     index,
@@ -106,6 +146,7 @@ export default function CommonButtons({
                             <i className="bi bi-trash" />
                         </Button>
                     </OverlayTrigger>
+                    <ShareButton q={q} />
                 </ButtonGroup>
             </div>
         </>

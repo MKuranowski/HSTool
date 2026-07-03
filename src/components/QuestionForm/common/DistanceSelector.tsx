@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { useSignalEffect } from "@preact/signals-react";
-import { useRef } from "react";
+import { useSignalRef } from "@preact/signals-react/utils";
 import { Form, InputGroup } from "react-bootstrap";
 import { type QuestionWithDistance } from "../../../model/question/index.ts";
 
@@ -14,7 +14,7 @@ export default function DistanceSelector({
     className?: string;
 }) {
     // useSignals(); // not needed, changes are handled by useSignalEffect
-    const input = useRef<HTMLInputElement | null>(null);
+    const input = useSignalRef<HTMLInputElement | null>(null);
 
     useSignalEffect(() => {
         if (input.current && q.distance.value !== input.current.valueAsNumber) {

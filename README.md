@@ -13,13 +13,13 @@ HSTool is an under-construction tool for seekers playing
     - [x] Save question timestamps
     - [x] Compute game time - including card bonuses and quick answer bonuses
     - [ ] Rest Periods
-    - [ ] Update Question.askedAt when a question is copied to clipboard
+    - [x] Update Question.askedAt when a question is copied to clipboard
 - [ ] Alternative units
 - [x] Voronoi-based end game
 - [ ] Better state shareability:
-    - [ ] Questions and options as well; not just the Preset
+    - [x] Questions and options as well; not just the Preset
     - [ ] Load from URL
-    - [ ] Copy to clipboard
+    - [x] Copy to clipboard
     - [ ] Pastebin (?)
 - [x] Palette gives out the same color past the end of pre-defined colors
 - [x] Clean-up, organize and test the mess in helper/geo

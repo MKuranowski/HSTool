@@ -3,7 +3,7 @@
 
 import { useSignalEffect } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
-import { useRef } from "react";
+import { useSignalRef } from "@preact/signals-react/utils";
 import { Button, Form, InputGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { toString } from "../../helper/strings.ts";
 import { type ThermometerQuestion } from "../../model/question/index.ts";
@@ -15,7 +15,7 @@ import PositionSelector from "./common/PositionSelector.tsx";
 
 function AzimuthSelector({ q, className }: { q: ThermometerQuestion; className?: string }) {
     // useSignals(); // not needed, changes are handled by useSignalEffect
-    const input = useRef<HTMLInputElement | null>(null);
+    const input = useSignalRef<HTMLInputElement | null>(null);
 
     useSignalEffect(() => {
         if (input.current && q.azimuth.value !== input.current.valueAsNumber) {

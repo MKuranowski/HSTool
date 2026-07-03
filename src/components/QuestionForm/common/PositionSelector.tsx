@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { useSignalEffect } from "@preact/signals-react";
-import { useRef } from "react";
+import { useSignalRef } from "@preact/signals-react/utils";
 import { Button, Form, InputGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { toString } from "../../../helper/strings.ts";
 import { type QuestionWithSeekers } from "../../../model/question/index.ts";
@@ -78,8 +78,8 @@ export default function PositionSelector({
     isStart?: boolean | undefined;
 }) {
     // useSignals(); // not needed, changes are handled by useSignalEffect
-    const latInput = useRef<HTMLInputElement | null>(null);
-    const lonInput = useRef<HTMLInputElement | null>(null);
+    const latInput = useSignalRef<HTMLInputElement | null>(null);
+    const lonInput = useSignalRef<HTMLInputElement | null>(null);
 
     useSignalEffect(() => {
         if (latInput.current && q.seekers.value[1] != latInput.current.valueAsNumber) {

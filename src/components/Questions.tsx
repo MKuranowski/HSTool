@@ -11,6 +11,8 @@ import {
     OverlayTrigger,
     Tooltip,
 } from "react-bootstrap";
+import { questionFromMessage } from "../helper/questionShare.ts";
+import { toString } from "../helper/strings.ts";
 import type { Position } from "../model/geo.ts";
 import {
     createNewQuestion,
@@ -60,6 +62,33 @@ function NewQuestionButton({ kind }: { kind: QuestionKind }) {
     );
 }
 
+function PasteQuestionButton() {
+    return (
+        <OverlayTrigger overlay={<Tooltip id="new-q-paste">Paste from clipboard</Tooltip>}>
+            <Button
+                variant="outline-dark"
+                onClick={() => {
+                    navigator.clipboard
+                        .readText()
+                        .then((msg) => {
+                            $.stagingQuestion.value = questionFromMessage(msg);
+                        })
+                        .catch((error: unknown) => {
+                            console.error("Failed to read question from clipboard:", error);
+                            $.toast.value = {
+                                header: "Failed to read question from clipboard",
+                                body: toString(error),
+                                variant: "danger",
+                            };
+                        });
+                }}
+            >
+                <i className="bi bi-clipboard" />
+            </Button>
+        </OverlayTrigger>
+    );
+}
+
 function QuestionStagingArea({ q }: { q: Question }) {
     useSignals();
     return (
@@ -87,6 +116,7 @@ function QuestionPicker() {
                 <NewQuestionButton kind="thermometer" />
                 <NewQuestionButton kind="tentacles" />
                 <NewQuestionButton kind="custom" />
+                <PasteQuestionButton />
             </ButtonGroup>
         </div>
     );

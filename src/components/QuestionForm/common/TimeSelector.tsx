@@ -3,7 +3,7 @@
 
 import { useSignalEffect } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
-import { useRef } from "react";
+import { useSignalRef } from "@preact/signals-react/utils";
 import { Button, Form, InputGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 import type { Question } from "../../../model/question/index.ts";
 import Timestamp from "../../../model/timestamp.ts";
@@ -18,7 +18,7 @@ export default function TimeSelector({
     className?: string | undefined;
 }) {
     useSignals(); // needed for properly displaying the lock icon
-    const input = useRef<HTMLInputElement | null>(null);
+    const input = useSignalRef<HTMLInputElement | null>(null);
     const signal = q[variant];
 
     useSignalEffect(() => {
@@ -39,6 +39,7 @@ export default function TimeSelector({
         <InputGroup className={className}>
             <InputGroup.Text>{variant === "askedAt" ? "Asked at" : "Answered at"}</InputGroup.Text>
             <Form.Control
+                ref={input}
                 type="datetime-local"
                 defaultValue={initialValue}
                 onChange={(e) => {

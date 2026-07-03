@@ -131,4 +131,15 @@ export default class Preset {
             overlay: this.overlay.value,
         };
     }
+
+    findCandidateSet(
+        name: string,
+    ): FeatureCollection<Point | LineString | Area, Identified> | null {
+        const keys = ["points", "lines", "areas"] as const;
+        for (const key of keys) {
+            const set = this[key].value;
+            if (name in set) return set[name];
+        }
+        return null;
+    }
 }

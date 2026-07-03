@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime";
-import { useRef, useState } from "react";
+import { useSignalRef } from "@preact/signals-react/utils";
+import { useState } from "react";
 import {
     Button,
     ButtonGroup,
@@ -98,7 +99,7 @@ export function PresetInput() {
 
 export function AnswerTimeInput({ photo = false }: { photo?: boolean | undefined }) {
     // useSignals(); // not needed, changes are handled by useSignalEffect
-    const input = useRef<HTMLInputElement | null>(null);
+    const input = useSignalRef<HTMLInputElement | null>(null);
     const signal = photo ? $.preset.photoAnswerTime : $.preset.answerTime;
 
     useSignalEffect(() => {
@@ -146,7 +147,7 @@ export function AnswerTimeInput({ photo = false }: { photo?: boolean | undefined
 
 export function QuickAnswerMultiplierInput() {
     // useSignals(); // not needed, changes are handled by useSignalEffect
-    const input = useRef<HTMLInputElement | null>(null);
+    const input = useSignalRef<HTMLInputElement | null>(null);
 
     useSignalEffect(() => {
         if (input.current && input.current.valueAsNumber !== $.preset.quickAnswerMultiplier.value) {
@@ -192,7 +193,7 @@ export function QuickAnswerMultiplierInput() {
 
 export function HidingZoneRadiusInput() {
     // useSignals(); // not needed, changes are handled by useSignalEffect
-    const input = useRef<HTMLInputElement | null>(null);
+    const input = useSignalRef<HTMLInputElement | null>(null);
 
     useSignalEffect(() => {
         if (input.current && input.current.valueAsNumber !== $.preset.hidingRadius.value) {
