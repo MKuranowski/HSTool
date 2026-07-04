@@ -30,22 +30,21 @@ function getMapBounds(stations: FeatureCollection<Point>): L.LatLngBounds {
 function StationsLayer() {
     useSignals();
     const endGameStation = $.endGameStation.value;
-    const showVoronoi = $.preferences.showMapDivisions.value;
+    const hiderMode = $.hiderStation.value !== null;
+    const showVoronoi = $.preferences.showMapDivisions.value || endGameStation; // force voronoi in end games
+    const showStations = endGameStation === null || hiderMode;
 
-    if (endGameStation) {
-        return <EndGameLayer s={endGameStation} />;
-    } else if (!showVoronoi) {
-        return <StationLayer />;
-    } else {
-        return (
-            <>
+    return (
+        <>
+            {endGameStation && <EndGameLayer s={endGameStation} />}
+            {showVoronoi && (
                 <Pane name="voronoiPane" style={{ zIndex: 220 }}>
                     <VoronoiLayer />
                 </Pane>
-                <StationLayer />
-            </>
-        );
-    }
+            )}
+            {showStations && <StationLayer />}
+        </>
+    );
 }
 
 export default function GameMap() {

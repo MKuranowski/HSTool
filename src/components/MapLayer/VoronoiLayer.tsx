@@ -58,15 +58,23 @@ export function VoronoiAreaLayer({ q }: { q: Question }) {
     useSignals();
 
     // Compute the extent over which division needs to be calculated
-    const disabledStations = $.disabledStations.value;
-    const circlePrecision = $.preferences.circlePrecision.value;
-    const extent = stationsExtent(
-        $.preset.stations.value,
-        (id) => disabledStations.has(id),
-        $.preset.hidingRadius.value,
-    );
+    // Usually this will be the extend of all enabled stations, with the exception of:
+    // end-games - either non hider-mode, or in hider mode with showMapDivisions disabled
+    let extent: BBox;
+    if ($.endGameStation.value && (!$.hiderMode.value || !$.preferences.showMapDivisions.value)) {
+        const station = $.endGameStation.value;
+        extent = bufferBBox(turf.bbox(station), $.preset.hidingRadius.value + 0.1);
+    } else {
+        const disabledStations = $.disabledStations.value;
+        extent = stationsExtent(
+            $.preset.stations.value,
+            (id) => disabledStations.has(id),
+            $.preset.hidingRadius.value,
+        );
+    }
 
     // Compute the extent division
+    const circlePrecision = $.preferences.circlePrecision.value;
     const collection: FeatureCollection<Area, Answered & { color?: string }> | null = q.divideArea(
         extent,
         circlePrecision,

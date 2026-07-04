@@ -4,15 +4,11 @@
 import { computed } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
 import * as turf from "@turf/turf";
-import type { Feature, FeatureCollection, MultiPolygon, Point, Polygon, Position } from "geojson";
-import type { PathOptions } from "leaflet";
-import { Circle, LayerGroup, Polygon as PolygonLayer, type PolygonProps } from "react-leaflet";
+import type { Feature, MultiPolygon, Point, Polygon, Position } from "geojson";
+import { Circle, Polygon as PolygonLayer, type PolygonProps } from "react-leaflet";
 import { bufferBBox } from "../../helper/geo/area.ts";
-import * as palette from "../../helper/palette.ts";
-import type { Area } from "../../model/geo.ts";
-import type { Answered, Named } from "../../model/props.ts";
+import type { Named } from "../../model/props.ts";
 import $ from "../../state.ts";
-import { VoronoiExtraLayer } from "./VoronoiLayer.tsx";
 
 const $endGameArea = computed((): Feature<MultiPolygon> | null => {
     const endGameStation = $.endGameStation.value;
@@ -55,16 +51,6 @@ const $endGameArea = computed((): Feature<MultiPolygon> | null => {
     return area as Feature<MultiPolygon>;
 });
 
-function getPathOptions(color: string = "#3388ff"): PathOptions {
-    return {
-        color,
-        weight: 2,
-        opacity: 0.4,
-        fillColor: color,
-        fillOpacity: 0.2,
-    };
-}
-
 function StationCircleLayer({ coords }: { coords: Position }) {
     useSignals();
     const hidingRadius = $.preset.hidingRadius.value;
@@ -101,55 +87,22 @@ function LeftoverArea() {
     useSignals();
 
     const endGameArea = $endGameArea.value;
-    const circlePrecision = $.preferences.circlePrecision.value;
-    const q = $.stagingQuestion.value;
-
     if (endGameArea === null) return null;
-    if (q === null) {
-        return (
-            <GeoJSONPolygonLayer geometry={endGameArea.geometry} pathOptions={getPathOptions()} />
-        );
+
+    const pathOptions = {
+        color: "#3388ff",
+        weight: 2,
+        opacity: 0.8,
+        fillColor: "#3388ff",
+        fillOpacity: 0.2,
+    };
+
+    // Tweak visibility when staging a question
+    if ($.stagingQuestion.value !== null && $.stagingQuestion.value.kind !== "custom") {
+        pathOptions.fillOpacity = 0.075;
     }
 
-    const extent = bufferBBox(turf.bbox(endGameArea), 0.1);
-    const answerAreas: FeatureCollection<Area, Answered & { color?: string | undefined }> | null = q
-        .divideArea(extent, circlePrecision);
-    if (answerAreas === null || answerAreas.features.length === 0) {
-        return (
-            <GeoJSONPolygonLayer geometry={endGameArea.geometry} pathOptions={getPathOptions()} />
-        );
-    }
-
-    // Figure out how to color answer-areas
-    const answerToColor = new Map(q.answers.value.map((a, idx) => [a, palette.getNthColor(idx)]));
-
-    // Add appropriate color to each answer-area
-    answerAreas.features.forEach((feature) => {
-        feature.properties.color = answerToColor.get(feature.properties.answer.id);
-    });
-
-    return (
-        <>
-            <GeoJSONPolygonLayer
-                geometry={endGameArea.geometry}
-                pathOptions={{
-                    color: "#3388ff",
-                    fillOpacity: 0.1,
-                    weight: 1,
-                }}
-            />
-            <LayerGroup>
-                {answerAreas.features.map((feature) => (
-                    <GeoJSONPolygonLayer
-                        key={feature.properties.id}
-                        geometry={feature.geometry}
-                        pathOptions={getPathOptions(feature.properties.color)}
-                    />
-                ))}
-            </LayerGroup>
-            <VoronoiExtraLayer key="__voronoi_extra" q={q} />
-        </>
-    );
+    return <GeoJSONPolygonLayer geometry={endGameArea.geometry} pathOptions={pathOptions} />;
 }
 
 export function EndGameLayer({ s }: { s: Feature<Point, Named> }) {

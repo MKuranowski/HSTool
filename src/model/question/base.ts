@@ -58,7 +58,10 @@ export default abstract class BaseQuestion {
      * Validate and update the {@link answer} to this question, and {@link answeredAt} as appropriate.
      */
     setAnswer(answer: string | undefined): void {
-        if (answer !== undefined && !this.answers.value.includes(answer)) {
+        if (
+            answer !== undefined && this.answers.value.length > 0 &&
+            !this.answers.value.includes(answer)
+        ) {
             throw new Error(
                 `invalid answer: got ${answer}, expected one of: ${this.answers.value.join(", ")}`,
             );
@@ -152,5 +155,26 @@ export default abstract class BaseQuestion {
      */
     divideArea(_extent: BBox, _circlePrecision = 512): FeatureCollection<Area, Answered> | null {
         return null;
+    }
+
+    /**
+     * Is this question answered correctly for someone hiding at the providing hiding zone?
+     *
+     * Logically `question.categorize(center, radius).some(a => a.id === q.answer.value)`,
+     * but handles questions without specific answers (custom questions) and other edge cases.
+     *
+     * @param center center of the hiding zone
+     * @param radius radius of the hiding zone, in kilometers
+     * @returns true if question is answered correctly, fals otherwise
+     */
+    isAnsweredCorrectly(station: Coord, radius: number): boolean {
+        // Question doesn't have a specific set of answers - ignore
+        if (this.answers.value.length === 0) return true;
+
+        // No answer - is not answered correctly
+        if (this.answer.value === undefined) return false;
+
+        // Check if current answer is in the station's categorization
+        return this.categorize(station, radius).some((a) => a.id === this.answer.value);
     }
 }

@@ -50,6 +50,10 @@ $tabs-min-width: 27.5rem;
     filter: hue-rotate(147deg);
 }
 
+.error-flag {
+    color: $danger;
+}
+
 @include media-breakpoint-up(lg) {
     .app-container {
         grid-template-columns: minmax(0, 2fr) minmax($tabs-min-width, 1fr);

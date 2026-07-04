@@ -1,6 +1,6 @@
 # HSTool
 
-HSTool is an under-construction tool for seekers playing
+HSTool is an under-construction tool for playing
 [Jet Lag: The Game — Hide and Seek Transit Game](https://store.nebula.tv/collections/jetlag/products/hideandseek).
 
 ## TODO
@@ -26,7 +26,7 @@ HSTool is an under-construction tool for seekers playing
 - [x] Show answer names (not ids) in station popups when staging a question
 - [x] Show thermometer end coordinates
 - [x] Make every map layer toggleable ~~(through Leaflet's LayersControl)~~
-- [ ] Hider Mode
+- [x] Hider Mode
 
 ## How to create a preset?
 

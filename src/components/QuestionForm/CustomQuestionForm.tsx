@@ -32,7 +32,7 @@ export default function CustomQuestionForm({
                     type="text"
                     value={q.answer.value}
                     onChange={(e) => {
-                        q.answer.value = e.target.value;
+                        q.setAnswer(e.target.value);
                     }}
                 />
             </InputGroup>

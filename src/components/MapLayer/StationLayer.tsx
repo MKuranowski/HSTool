@@ -112,6 +112,8 @@ function StationPopup({
     station: Feature<Point, AnnotatedStationProperties>;
     answerToColor: Map<string, string>;
 }) {
+    useSignals();
+
     // deno-lint-ignore jsx-key
     const children = [<b>{station.properties.name}</b>, <br />];
 
@@ -128,20 +130,32 @@ function StationPopup({
                     );
                 })}
             </ul>,
-            <br />,
         );
     }
 
-    children.push(
-        <a
-            href="#"
-            onClick={() => {
-                $.endGameStation.value = station;
-            }}
-        >
-            Start End Game
-        </a>,
-    );
+    if ($.endGameStation.value === null) {
+        children.push(
+            <a
+                href="#"
+                onClick={() => {
+                    $.endGameStation.value = station;
+                    $.hiderMode.value = true;
+                }}
+            >
+                <i className="bi bi-house-door" /> Start Hider Mode
+            </a>,
+            <br />,
+            <a
+                href="#"
+                onClick={() => {
+                    $.endGameStation.value = station;
+                    $.hiderMode.value = false;
+                }}
+            >
+                <i className="bi bi-flag" /> Start End Game
+            </a>,
+        );
+    }
 
     return <Popup>{children}</Popup>;
 }
@@ -212,11 +226,17 @@ export function StationLayer() {
     const disabledStations = $.disabledStations.value;
     const hidingZoneRadius = $.preset.hidingRadius.value;
     const showHidingZones = $.preferences.showHidingZones.value;
+    const hiderStation = $.hiderStation.value;
+
+    // Don't show any station pins in hider mode without "show map divisions"
+    if (hiderStation && !$.preferences.showMapDivisions.value) return null;
 
     const visibleStations = {
         type: "FeatureCollection" as const,
         features: $.preset.stations.value.features.filter(
-            (s) => !disabledStations.has(s.properties.id),
+            (s) =>
+                !disabledStations.has(s.properties.id) &&
+                s.properties.id !== hiderStation?.properties.id,
         ),
     };
 
@@ -231,7 +251,8 @@ export function StationLayer() {
             : [],
     );
 
-    if (showHidingZones && hidingZoneRadius > 0) {
+    // Never show station circles in hider mode
+    if (hiderStation === null && showHidingZones && hidingZoneRadius > 0) {
         return (
             <StationZoneLayer
                 stations={annotatedStations}

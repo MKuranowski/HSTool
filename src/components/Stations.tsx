@@ -1,13 +1,14 @@
 // SPDX-FileCopyrightText: 2026 Mikołaj Kuranowski
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import { batch } from "@preact/signals-core";
 import { useSignals } from "@preact/signals-react/runtime";
 import type { Feature, Point } from "geojson";
 import { Button, ButtonGroup, ListGroup, OverlayTrigger, Stack, Tooltip } from "react-bootstrap";
 import type { Named } from "../model/props.ts";
 import $ from "../state.ts";
 
-function Station({
+function StationListElement({
     station,
     isDiscarded = false,
 }: {
@@ -29,28 +30,48 @@ function Station({
                 >
                     {station.properties.name}
                 </span>
-                <OverlayTrigger
-                    overlay={
-                        <Tooltip id={`${station.properties.id}-end-game`}>Start End Game</Tooltip>
-                    }
-                >
-                    <Button
-                        size="sm"
-                        variant="outline-secondary"
-                        className="ms-auto"
-                        onClick={() => {
-                            $.endGameStation.value = station;
-                        }}
+                <ButtonGroup className="ms-auto">
+                    <OverlayTrigger
+                        overlay={
+                            <Tooltip id={`${station.properties.id}-hide`}>Start Hider Mode</Tooltip>
+                        }
                     >
-                        <i className="bi bi-flag" />
-                    </Button>
-                </OverlayTrigger>
+                        <Button
+                            size="sm"
+                            variant="primary"
+                            onClick={() => {
+                                $.endGameStation.value = station;
+                                $.hiderMode.value = true;
+                            }}
+                        >
+                            <i className="bi bi-house-door" />
+                        </Button>
+                    </OverlayTrigger>
+                    <OverlayTrigger
+                        overlay={
+                            <Tooltip id={`${station.properties.id}-end-game`}>
+                                Start End Game
+                            </Tooltip>
+                        }
+                    >
+                        <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => {
+                                $.endGameStation.value = station;
+                                $.hiderMode.value = false;
+                            }}
+                        >
+                            <i className="bi bi-flag" />
+                        </Button>
+                    </OverlayTrigger>
+                </ButtonGroup>
             </Stack>
         </ListGroup.Item>
     );
 }
 
-export function StationList() {
+function StationList() {
     useSignals();
 
     const stations = $.preset.stations.value.features.filter(
@@ -83,9 +104,10 @@ export function StationList() {
                     Disable All
                 </Button>
             </ButtonGroup>
+            <p>Click on a station name to disable it. Eliminated stations are not listed.</p>
             <ListGroup>
                 {stations.map((station) =>
-                    Station({
+                    StationListElement({
                         station,
                         isDiscarded: $.discardedStations.value.has(station.properties.id),
                     })
@@ -95,7 +117,7 @@ export function StationList() {
     );
 }
 
-export function EndGameStation({ s }: { s: Feature<Point, Named> }) {
+function EndGameStation({ s }: { s: Feature<Point, Named> }) {
     return (
         <>
             <p>
@@ -105,7 +127,15 @@ export function EndGameStation({ s }: { s: Feature<Point, Named> }) {
                 size="sm"
                 variant="danger"
                 onClick={() => {
-                    $.endGameStation.value = null;
+                    const confirmDialog = "Do you want to leave the end game? " +
+                        "This will reset all questions to non-end-game.";
+
+                    if (window.confirm(confirmDialog)) {
+                        batch(() => {
+                            $.endGameStation.value = null;
+                            for (const q of $.questions.value) q.inEndGame.value = false;
+                        });
+                    }
                 }}
             >
                 Abandon End Game
@@ -114,8 +144,38 @@ export function EndGameStation({ s }: { s: Feature<Point, Named> }) {
     );
 }
 
+function HiderStation({ s }: { s: Feature<Point, Named> }) {
+    return (
+        <>
+            <p>
+                Hiding at <strong>{s.properties.name}</strong>.
+            </p>
+            <Button
+                size="sm"
+                variant="danger"
+                onClick={() => {
+                    batch(() => {
+                        $.endGameStation.value = null;
+                        $.hiderMode.value = false;
+                    });
+                }}
+            >
+                Disable hider mode
+            </Button>
+        </>
+    );
+}
+
 export default function Stations() {
     useSignals();
+    const hiderStation = $.hiderStation.value;
     const endGameStation = $.endGameStation.value;
-    return endGameStation ? <EndGameStation s={endGameStation} /> : <StationList />;
+
+    if (hiderStation) {
+        return <HiderStation s={hiderStation} />;
+    } else if (endGameStation) {
+        return <EndGameStation s={endGameStation} />;
+    } else {
+        return <StationList />;
+    }
 }

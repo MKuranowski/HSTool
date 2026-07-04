@@ -49,7 +49,7 @@ function NewQuestionButton({ kind }: { kind: QuestionKind }) {
                 variant={QuestionColor(kind)}
                 onClick={() => {
                     const q = createNewQuestion(kind);
-                    q.inEndGame.value = $.endGameStation.peek() !== null;
+                    q.inEndGame.value = $.endGameStation.peek() !== null && !$.hiderMode.peek();
                     if (questionHasSeekers(q)) {
                         q.seekers.value = computeInitialPinLocation();
                     }
@@ -71,7 +71,45 @@ function PasteQuestionButton() {
                     navigator.clipboard
                         .readText()
                         .then((msg) => {
-                            $.stagingQuestion.value = questionFromMessage(msg);
+                            const q = questionFromMessage(msg);
+                            $.stagingQuestion.value = q;
+
+                            // Hider mode: print available answers, and update it if there's only one
+                            const hiderStation = $.hiderStation.peek();
+                            if (hiderStation) {
+                                const hidingRadius = $.preset.hidingRadius.peek();
+                                const answers = q.categorize(hiderStation, hidingRadius);
+
+                                if (answers.length === 1) {
+                                    const answer = answers[0];
+                                    const name = answer.name ?? answer.id;
+                                    q.setAnswer(answer.id);
+                                    $.toast.value = {
+                                        header: "Automatic answer",
+                                        body:
+                                            `The only possible answer at your station is:\n${name}`,
+                                        variant: "primary",
+                                    };
+                                } else if (answers.length > 1) {
+                                    const names = answers.map((a) => `\n- ${a.name ?? a.id}`)
+                                        .join("");
+
+                                    $.toast.value = {
+                                        header: "Automatic answer",
+                                        body:
+                                            `There are multiple possible answers at your station:${names}`,
+                                        variant: "primary",
+                                    };
+                                } else if (answers.length === 0 && q.answers.value.length > 0) {
+                                    // Question should have answers, but categorize returned non
+                                    $.toast.value = {
+                                        header: "Automatic answer",
+                                        body:
+                                            "Couldn't determine available answers at your station.",
+                                        variant: "warning",
+                                    };
+                                }
+                            }
                         })
                         .catch((error: unknown) => {
                             console.error("Failed to read question from clipboard:", error);
@@ -89,11 +127,27 @@ function PasteQuestionButton() {
     );
 }
 
+function IncorrectAnswerFlag({ id }: { id: string }) {
+    return (
+        <OverlayTrigger
+            overlay={<Tooltip id={`q-${id}-wrong`}>Incorrect answer for your station</Tooltip>}
+        >
+            <i className="bi bi-exclamation-circle-fill me-2 error-flag" />
+        </OverlayTrigger>
+    );
+}
+
 function QuestionStagingArea({ q }: { q: Question }) {
     useSignals();
+
+    const hiderStation = $.hiderStation.value;
+    const flag = hiderStation && !q.isAnsweredCorrectly(hiderStation, $.preset.hidingRadius.value)
+        ? <IncorrectAnswerFlag id={q.id} />
+        : null;
+
     return (
         <ListGroup>
-            <ListGroup.Item variant={QuestionColor(q.kind)}>{q.name}</ListGroup.Item>
+            <ListGroup.Item variant={QuestionColor(q.kind)}>{flag}{q.name}</ListGroup.Item>
             <ListGroup.Item>
                 <QuestionForm q={q} index={null} />
             </ListGroup.Item>
@@ -130,6 +184,9 @@ export default function Questions() {
         ? <QuestionPicker />
         : <QuestionStagingArea q={stagingQuestion} />;
 
+    const hiderStation = $.hiderStation.value;
+    const hidingRadius = hiderStation ? $.preset.hidingRadius.value : NaN;
+
     return (
         <>
             {stagingArea}
@@ -137,9 +194,14 @@ export default function Questions() {
             <Accordion>
                 {$.questions.value.map((q, idx) => {
                     const key = `question-${q.id}`;
+                    const flag = hiderStation && !q.isAnsweredCorrectly(hiderStation, hidingRadius)
+                        ? <IncorrectAnswerFlag id={q.id} />
+                        : null;
+
                     return (
                         <Accordion.Item key={key} eventKey={key}>
                             <Accordion.Header className="overflow-x-scroll">
+                                {flag}
                                 {q.name}
                             </Accordion.Header>
                             <Accordion.Body>

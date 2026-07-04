@@ -12,6 +12,7 @@ import Preset from "./model/preset.ts";
 import type { Named } from "./model/props.ts";
 import { type Question } from "./model/question/index.ts";
 import Timing, { timingSchema } from "./model/timing.ts";
+import { featureSchema, pointSchema, propsWithName } from "./wire/geojson.ts";
 import { presetSchema } from "./wire/preset.ts";
 import { questionSchema } from "./wire/questions.ts";
 
@@ -80,6 +81,28 @@ export class State {
     /** Station used for the (presumed) end-game. */
     readonly endGameStation = new Signal<Feature<Point, Named> | null>(null);
 
+    /**
+     * Switch the tool to aid in hiding, not seeking.
+     *
+     * Instead of interrogating this value, components should check {@link hiderStation}
+     * end enable hiding mode based on that.
+     *
+     * This is similar to end-game mode, except that:
+     * - all other station pins are still shown,
+     * - possible answers are restricted to that of {@link endGameStation},
+     * - there's an extra "answer-based-on-GPS" button.
+     */
+    readonly hiderMode = new Signal<boolean>(false);
+
+    /** {@link endGameStation} when in {@link hiderMode}, null otherwise.
+     *
+     * This should be used as the condition for enabling hider mode,
+     * to avoid a pathological case of `hiderMode && !endGameStation`.
+     */
+    readonly hiderStation: ReadonlySignal<Feature<Point, Named> | null> = computed(() => {
+        return this.hiderMode.value ? this.endGameStation.value : null;
+    });
+
     /** Game time computation. */
     readonly timing: Timing = new Timing({ preset: this.preset, questions: this.questions });
 
@@ -96,6 +119,8 @@ export class State {
         persistSignal("stagingQuestion", this.stagingQuestion, questionSchema.nullable());
         persistSignal("questions", this.questions, questionSchema.array().readonly());
         persistSignal("discardedStations", this.discardedStations, stringSetSchema);
+        persistSignal("endGameStation", this.endGameStation, stationSchema.nullable());
+        persistSignal("hiderMode", this.hiderMode, z.boolean());
         persistObject("timing", this.timing, timingSchema);
         persistObject("preferences", this.preferences, preferencesSchema);
     }
@@ -110,6 +135,7 @@ export class State {
             this.questions.value = [];
             this.discardedStations.clear();
             this.endGameStation.value = null;
+            this.hiderMode.value = false;
             this.timing.clear();
         });
     }
@@ -194,6 +220,8 @@ const stringSetSchema = z.codec(z.array(z.string()), z.set(z.string()), {
     decode: (arr) => new Set(arr),
     encode: (set) => [...set],
 });
+
+const stationSchema = featureSchema(pointSchema, propsWithName);
 
 type JSONValue =
     | string

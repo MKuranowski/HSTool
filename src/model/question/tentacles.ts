@@ -19,7 +19,7 @@ import {
     type WithSeekersParams,
 } from "./mixin.ts";
 
-const NIL: Answer = { id: "__nil", name: "(nil answer)" };
+export const NIL: Required<Answer> = { id: "__nil", name: "(nil answer)" };
 
 export interface TentaclesQuestionParams
     extends
