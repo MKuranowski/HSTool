@@ -1,32 +1,6 @@
 # HSTool
 
-HSTool is an under-construction tool for playing
-[Jet Lag: The Game — Hide and Seek Transit Game](https://store.nebula.tv/collections/jetlag/products/hideandseek).
-
-## TODO
-
-- [x] Questions & station filtering
-- [x] Permanent background overlay
-- [x] Show hiding zones
-- [x] Voronoi diagrams of staging questions
-- [ ] Timing
-    - [x] Save question timestamps
-    - [x] Compute game time - including card bonuses and quick answer bonuses
-    - [ ] Rest Periods
-    - [x] Update Question.askedAt when a question is copied to clipboard
-- [ ] Alternative units
-- [x] Voronoi-based end game
-- [ ] Better state shareability:
-    - [x] Questions and options as well; not just the Preset
-    - [ ] Load from URL
-    - [x] Copy to clipboard
-    - [ ] Pastebin (?)
-- [x] Palette gives out the same color past the end of pre-defined colors
-- [x] Clean-up, organize and test the mess in helper/geo
-- [x] Show answer names (not ids) in station popups when staging a question
-- [x] Show thermometer end coordinates
-- [x] Make every map layer toggleable ~~(through Leaflet's LayersControl)~~
-- [x] Hider Mode
+HSTool is a tool for playing [Jet Lag: The Game — Hide and Seek Transit Game](https://store.nebula.tv/collections/jetlag/products/hideandseek).
 
 ## How to create a preset?
 
@@ -98,6 +72,10 @@ HSTool is a single-page application written using React, Bootstrap, Leaflet and 
 ## License
 
 HSTool is distributed under GNU GPL v3 (or any later version).
+
+A notable exception is data under <public/presets/>. Those presets were generated based on
+data by [© OpenStreetMap contributors](https://www.openstreetmap.org/copyright) and
+are therefore solely licensed under [ODbL](https://opendatacommons.org/licenses/odbl/).
 
 > © Copyright 2026 Mikołaj Kuranowski
 >
