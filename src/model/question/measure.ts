@@ -3,7 +3,15 @@
 
 import { computed, type ReadonlySignal, Signal } from "@preact/signals-react";
 import * as turf from "@turf/turf";
-import type { BBox, FeatureCollection, LineString, Point } from "geojson";
+import type {
+    BBox,
+    Feature,
+    FeatureCollection,
+    LineString,
+    MultiPolygon,
+    Point,
+    Polygon,
+} from "geojson";
 import { categorizeBinary } from "../../helper/answer.ts";
 import { isArea, isMultiPolygon, soleDivision } from "../../helper/geo/area.ts";
 import { distanceToFeature } from "../../helper/geo/dist.ts";
@@ -61,9 +69,14 @@ export default class MeasureQuestion extends WithCandidates(
         extent: BBox,
         circlePrecision: number = 512,
     ): FeatureCollection<Area, Answered> | null {
-        const buffers = turf.buffer(this.candidates.value, this.seekerDistance.value, {
-            steps: circlePrecision,
-        });
+        // turf.buffer is notoriously slow, so scale down the precision
+        const steps = Math.min(circlePrecision, Math.round(Math.sqrt(32 * circlePrecision)));
+
+        const buffers = turf.featureCollection(
+            this.candidates.value.features.map((f) =>
+                bufferFeature(f, this.seekerDistance.value, { steps })
+            ).filter((f) => f !== undefined),
+        );
         if (buffers === undefined || buffers.features.length === 0) {
             return soleDivision(extent, { id: "further" });
         }
@@ -90,4 +103,23 @@ export default class MeasureQuestion extends WithCandidates(
             { ...further, properties: { id: "further", answer: { id: "further" } } },
         ]);
     }
+}
+
+type BufferOptions = Parameters<typeof turf.buffer>[2];
+
+function bufferFeature(
+    f: Feature,
+    radius: number,
+    options?: BufferOptions,
+): Feature<Polygon | MultiPolygon> | undefined {
+    // Workaround https://github.com/Turfjs/turf/issues/2929 by converting closed LineStrings
+    // to Polygons before buffering.
+    f = isClosedLineString(f) ? turf.lineToPolygon(f) : f;
+    return turf.buffer(f, radius, options);
+}
+
+function isClosedLineString(f: Feature): f is Feature<LineString> {
+    return f.geometry.type === "LineString" && f.geometry.coordinates.length >= 4 &&
+        f.geometry.coordinates[0][0] === f.geometry.coordinates.at(-1)![0] &&
+        f.geometry.coordinates[0][1] === f.geometry.coordinates.at(-1)![1];
 }
