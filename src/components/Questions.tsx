@@ -200,7 +200,7 @@ export default function Questions() {
 
                     return (
                         <Accordion.Item key={key} eventKey={key}>
-                            <Accordion.Header className="overflow-x-scroll">
+                            <Accordion.Header>
                                 {flag}
                                 {q.name}
                             </Accordion.Header>
