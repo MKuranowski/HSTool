@@ -12,11 +12,6 @@ import DeriveAnswerButton from "./common/DeriveAnswerButton.tsx";
 import DistanceSelector from "./common/DistanceSelector.tsx";
 import PositionSelector from "./common/PositionSelector.tsx";
 
-interface MaybeAnswer {
-    id: string | undefined;
-    name?: string | undefined;
-}
-
 function getAvailableAnswers(q: TentaclesQuestion): (string | undefined)[] {
     const hiderStation = $.hiderStation.value;
 
@@ -34,7 +29,7 @@ function getAvailableAnswers(q: TentaclesQuestion): (string | undefined)[] {
 function TentaclesAnswerDropdown({ q }: { q: TentaclesQuestion }) {
     useSignals();
 
-    const idToName = useComputed(() => {
+    const idToNameMap = useComputed(() => {
         const m = new Map<string, string>();
         m.set(NIL.id, NIL.name);
         for (const s of $.preset.points.value[q.candidatesName.value]?.features ?? []) {
@@ -43,19 +38,23 @@ function TentaclesAnswerDropdown({ q }: { q: TentaclesQuestion }) {
         return m as ReadonlyMap<string, string>;
     });
 
+    const getName = (id: string | undefined) =>
+        id === undefined ? "(No answer)" : (idToNameMap.value.get(id) ?? id);
+
     const current = q.answer.value;
-    const currentName = idToName.value.get(current ?? "") ?? current ?? "(No answer)";
+    const availableAnswers = getAvailableAnswers(q).map((id) => ({ id, name: getName(id) }));
+    const collator = new Intl.Collator();
+    availableAnswers.sort((a, b) => collator.compare(a.name, b.name));
 
     return (
         <DropdownButton
             as={ButtonGroup}
             id={`q-${q.id}-answer`}
-            title={currentName}
+            title={getName(current)}
             variant="secondary"
         >
-            {getAvailableAnswers(q).map((id) => {
+            {availableAnswers.map(({ id, name }) => {
                 const key = id ?? "__no_answer";
-                const name = id === undefined ? "(No answer)" : (idToName.value.get(id) ?? id);
 
                 return (
                     <Dropdown.Item
