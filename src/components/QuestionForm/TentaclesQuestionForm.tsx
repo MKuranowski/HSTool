@@ -39,12 +39,18 @@ function TentaclesAnswerDropdown({ q }: { q: TentaclesQuestion }) {
     });
 
     const getName = (id: string | undefined) =>
-        id === undefined ? "(No answer)" : (idToNameMap.value.get(id) ?? id);
+        id === undefined ? "(no answer)" : (idToNameMap.value.get(id) ?? id);
 
     const current = q.answer.value;
     const availableAnswers = getAvailableAnswers(q).map((id) => ({ id, name: getName(id) }));
     const collator = new Intl.Collator();
-    availableAnswers.sort((a, b) => collator.compare(a.name, b.name));
+    availableAnswers.sort((a, b) => {
+        if (a.id === undefined) return -1;
+        else if (b.id === undefined) return 1;
+        else if (a.id === "__nil") return -1;
+        else if (b.id === "__nil") return 1;
+        else return collator.compare(a.name, b.name);
+    });
 
     return (
         <DropdownButton
