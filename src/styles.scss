@@ -55,6 +55,10 @@ $tabs-min-width: 27.5rem;
 }
 
 @include media-breakpoint-up(lg) {
+    body {
+        overflow-y: hidden;
+    }
+
     .app-container {
         grid-template-columns: minmax(0, 2fr) minmax($tabs-min-width, 1fr);
     }
@@ -67,6 +71,7 @@ $tabs-min-width: 27.5rem;
         display: flex;
         flex-direction: column;
         height: 98vh;
+        overflow-y: auto;
     }
 
     .nav-tabs {
@@ -76,5 +81,7 @@ $tabs-min-width: 27.5rem;
     .tab-content {
         flex: 1 1 auto;
         overflow: auto;
+        scrollbar-width: thin;
+        scrollbar-gutter: stable;
     }
 }
