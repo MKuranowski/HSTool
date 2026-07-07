@@ -92,6 +92,29 @@ function StationList() {
                 >
                     Enable All
                 </Button>
+                <OverlayTrigger
+                    placement="bottom"
+                    overlay={
+                        <Tooltip id="stations-disable-eliminated">
+                            Use this to preserve eliminated stations when changing the hiding zone
+                            radius due to a curse. Increasing the radius causes all questions and
+                            eliminations to be re-evaluated, which can bring back stations which
+                            were eliminated before a curse was played.
+                        </Tooltip>
+                    }
+                >
+                    <Button
+                        className="flex-grow-0"
+                        variant="warning"
+                        onClick={() => {
+                            const copy = new Set($.discardedStations.peek());
+                            $.eliminatedStations.peek().forEach((id) => copy.add(id));
+                            $.discardedStations.value = copy;
+                        }}
+                    >
+                        Disable Eliminated <i className="bi bi-question-circle ps-1" />
+                    </Button>
+                </OverlayTrigger>
                 <Button
                     className="flex-grow-0"
                     variant="danger"
