@@ -1,1 +1,6 @@
-{"": "warsaw.json", "Warsaw": "warsaw.json", "Brno": "brno.json"}
+{
+  "": "warsaw.json",
+  "Warsaw": "warsaw.json",
+  "Brno": "brno.json",
+  "Budapest": "budapest.json"
+}
