@@ -4,7 +4,11 @@ $bootstrap-icons-font-dir: "bootstrap-icons/font/fonts";
 @import "bootstrap-icons/font/bootstrap-icons";
 @import "leaflet/dist/leaflet.css";
 
-$tabs-min-width: 27.5rem;
+$tabs-min-width: 25.7rem;
+
+body {
+    touch-action: pan-x pan-y;
+}
 
 .app-container {
     display: grid;
