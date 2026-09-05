@@ -6,6 +6,8 @@ import * as L from "leaflet";
 import { TileLayer } from "react-leaflet";
 import $ from "../../state.ts";
 
+const CARTO_KEY = "cb1_2xr2_1_3a2facbc8ad1f7b11a7c4c8b";
+
 export default function BaseMapLayer() {
     useSignals();
 
@@ -24,7 +26,7 @@ export default function BaseMapLayer() {
         case "carto-voyager":
             return (
                 <TileLayer
-                    url={`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}${scale}.png`}
+                    url={`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}${scale}.png?key=${CARTO_KEY}`}
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | &copy; <a href="https://carto.com/attributions">CARTO</a>'
                     maxZoom={20}
                     noWrap
@@ -34,7 +36,7 @@ export default function BaseMapLayer() {
         case "carto-light":
             return (
                 <TileLayer
-                    url={`https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}${scale}.png`}
+                    url={`https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}${scale}.png?key=${CARTO_KEY}`}
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | &copy; <a href="https://carto.com/attributions">CARTO</a>'
                     maxZoom={20}
                     noWrap
@@ -44,7 +46,7 @@ export default function BaseMapLayer() {
         case "carto-dark":
             return (
                 <TileLayer
-                    url={`https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}${scale}.png`}
+                    url={`https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}${scale}.png?key=${CARTO_KEY}`}
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | &copy; <a href="https://carto.com/attributions">CARTO</a>'
                     maxZoom={20}
                     noWrap
