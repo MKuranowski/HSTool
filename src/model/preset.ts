@@ -12,6 +12,7 @@ import type {
     Point,
     Polygon,
 } from "geojson";
+import * as uuid from "uuid";
 import type { Area } from "./geo.ts";
 import type { Identified, Named } from "./props.ts";
 
@@ -51,6 +52,15 @@ function fillParams(p: PresetParams, fallback: FullPresetParams = emptyPreset): 
 }
 
 export default class Preset {
+    /**
+     * UUIDv7 which changes every time the preset is fully replaced.
+     *
+     * As of now, manual updates to signals don't trigger a version change.
+     * This was invented as a workaround for BackgroundOverlay not updating when data changes
+     * (https://github.com/PaulLeCam/react-leaflet/issues/332).
+     */
+    readonly version: Signal<string>;
+
     /** User-facing name identifying the preset */
     readonly name: Signal<string>;
 
@@ -89,6 +99,7 @@ export default class Preset {
 
     constructor(p: PresetParams = {}) {
         const f = fillParams(p);
+        this.version = new Signal(uuid.v7());
         this.name = new Signal(f.name);
         this.hidingRadius = new Signal(f.hidingRadius);
         this.answerTime = new Signal(f.answerTime);
@@ -104,6 +115,7 @@ export default class Preset {
     update(p: PresetParams): void {
         const f = fillParams(p);
         batch(() => {
+            this.version.value = uuid.v7();
             this.name.value = f.name;
             this.hidingRadius.value = f.hidingRadius;
             this.answerTime.value = f.answerTime;

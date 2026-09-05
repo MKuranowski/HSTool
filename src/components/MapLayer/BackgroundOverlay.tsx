@@ -47,6 +47,7 @@ export function BackgroundOverlay() {
 
     return (
         <GeoJSON
+            key={$.preset.version.value}
             data={overlay}
             interactive={false}
             style={(f) => {
