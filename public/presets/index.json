@@ -5,5 +5,6 @@
   "Brno": "brno.json",
   "Budapest": "budapest.json",
   "GZM": "gzm.json",
-  "Tokyo": "tokyo.json"
+  "Tokyo": "tokyo.json",
+  "Tokyo-Mini": "tokyo-mini.json"
 }
